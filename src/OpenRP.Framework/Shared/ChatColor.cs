@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Shared
 {
-    public class ChatColor
+    /// <summary>
+    /// Contains predefined chat color codes used in Open Roleplay.
+    /// </summary>
+    public static class ChatColor
     {
         public const string White = "{FFFFFF}";
         public const string Yellow = "{FFFF00}";
@@ -17,7 +20,7 @@ namespace OpenRP.Framework.Shared
         public const string ChromeYellow = "{FFA500}";
 
         // Open Roleplay Colors
-        public const string Main = "{6495ED}";
+        public const string Main = CornflowerBlue; // Reusing the value from CornflowerBlue
         public const string Highlight = "{B2CAF6}";
     }
 }

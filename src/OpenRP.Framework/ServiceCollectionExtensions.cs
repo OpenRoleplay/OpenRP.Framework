@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,8 @@ namespace OpenRP.Framework
     {
         public static IServiceCollection AddOpenRoleplayFramework(this IServiceCollection self)
         {
-            return self; // TODO: Add Services
+            return self
+                .AddSystemsInAssembly();
         }
     }
 }
