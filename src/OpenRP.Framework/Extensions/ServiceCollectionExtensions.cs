@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Animations.Extensions;
+using OpenRP.Framework.Features.Characters.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
 using SampSharp.Entities;
 using System;
@@ -17,6 +18,7 @@ namespace OpenRP.Framework.Extensions
             return self
                 .AddAnimations()
                 .AddVirtualWorldManager()
+                .AddCharacters()
                 .AddSystemsInAssembly();
         }
     }

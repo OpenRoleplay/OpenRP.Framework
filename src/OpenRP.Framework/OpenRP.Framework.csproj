@@ -7,8 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
     <PackageReference Include="SampSharp.Core" Version="0.10.1" />
     <PackageReference Include="SampSharp.Entities" Version="0.10.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Players\" />
   </ItemGroup>
 
 </Project>
