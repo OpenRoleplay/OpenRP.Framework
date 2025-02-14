@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenRP.Framework
+namespace OpenRP.Framework.Extensions
 {
     public static partial class ServiceCollectionExtensions
     {
