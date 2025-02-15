@@ -18,7 +18,7 @@
   - [File Structure](#-file-structure)
 - [Credits](#credits)
   - [Direct Involvement](#-direct-involvement)
-  - [Indirect Involvement](#-indirect-but-essential-involvement)
+  - [Indirect (But Essential) Involvement](#-indirect-but-essential-involvement)
 
 ## General Information
 ### 🔹 What is OpenRP.Framework?  
@@ -116,6 +116,47 @@ Click on any thumbnail to watch the video, or [click here](https://www.youtube.c
 | `Shared/ServerColor.cs`                           | Defines constants for shared server color settings.                                                                                 |
 | `Systems`                                         | Contains all project-related systems.                                                                                               |
 
+## Join the Team
+
+### Positions
+
+We're looking for passionate volunteers to help shape the future of Open Roleplay. If you love strict roleplay and GTA San Andreas as much as we do, consider joining us in one (or more) of these roles:
+
+- **.NET Developers**  
+  Help develop our game mode and build a custom server launcher.
+  
+- **C++ Developers**  
+  Help create new server-client functionalities that make new features possible.
+  
+- **Laravel Developers**  
+  Build and maintain the backend for our website.
+  
+- **Web Designers**  
+  Help make the visual elements of our website for a seamless user experience.
+  
+- **GTA Modelers**  
+  Create detailed models that bring our world to life.
+  
+- **Graphic Artists**  
+  Design artwork and visuals that define the look and feel of Open Roleplay.
+  
+- **Video Editors**  
+  Edit engaging content for YouTube and promotional materials.
+  
+- **Mappers**  
+  Develop immersive maps that enhance gameplay.
+  
+- **YouTubers**  
+  Spread the word about our server and help grow our community.
+  
+- **Players**  
+  Because without you, there’s no server!
+
+**Please Note:**  
+These positions are entirely voluntary and driven by passion rather than monetary gain.
+
+For more information or to get involved, contact **Pluto** (Username is *plutorexinfernus*) on Discord.
+
 ## Credits
 
 ### 👏 Direct Involvement
@@ -124,9 +165,9 @@ Click on any thumbnail to watch the video, or [click here](https://www.youtube.c
 
 ### 👏 Indirect (But Essential) Involvement
 - [ikkentim](https://github.com/ikkentim) for creating the [SampSharp](https://github.com/ikkentim/SampSharp) framework that allows us to write game modes in .NET.
-- [samp-incognito](https://github.com/samp-incognito) for creating the [streamer plugin](https://github.com/samp-incognito/samp-streamer) that our Biome Generator would be impossible without due to the 2000 object limit.
+- [samp-incognito](https://github.com/samp-incognito) for creating the [streamer plugin](https://github.com/samp-incognito/samp-streamer-plugin) that our Biome Generator would be impossible without due to the 2000 object limit.
 - [Pottus](https://github.com/Pottus) for creating the [ColAndreas plugin](https://github.com/Pottus/ColAndreas) that our Biome Generator and many other systems depend on.
-- [Open Multiplayer](https://github.com/openmultiplayer) for continuing to breathe new life into the Multiplayer mod that we all love.
+- [Open Multiplayer](https://github.com/openmultiplayer) for continuing to breathe new life into the Multiplayer Mod that we all love.
 - The incredible team at [GTA Stars & Stripes](https://www.moddb.com/mods/gta-stars-stripes) for inspiring me ([Koert Lichtendonk](https://github.com/KoertLichtendonk)) to take up modelling which has been extremely helpful in this project so far. Check out their incredible mod if you love San Andreas as much as we do!
 - The amazing community, former owners and developers of **X-Roleplay** who came up with many features and interesting ideas that were unseen before in a strict roleplaying server, but that many of us miss to this very day, and that now heavily inspire Open Roleplay. Special thanks to **Ben**, **Dovis**, **Fiddertots**, **TGF**, **Tomboeg** and **XIK** who have been here since day one.
 - **You**, the incredible community whose support and boundless creativity inspire us to work on and improve the project every day. We wouldn’t be here without you!
