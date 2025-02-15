@@ -110,5 +110,5 @@ Click on any thumbnail to watch the video, or [click here](https://www.youtube.c
 | `Shared/Dialogs/`                                 | Contains shared dialog logic used across the project.                                                                               |
 | `Shared/ServerEvents/`                            | Houses logic for handling server events that is used project-wide.                                                                    |
 | `Shared/ChatColor.cs`                             | Defines constants for shared chat color settings.                                                                                   |
-| `Shared/ServerCOLOR.cs`                           | Defines constants for shared server color settings.                                                                                 |
+| `Shared/ServerColor.cs`                           | Defines constants for shared server color settings.                                                                                 |
 | `Systems`                                         | Contains all project-related systems.                                                                                               |
