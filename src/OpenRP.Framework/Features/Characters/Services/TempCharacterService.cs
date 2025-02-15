@@ -87,9 +87,7 @@ namespace OpenRP.Framework.Features.Characters.Services
                             inventoryItem.Transfer(wallet.Id);
                         }
                     }
-                }
-
-                _dataContext.SaveChanges();*/
+                }*/
 
                 return characterData.Inventory;
             }
