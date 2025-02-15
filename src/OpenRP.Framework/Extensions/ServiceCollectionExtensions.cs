@@ -4,6 +4,7 @@ using OpenRP.Framework.Features.Characters.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
 using OpenRP.Framework.Shared.ServerEvents.Extensions;
+using SampSharp.ColAndreas.Entities.Services;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
