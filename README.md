@@ -127,10 +127,10 @@ We're looking for passionate volunteers to help shape the future of Open Rolepla
 - **👨‍💻 .NET Developers**  
   Help develop our game mode and build a custom server launcher.
   
-- **👩‍💻 C++ Developers**  
+- **👨‍💻 C++ Developers**  
   Help create new server-client functionalities that make new features possible.
   
-- **👩‍💻 Laravel Developers**  
+- **👨‍💻 Laravel Developers**  
   Build and maintain the backend for our website.
   
 - **🎨 Web Designers**  
