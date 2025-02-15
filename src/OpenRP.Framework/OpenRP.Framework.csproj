@@ -14,10 +14,7 @@
     <PackageReference Include="SampSharp.ColAndreas.Entities" Version="0.1.1" />
     <PackageReference Include="SampSharp.Core" Version="0.10.1" />
     <PackageReference Include="SampSharp.Entities" Version="0.10.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Players\" />
+    <PackageReference Include="SampSharp.Streamer.Entities" Version="0.10.0" />
   </ItemGroup>
 
 </Project>
