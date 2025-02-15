@@ -18,7 +18,7 @@
   - [File Structure](#-file-structure)
 - [Credits](#credits)
   - [Direct Involvement](#-direct-involvement)
-  - [Indirect Involvement](#-indirect-involvement)
+  - [Indirect Involvement](#-indirect-but-essential-involvement)
 
 ## General Information
 ### 🔹 What is OpenRP.Framework?  
