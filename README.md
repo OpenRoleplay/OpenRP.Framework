@@ -14,6 +14,8 @@
   - [Procedural Biome Generator](#-procedural-biome-generator)
   - [AI Actors](#-ai-actors)
   - [AI Actors 2.0 (WIP)](#-ai-actors-20-wip)
+- [Technical Documentation](#technical-documentation)
+  - [File Structure](#-file-structure)
 
 ## General Information
 ### 🔹 What is OpenRP.Framework?  
@@ -85,3 +87,28 @@ Click on any thumbnail to watch the video, or [click here](https://www.youtube.c
 
 ### 👨‍👩‍👧 AI Actors 2.0 (WIP)
 [![Open Roleplay | AI Actors 2.0 | Ability to roleplay with /me and /do](https://img.youtube.com/vi/RMHRkCpbA9A/0.jpg)](https://www.youtube.com/watch?v=RMHRkCpbA9A)
+
+## Technical Documentation
+
+### 📁 File Structure
+
+| Path                                              | Description                                                                                                                         |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `Database/Models`                                 | Contains all database models.                                                                                                       |
+| `Database/BaseDataContext.cs`                     | Defines the BaseDataContext and DbSets against which queries are executed.                                                          |
+| `Extensions/ServiceCollectionExtensions.cs`       | Registers all combined service extensions of all features.                                                                             |
+| `Features/**/Commands`                            | Contains all command classes for a given feature.                                                                                   |
+| `Features/**/Components`                          | Houses all component implementations for a given feature.                                                                           |
+| `Features/**/Enums`                               | Defines all enums used within a feature.                                                                                            |
+| `Features/**/Extensions`                          | Contains extension methods for a feature.                                                                                           |
+| `Features/**/Extensions/ServiceCollectionExtensions.cs` | Registers service extensions belonging to a feature.                                                                             |
+| `Features/**/Services`                            | Contains all service classes and interfaces for a feature.                                                                             |
+| `Features/**/Systems`                             | Contains system implementations for a feature (including both `ISystem` and `IServerSystem` types).                                   |
+| `Features/**/Entities`                            | Holds all entity classes associated with a feature.                                                                                 |
+| `Features/**/Helpers`                             | Contains miscellaneous helper classes for a feature.                                                                                |
+| `Shared/Chat/`                                    | Contains shared logic related to chat functionality.                                                                                |
+| `Shared/Dialogs/`                                 | Contains shared dialog logic used across the project.                                                                               |
+| `Shared/ServerEvents/`                            | Houses logic for handling server events that is used project-wide.                                                                    |
+| `Shared/ChatColor.cs`                             | Defines constants for shared chat color settings.                                                                                   |
+| `Shared/ServerCOLOR.cs`                           | Defines constants for shared server color settings.                                                                                 |
+| `Systems`                                         | Contains all project-related systems.                                                                                               |
