@@ -157,7 +157,7 @@ We're looking for passionate volunteers to help shape the future of Open Rolepla
 **Please Note:**  
 These positions are entirely voluntary and driven by passion rather than monetary gain.
 
-For more information or to get involved, contact **Pluto** (Username is *plutorexinfernus*) on Discord.
+For more information or to get involved, contact **Corne** (Username is *plutorexinfernus*) on Discord.
 
 ## Credits
 
