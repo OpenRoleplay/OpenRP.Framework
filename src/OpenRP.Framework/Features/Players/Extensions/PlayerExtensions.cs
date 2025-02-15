@@ -1,4 +1,5 @@
 ﻿using OpenRP.Framework.Features.Accounts.Components;
+using OpenRP.Framework.Features.Characters.Components;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Players.Extensions
 {
-    public static class PlayerExtensions
+    public static partial class PlayerExtensions
     {
         public static bool IsPlayerLoggedInAccount(this Player player)
         {
@@ -30,6 +31,25 @@ namespace OpenRP.Framework.Features.Players.Extensions
                 return accountComponent;
             }
             return null;
+        }
+
+        public static bool IsPlayerPlayingAsCharacter(this Player player)
+        {
+            Character character = player.GetComponent<Character>();
+
+            if (character != null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static Character GetPlayerCurrentlyPlayingAsCharacter(this Player player)
+        {
+            Character character = player.GetComponent<Character>();
+
+            return character;
         }
     }
 }

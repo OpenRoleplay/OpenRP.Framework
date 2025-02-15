@@ -1,6 +1,6 @@
 ﻿using OpenRP.Framework.Shared.Dialogs.Enums;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 using OpenRP.Framework.Shared.Dialogs.Helpers;
-using OpenRP.Framework.Shared.Extensions;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;

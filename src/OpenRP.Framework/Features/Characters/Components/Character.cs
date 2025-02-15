@@ -46,6 +46,15 @@ namespace OpenRP.Framework.Features.Characters.Components
         {
             return String.Format("{0} {1}", _characterModel.FirstName, _characterModel.LastName);
         }
-    }
 
+        public bool HasAccent()
+        {
+            return !String.IsNullOrEmpty(_characterModel.Accent);
+        }
+
+        public string GetAccent()
+        {
+            return _characterModel.Accent;
+        }
+    }
 }

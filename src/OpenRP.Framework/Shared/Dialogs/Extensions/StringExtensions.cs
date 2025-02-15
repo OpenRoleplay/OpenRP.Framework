@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace OpenRP.Framework.Shared.Extensions
+namespace OpenRP.Framework.Shared.Dialogs.Extensions
 {
-    public static class StringExtensions
+    public static partial class StringExtensions
     {
         /// <summary>
         /// Inserts newlines into the given text so that no line exceeds the specified length by too much,
@@ -48,8 +48,8 @@ namespace OpenRP.Framework.Shared.Extensions
                     int visibleLength = word.GetVisibleLength();
 
                     // If adding this word would exceed the visible limit
-                    int addedLength = (currentLine.Count == 0) ? visibleLength : (visibleLength + 1);
-                    if (currentLine.Count > 0 && (currentLength + addedLength) > lineLength)
+                    int addedLength = currentLine.Count == 0 ? visibleLength : visibleLength + 1;
+                    if (currentLine.Count > 0 && currentLength + addedLength > lineLength)
                     {
                         // Join the current line and add to result
                         resultLines.Add(string.Join(" ", currentLine));
@@ -59,7 +59,7 @@ namespace OpenRP.Framework.Shared.Extensions
 
                     // Add the word to the current line
                     currentLine.Add(word);
-                    currentLength = (currentLine.Count == 1) ? visibleLength : currentLength + visibleLength + 1;
+                    currentLength = currentLine.Count == 1 ? visibleLength : currentLength + visibleLength + 1;
                 }
 
                 // Add the last line if there are any leftover words
