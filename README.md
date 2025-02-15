@@ -4,7 +4,16 @@
 
 ## Index
 - [General Information](#general-information)
+  - [What is OpenRP.Framework?](#-what-is-openrpframework)
+  - [What is Roleplay?](#-what-is-roleplay)
+  - [The Vision](#-the-vision)
+  - [The Open Philosophy](#-the-open-philosophy)
+  - [Open Source, Not Copy-Paste](#-open-source-not-copy-paste)
+  - [Get Involved](#-get-involved)
 - [Video Highlights](#video-highlights)
+  - [Procedural Biome Generator](#procedural-biome-generator)
+  - [AI Actors](#ai-actors)
+  - [AI Actors 2.0 (WIP)](#ai-actors-20-wip)
 
 ## General Information
 ### 🔹 What is OpenRP.Framework?  
