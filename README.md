@@ -165,7 +165,7 @@ For more information or to get involved, contact **Corne** (Username is *plutore
 ## Credits
 
 ### 👏 Direct Involvement
-- [Koert Lichtendonk](https://github.com/KoertLichtendonk) for leading the project and most of the contributions towards the project.
+- [Koert Lichtendonk](https://github.com/KoertLichtendonk) for leading the project, paying for the hosting, and most of the contributions towards the project.
 - **Dovis** for managing the Discord and helping to test the gamemode.
 
 ### 👏 Indirect (But Essential) Involvement
