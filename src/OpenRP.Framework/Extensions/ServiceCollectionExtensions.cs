@@ -3,6 +3,7 @@ using OpenRP.Framework.Features.Animations.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
+using OpenRP.Framework.Shared.ServerEvents.Extensions;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace OpenRP.Framework.Extensions
                 .AddVirtualWorldManager()
                 .AddCharacters()
                 .AddInventories()
+                .AddServerSystemEvents()
                 .AddSystemsInAssembly();
         }
     }
