@@ -16,6 +16,9 @@
   - [AI Actors 2.0 (WIP)](#-ai-actors-20-wip)
 - [Technical Documentation](#technical-documentation)
   - [File Structure](#-file-structure)
+- [Credits](#credits)
+  - [Direct Involvement](#-direct-involvement)
+  - [Indirect Involvement](#-indirect-involvement)
 
 ## General Information
 ### 🔹 What is OpenRP.Framework?  
