@@ -43,15 +43,33 @@ The **"Open"** in Open Roleplay isn’t just a name but it reflects the way the 
 - **Freedom to Build:** No red tape stopping you from making things happen. If an idea is **realistic, fits the time period, and aligns with the lore of our world**, then you can make it happen if you are willing to put in effort and dedication.
 - **Community-Driven:** OpenRP.Framework is built to evolve with its contributors, shaping the ultimate roleplay experience. The community helps to decide the direction we go in, both IC and OOC.
 
-### 🛠 Open Source, Not Copy-Paste  
-This framework isn’t meant to be a plug-and-play gamemode for copycats. It’s **a foundation for the community to help build the best possible roleplay server together**.  
+### 🛠 Open Source, Not Copy-Paste
 
-OpenRP.Framework is released under the **LGPL-3.0 license**, meaning:  
-- **Contributions are welcome:** If you make improvements, give back to the community.  
-- **Credits must remain intact:** Don’t strip out acknowledgments.
-- **Respect the license:** Modifications are allowed, but keep things fair.
+This framework isn’t a plug-and-play gamemode for copycats. It’s a foundation for the community to help build the ultimate roleplaying server together.  
 
-Read into the **LGPL-3.0 license** if you wish to use the framework or its code.
+**OpenRP.Framework is distributed under the [LGPL-3.0 license](https://www.gnu.org/licenses/lgpl-3.0.html).**
+
+What does that mean for you if you use it in your project? Simply put:
+
+- **Include the License:**  
+  Any project that uses OpenRP.Framework must include a copy of the LGPL-3.0 license. This informs your users of their rights and the conditions under which the library is provided.
+
+- **Keep the Credits Intact:**  
+  The original credits and acknowledgments must remain. It’s about honoring the work that built this foundation and keeping our community’s heritage visible.
+
+- **Share Your Library Modifications:**  
+  If you tweak or improve the framework itself, those modifications must be released under the LGPL-3.0. This ensures that improvements benefit the entire community.
+
+- **Freedom for Your Own Code:**  
+  You’re free to use and even integrate OpenRP.Framework into proprietary projects, provided that you link to it dynamically. That means your own code can remain closed, as long as the library’s part stays compliant and replaceable.
+
+- **Distribution Must Respect User Freedom:**  
+  Whether you distribute a compiled binary or source code, you must provide a means (or instructions) that allows re-link or update the LGPL-covered portions. This prevents “lock-in” and keeps the spirit of open collaboration alive.
+
+- **Beware of Copy-Pasting Code:**  
+  Simply copying the library’s code directly into your project (instead of linking to it) converts your project into a derivative work. In that case, any modifications to that copied code must also be released under the LGPL-3.0. Failure to do so breaches the license.
+
+By using OpenRP.Framework, you’re not only benefiting from a solid roleplay server foundation, you’re also agreeing to uphold these principles. They protect both your freedom as a developer and the collective progress of our community.
 
 ### 🚀 Get Involved  
 OpenRP.Framework is a **community-driven project**, and contributions are encouraged. Whether you're a **developer, designer, or just passionate about roleplay**, you can help shape the future of the framework. Fork the project, submit pull requests, or join discussions to be part of something bigger.  
