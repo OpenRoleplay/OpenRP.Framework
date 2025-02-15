@@ -16,6 +16,8 @@
   - [AI Actors 2.0 (WIP)](#-ai-actors-20-wip)
 - [Technical Documentation](#technical-documentation)
   - [File Structure](#-file-structure)
+- [Join The Team](#join-the-team)
+  - [Positions](#-positions)
 - [Credits](#credits)
   - [Direct Involvement](#-direct-involvement)
   - [Indirect (But Essential) Involvement](#-indirect-but-essential-involvement)
@@ -116,40 +118,40 @@ Click on any thumbnail to watch the video, or [click here](https://www.youtube.c
 | `Shared/ServerColor.cs`                           | Defines constants for shared server color settings.                                                                                 |
 | `Systems`                                         | Contains all project-related systems.                                                                                               |
 
-## Join the Team
+## Join The Team
 
-### Positions
+### 📋 Positions
 
 We're looking for passionate volunteers to help shape the future of Open Roleplay. If you love strict roleplay and GTA San Andreas as much as we do, consider joining us in one (or more) of these roles:
 
-- **.NET Developers**  
+- **👨‍💻 .NET Developers**  
   Help develop our game mode and build a custom server launcher.
   
-- **C++ Developers**  
+- **👩‍💻 C++ Developers**  
   Help create new server-client functionalities that make new features possible.
   
-- **Laravel Developers**  
+- **👩‍💻 Laravel Developers**  
   Build and maintain the backend for our website.
   
-- **Web Designers**  
+- **🎨 Web Designers**  
   Help make the visual elements of our website for a seamless user experience.
   
-- **GTA Modelers**  
+- **🏙️ GTA Modelers**  
   Create detailed models that bring our world to life.
   
-- **Graphic Artists**  
+- **🖌️ Graphic Artists**  
   Design artwork and visuals that define the look and feel of Open Roleplay.
   
-- **Video Editors**  
+- **🎬 Video Editors**  
   Edit engaging content for YouTube and promotional materials.
   
-- **Mappers**  
+- **🗺️ Mappers**  
   Develop immersive maps that enhance gameplay.
   
-- **YouTubers**  
+- **🎥 YouTubers**  
   Spread the word about our server and help grow our community.
   
-- **Players**  
+- **🎮 Players**  
   Because without you, there’s no server!
 
 **Please Note:**  
