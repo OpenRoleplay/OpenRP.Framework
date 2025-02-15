@@ -29,7 +29,7 @@ Open Roleplay itself is split into two projects:
 Roleplay is about **stepping into a character and shaping stories through player-driven interactions**. Open Roleplay takes this concept further with **immersive mechanics, unique player-led factions, and dynamic world systems**, cutting out unnecessary bureaucracy while keeping realism and structure in place.  
 
 ### 🚀 The Vision  
-The goal of Open Roleplay is to **break away from outdated roleplay formulas** and introduce **fresh, ambitious features** that feel like they could’ve been made by Rockstar, if they cared about their community rather than just selling Shark Cards.  
+The goal of Open Roleplay is to **break away from outdated roleplay formulas** and introduce **fresh, ambitious features** that feel like they could’ve been made by Rockstar if they actually cared about their community rather than just selling Shark Cards.  
 
 Russian roleplay servers have been pushing the boundaries of what’s possible for years. Open Roleplay takes inspiration from that approach, aiming to bring **highly detailed, feature-rich** roleplay to the English-speaking community while ensuring everything remains **polished, immersive, and grounded in realism**.  
 
@@ -112,3 +112,18 @@ Click on any thumbnail to watch the video, or [click here](https://www.youtube.c
 | `Shared/ChatColor.cs`                             | Defines constants for shared chat color settings.                                                                                   |
 | `Shared/ServerColor.cs`                           | Defines constants for shared server color settings.                                                                                 |
 | `Systems`                                         | Contains all project-related systems.                                                                                               |
+
+## Credits
+
+### 👏 Direct Involvement
+- [Koert Lichtendonk](https://github.com/KoertLichtendonk) for leading the project and most of the contributions towards the project.
+- **Dovis** for managing the Discord and helping to test the gamemode.
+
+### 👏 Indirect (But Essential) Involvement
+- [ikkentim](https://github.com/ikkentim) for creating the [SampSharp](https://github.com/ikkentim/SampSharp) framework that allows us to write game modes in .NET.
+- [samp-incognito](https://github.com/samp-incognito) for creating the [streamer plugin](https://github.com/samp-incognito/samp-streamer) that our Biome Generator would be impossible without due to the 2000 object limit.
+- [Pottus](https://github.com/Pottus) for creating the [ColAndreas plugin](https://github.com/Pottus/ColAndreas) that our Biome Generator and many other systems depend on.
+- [Open Multiplayer](https://github.com/openmultiplayer) for continuing to breathe new life into the Multiplayer mod that we all love.
+- The incredible team at [GTA Stars & Stripes](https://www.moddb.com/mods/gta-stars-stripes) for inspiring me ([Koert Lichtendonk](https://github.com/KoertLichtendonk)) to take up modelling which has been extremely helpful in this project so far. Check out their incredible mod if you love San Andreas as much as we do!
+- The amazing community, former owners and developers of **X-Roleplay** who came up with many features and interesting ideas that were unseen before in a strict roleplaying server, but that many of us miss to this very day, and that now heavily inspire Open Roleplay. Special thanks to **Ben**, **Dovis**, **Fiddertots**, **TGF**, **Tomboeg** and **XIK** who have been here since day one.
+- **You**, the incredible community whose support and boundless creativity inspire us to work on and improve the project every day. We wouldn’t be here without you!
