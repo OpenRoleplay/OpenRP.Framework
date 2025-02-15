@@ -59,11 +59,11 @@ OpenRP.Framework is a **community-driven project**, and contributions are encour
 ## Video Highlights
 Click on any thumbnail to watch the video, or [click here](https://www.youtube.com/@openrp-server) to visit our YouTube channel.
 
-### Procedural Biome Generator
+### 🌳 Procedural Biome Generator
 [![Open Roleplay | Procedural Biome Generator | Red County v2.2](https://img.youtube.com/vi/6HkTJOOMALA/0.jpg)](https://www.youtube.com/watch?v=6HkTJOOMALA)
 
-### AI Actors
+### 👨🏻‍🌾 AI Actors
 [![Open Roleplay | AI Actors | Meeting Finn O'Hare at Palomino Creek Fishing Bay](https://img.youtube.com/vi/ZoWpUR5I7V8/0.jpg)](https://www.youtube.com/watch?v=ZoWpUR5I7V8)
 
-### AI Actors 2.0 (WIP)
+### 👨‍👩‍👧 AI Actors 2.0 (WIP)
 [![Open Roleplay | AI Actors 2.0 | Ability to roleplay with /me and /do](https://img.youtube.com/vi/RMHRkCpbA9A/0.jpg)](https://www.youtube.com/watch?v=RMHRkCpbA9A)
