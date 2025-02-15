@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using OpenRP.Framework.Features.Accounts.Extensions;
 using OpenRP.Framework.Features.Animations.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
@@ -23,6 +24,7 @@ namespace OpenRP.Framework.Extensions
                 .AddVirtualWorldManager()
                 .AddCharacters()
                 .AddInventories()
+                .AddAccounts()
                 .AddServerSystemEvents()
                 .AddSystemsInAssembly();
         }
