@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Animations.Services;
 using OpenRP.Framework.Shared.ServerEvents.Entities;
+using OpenRP.Framework.Shared.ServerEvents.Helpers;
 using OpenRP.Framework.Shared.ServerEvents.Services;
 using SampSharp.Entities.Utilities;
 using System;
@@ -32,6 +33,9 @@ namespace OpenRP.Framework.Shared.ServerEvents.Extensions
 
             foreach (var type in types)
                 AddServerSystem(services, type);
+
+            // Add the assembly to the registry
+            ServerSystemRegistry.RegisteredAssemblies.Add(assembly);
 
             return services;
         }
