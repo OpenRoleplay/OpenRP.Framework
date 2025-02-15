@@ -151,6 +151,9 @@ We're looking for passionate volunteers to help shape the future of Open Rolepla
 - **🎥 YouTubers**  
   Spread the word about our server and help grow our community.
   
+- **💰 Patreons**  
+  A huge thank you to our Patreon supporters! Running a dedicated server comes with costs, and while this passion project thrives on love and dedication and I can afford to pay for it, your contributions enable us to invest in extras like a professional logo and other enhancements that make the project even better.
+  
 - **🎮 Players**  
   Because without you, there’s no server!
 
