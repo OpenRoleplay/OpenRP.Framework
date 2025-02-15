@@ -15,7 +15,7 @@ namespace OpenRP.Framework.Features.Characters.Extensions
         public static IServiceCollection AddCharacters(this IServiceCollection self)
         {
             return self
-                .AddSingleton<ITempCharacterService, TempCharacterService>();
+                .AddTransient<ITempCharacterService, TempCharacterService>();
         }
     }
 }

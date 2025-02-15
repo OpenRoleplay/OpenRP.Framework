@@ -16,11 +16,11 @@ namespace OpenRP.Framework.Features.Characters.Components
     public class Character : Component
     {
         private Player _player;
-        private CharacterModel _character;
+        private CharacterModel _characterModel;
 
         public Character(CharacterModel characterModel)
         {
-            _character = characterModel;
+            _characterModel = characterModel;
         }
 
         public ulong GetDatabaseId() => GetCharacterModel().Id;
@@ -39,14 +39,12 @@ namespace OpenRP.Framework.Features.Characters.Components
         /// </summary>
         public CharacterModel GetCharacterModel()
         {
-            return _character;
+            return _characterModel;
         }
 
         public string GetCharacterName()
         {
-            CharacterModel characterModel = GetCharacterModel();
-
-            return String.Format("{0} {1}", characterModel.FirstName, characterModel.LastName);
+            return String.Format("{0} {1}", _characterModel.FirstName, _characterModel.LastName);
         }
     }
 
