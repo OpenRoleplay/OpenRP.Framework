@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Accounts.Extensions;
+using OpenRP.Framework.Features.AccountSettingsFeature.Extensions;
 using OpenRP.Framework.Features.Animations.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
@@ -25,6 +26,7 @@ namespace OpenRP.Framework.Extensions
                 .AddCharacters()
                 .AddInventories()
                 .AddAccounts()
+                .AddAccountSettings()
                 .AddServerSystemEvents()
                 .AddSystemsInAssembly();
         }
