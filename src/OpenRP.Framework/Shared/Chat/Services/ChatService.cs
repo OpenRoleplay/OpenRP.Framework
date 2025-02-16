@@ -163,7 +163,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
                     case PlayerChatMessageType.LOW:
                         // TODO: Accents for low and change color. Placeholder for now.
                         string CHAT_ACTION_LOW = String.Format("{0} says quietly: {1}", character.GetCharacterName(), text);
-                        SendClientRangedMessage(player, Color.LightSlateGray, 7, CHAT_ACTION_LOW);
+                        SendClientRangedMessage(player, Color.LightSlateGray, 3, CHAT_ACTION_LOW);
                         break;
                 }
             }
