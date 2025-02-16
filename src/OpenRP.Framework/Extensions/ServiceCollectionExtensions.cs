@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using OpenRP.Framework.Database.Extensions;
 using OpenRP.Framework.Features.Accounts.Extensions;
 using OpenRP.Framework.Features.AccountSettingsFeature.Extensions;
 using OpenRP.Framework.Features.Animations.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
+using OpenRP.Framework.Features.Fishing.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
+using OpenRP.Framework.Features.Permissions.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
 using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.ServerEvents.Extensions;
@@ -22,6 +25,7 @@ namespace OpenRP.Framework.Extensions
         public static IServiceCollection AddOpenRoleplayFramework(this IServiceCollection self)
         {
             return self
+                .AddDatabase()
                 .AddAnimations()
                 .AddVirtualWorldManager()
                 .AddCharacters()
@@ -29,6 +33,8 @@ namespace OpenRP.Framework.Extensions
                 .AddAccounts()
                 .AddAccountSettings()
                 .AddChat()
+                .AddPermissions()
+                .AddFishing()
                 .AddServerSystemEvents()
                 .AddSystemsInAssembly();
         }
