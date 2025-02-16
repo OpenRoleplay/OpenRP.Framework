@@ -161,9 +161,15 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         SendTalkMessage(player, text);
                         break;
                     case PlayerChatMessageType.LOW:
-                        // TODO: Accents for low and change color. Placeholder for now.
+                        // TODO: Find a good color.
                         string CHAT_ACTION_LOW = String.Format("{0} says quietly: {1}", character.GetCharacterName(), text);
+
                         SendClientRangedMessage(player, Color.LightSlateGray, 3, CHAT_ACTION_LOW);
+                        break;
+                    case PlayerChatMessageType.SHOUT:
+                        string CHAT_ACTION_SHOUT = String.Format("{0} shouts: {1}", character.GetCharacterName(), text);
+
+                        SendClientRangedMessage(player, Color.OrangeRed, 30, CHAT_ACTION_SHOUT);
                         break;
                 }
             }

@@ -17,7 +17,6 @@ namespace OpenRP.Framework.Features.RoleplayChats.Commands
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Describe something related to your character. For example, /my face is cut would display \"Player's face is cut\" in chat to nearby players.",
             CommandGroups = new[] { "Chat" })]
-
         public void My(Player player, IChatService chatService, string text)
         {
             if (player.IsPlayerPlayingAsCharacter())
