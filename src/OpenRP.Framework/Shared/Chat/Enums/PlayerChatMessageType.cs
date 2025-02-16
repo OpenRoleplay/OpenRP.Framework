@@ -10,6 +10,9 @@ namespace OpenRP.Framework.Shared.Chat.Enums
     {
         ME,
         DO,
+        MY,
+        LOW,
+        WHISPER,
         SHOUT,
         AME,
         TALK,

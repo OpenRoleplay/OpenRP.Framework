@@ -150,8 +150,20 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         player.SendClientMessage(ServerColor.RoleplayActionColor, CHAT_ACTION_AME);
                         player.SetChatBubble(CHAT_ACTION_AME, ServerColor.RoleplayActionColor, 20, CHAT_ACTION_AME.Length * 60);
                         break;
+                    case PlayerChatMessageType.MY:
+                        string characterName = character.GetCharacterName();
+                        string nameSuffix = characterName.EndsWith("s") ? "'" : "'s";
+                        string CHAT_ACTION_MY = String.Format("* {0}{1} {2}", characterName, nameSuffix, text);
+
+                        SendClientRangedMessage(player, ServerColor.RoleplayActionColor, 20, CHAT_ACTION_MY);
+                        break;
                     case PlayerChatMessageType.TALK:
                         SendTalkMessage(player, text);
+                        break;
+                    case PlayerChatMessageType.LOW:
+                        // TODO: Accents for low and change color. Placeholder for now.
+                        string CHAT_ACTION_LOW = String.Format("{0} says quietly: {1}", character.GetCharacterName(), text);
+                        SendClientRangedMessage(player, Color.LightSlateGray, 7, CHAT_ACTION_LOW);
                         break;
                 }
             }
