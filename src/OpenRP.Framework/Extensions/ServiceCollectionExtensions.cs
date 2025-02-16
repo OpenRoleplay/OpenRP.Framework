@@ -7,6 +7,7 @@ using OpenRP.Framework.Features.Characters.Extensions;
 using OpenRP.Framework.Features.Fishing.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
 using OpenRP.Framework.Features.Permissions.Extensions;
+using OpenRP.Framework.Features.Vehicles.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
 using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.ServerEvents.Extensions;
@@ -35,6 +36,7 @@ namespace OpenRP.Framework.Extensions
                 .AddChat()
                 .AddPermissions()
                 .AddFishing()
+                .AddVehicles()
                 .AddServerSystemEvents()
                 .AddSystemsInAssembly();
         }
