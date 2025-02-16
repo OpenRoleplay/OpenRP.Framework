@@ -152,7 +152,7 @@ We're looking for passionate volunteers to help shape the future of Open Rolepla
   Spread the word about our server and help grow our community.
   
 - **💰 Patreons**  
-  A huge thank you to our Patreon supporters! Running a dedicated server comes with costs, and while this passion project thrives on love and dedication and I can afford to pay for it, your contributions enable us to invest in extras like a professional logo and other enhancements that make the project even better.
+  Running a dedicated server comes with costs, and while this passion project thrives on love and dedication and I can afford to pay for it, your contributions enable us to invest in extras like a professional logo and other enhancements that make the project even better.
   
 - **🎮 Players**  
   Because without you, there’s no server!
@@ -167,6 +167,7 @@ For more information or to get involved, contact **Corne** (Username is *plutore
 ### 👏 Direct Involvement
 - [Koert Lichtendonk](https://github.com/KoertLichtendonk) for leading the project, paying for the hosting, and most of the contributions towards the project.
 - **Dovis** for managing the Discord and helping to test the gamemode.
+- A huge thank you to our Patreon supporters! Running a dedicated server comes with costs, and while this passion project thrives on love and dedication and I can afford to pay for it, your contributions enable us to invest in extras like a professional logo and other enhancements that make the project even better.
 
 ### 👏 Indirect (But Essential) Involvement
 - [ikkentim](https://github.com/ikkentim) for creating the [SampSharp](https://github.com/ikkentim/SampSharp) framework that allows us to write game modes in .NET.
