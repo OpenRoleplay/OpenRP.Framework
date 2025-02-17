@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using OpenRP.Framework.Features.CDN.Entities;
+using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,18 @@ namespace OpenRP.Framework.Features.CDN.Services
                 throw new ArgumentNullException(nameof(OpenCdnOptions.Password));
             if (string.IsNullOrEmpty(_options.BaseUrl))
                 throw new ArgumentNullException(nameof(OpenCdnOptions.BaseUrl));
+        }
+
+        public void Play(Player player, string subDir, string path)
+        {
+            string link = GetLink(subDir, path);
+            player.PlayAudioStream(link);
+        }
+
+        public void Play(Player player, string subDir, string path, Vector3 position, float range)
+        {
+            string link = GetLink(subDir, path);
+            player.PlayAudioStream(link, position, range);
         }
     }
 }
