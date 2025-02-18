@@ -1,4 +1,5 @@
 ﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Features.AccountSettingsFeature.Components;
 using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Shared.Chat.Enums;
@@ -118,6 +119,17 @@ namespace OpenRP.Framework.Shared.Chat.Services
             }
         }
 
+        private bool ValidateOOCSender(Player player)
+        {
+            var accountSettings = player.GetComponent<AccountSettings>();
+            if (accountSettings != null && !accountSettings.GetGlobalChatEnabled())
+            {
+                player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You have OOC chat disabled.");
+                return false;
+            }
+            return true;
+        }
+
         public void SendPlayerChatMessage(Player player, PlayerChatMessageType type, string text)
         {
             Character character = player.GetPlayerCurrentlyPlayingAsCharacter();
@@ -127,11 +139,21 @@ namespace OpenRP.Framework.Shared.Chat.Services
                 switch (type)
                 {
                     case PlayerChatMessageType.OOC:
+                        if (!ValidateOOCSender(player))
+                        {
+                            return;
+                        }
+
                         string CHAT_ACTION_OOC = String.Format("(( OOC | {0}: {1} ))", character.GetCharacterName(), text);
 
                         foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
                         {
-                            foreachPlayer.SendClientMessage(Color.LightGray, CHAT_ACTION_OOC);
+                            var foreachPlayerSettings = foreachPlayer.GetComponent<AccountSettings>();
+
+                            if (foreachPlayerSettings != null && foreachPlayerSettings.GetGlobalChatEnabled())
+                            {
+                                foreachPlayer.SendClientMessage(Color.LightGray, CHAT_ACTION_OOC);
+                            }
                         }
                         break;
                     case PlayerChatMessageType.ME:
