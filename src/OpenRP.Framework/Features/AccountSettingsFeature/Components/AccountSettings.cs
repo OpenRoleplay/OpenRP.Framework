@@ -26,5 +26,10 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Components
         {
             return _accountSettingsModel.AccountGraphicPreset;
         }
+
+        public bool GetGlobalChatEnabled()
+        {
+            return _accountSettingsModel.GlobalChatEnabled;
+        }
     }
 }

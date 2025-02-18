@@ -156,6 +156,21 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
             return "N/A";
         }
 
+        public void SwitchGlobalChat(Player player, AccountSettings accountSettings)
+        {
+            ulong databaseId = accountSettings.GetDatabaseId();
+            AccountSettingsModel accountSettingsModel = _dataContext.AccountSettings.Find(databaseId);
+            accountSettingsModel.GlobalChatEnabled = !accountSettingsModel.GlobalChatEnabled;
+            _dataContext.SaveChanges();
+            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"OOC chat has been {(accountSettingsModel.GlobalChatEnabled ? "enabled" : "disabled")}.");
+            ReloadAccountSettings(player);
+        }
+
+        private string GetCurrentGlobalChatValue(AccountSettings accountSettings)
+        {
+            return accountSettings.GetGlobalChatEnabled() ? $"{Color.Green}Enabled" : $"{Color.DarkRed}Disabled";
+        }
+
         public void OpenAccountSettingsDialog(Player player)
         {
             AccountSettings accountSettings = player.GetComponent<AccountSettings>();
@@ -166,6 +181,9 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
 
             tablistDialog.AddHeaders("Graphics");
             int graphicPreset = tablistDialog.AddRow("Graphic Preset", GetCurrentGraphicPresetValue(accountSettings));
+
+            tablistDialog.AddHeaders("Chats");
+            int globalChat = tablistDialog.AddRow("OOC Chat", GetCurrentGlobalChatValue(accountSettings));
 
             void DialogHandler(TablistDialogResponse r)
             {
@@ -180,6 +198,13 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
                 if (index == graphicPreset)
                 {
                     SwitchGraphicPreset(player, accountSettings);
+                    OpenAccountSettingsDialog(player);
+                }
+
+                // OOC Chat Toggle
+                if (index == globalChat)
+                {
+                    SwitchGlobalChat(player, accountSettings);
                     OpenAccountSettingsDialog(player);
                 }
             }
