@@ -182,7 +182,7 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
             tablistDialog.AddHeaders("Graphics");
             int graphicPreset = tablistDialog.AddRow("Graphic Preset", GetCurrentGraphicPresetValue(accountSettings));
 
-            tablistDialog.AddHeaders("OOC Chat");
+            tablistDialog.AddHeaders("Chats");
             int globalChat = tablistDialog.AddRow("OOC Chat", GetCurrentGlobalChatValue(accountSettings));
 
             void DialogHandler(TablistDialogResponse r)
