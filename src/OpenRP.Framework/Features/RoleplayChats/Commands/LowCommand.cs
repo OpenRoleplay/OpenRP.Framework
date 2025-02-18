@@ -12,7 +12,7 @@ using OpenRP.Framework.Shared.Chat.Services;
 
 namespace OpenRP.Framework.Features.RoleplayChats.Commands
 {
-    class LowCommand : ISystem
+    public class LowCommand : ISystem
     {
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Send a low whisper to nearby players. For example, /low Why are we whispering? would display \"Player says quietly: Why are we whispering?\" in chat to nearby players.",

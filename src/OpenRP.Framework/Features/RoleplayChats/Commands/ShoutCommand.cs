@@ -12,7 +12,7 @@ using OpenRP.Framework.Shared.Chat.Services;
 
 namespace OpenRP.Framework.Features.RoleplayChats.Commands
 {
-    class ShoutCommand : ISystem
+    public class ShoutCommand : ISystem
     {
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Send a shout to nearby players. For example, /shout Why are we shouting? would display \"Player shouts: Why are we shouting?\" in chat to nearby players.",

@@ -19,9 +19,9 @@ namespace OpenRP.Framework.Shared.Chat.Services
     public class ChatService : IChatService
     {
         private IEntityManager _entityManager;
-        public ChatService() 
+        public ChatService(IEntityManager entityManager) 
         { 
-            _entityManager = new EntityManager();
+            _entityManager = entityManager;
         }
 
         public void SendInfoMessage(PlayerInfoMessageType type, string text)
