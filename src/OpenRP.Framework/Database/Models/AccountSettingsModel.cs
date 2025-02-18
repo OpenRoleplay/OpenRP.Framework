@@ -12,6 +12,7 @@ namespace OpenRP.Framework.Database.Models
         public ulong Id { get; set; }
         public ulong AccountId { get; set; }
         public AccountGraphicPreset AccountGraphicPreset { get; set; }
+        public bool GlobalChatEnabled { get; set; }
 
         // Navigational Properties
         public AccountModel AccountModel { get; set; }
@@ -20,6 +21,7 @@ namespace OpenRP.Framework.Database.Models
         public AccountSettingsModel()
         {
             AccountGraphicPreset = AccountGraphicPreset.High;
+            GlobalChatEnabled = true;
         }
     }
 }
