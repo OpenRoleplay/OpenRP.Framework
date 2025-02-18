@@ -157,9 +157,21 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         }
                         break;
                     case PlayerChatMessageType.LOOC:
-                        string CHAT_ACTION_LOOC = String.Format("(( LOOC | {0}: {1} ))", character.GetCharacterName(), text);
+                        string CHAT_ACTION_LOOC = String.Format("(( L-OOC | {0}: {1} ))", character.GetCharacterName(),text);
 
-                        SendClientRangedMessage(player, Color.LightGray, 3, CHAT_ACTION_LOOC);
+                        SendClientRangedMessage(player, Color.LightGray, 20, CHAT_ACTION_LOOC);
+                        break;
+                    case PlayerChatMessageType.NEWBIE:
+                        // TODO: display staff lvl on newbie chat
+                        // implement cooldown
+                        // toggle newbie chat
+                  
+                        string CHAT_ACTION_NEWBIE = String.Format("(( Newbie | {0}: {1} ))", character.GetCharacterName(), text);
+                        
+                        foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
+                        {
+                            foreachPlayer.SendClientMessage(Color.LightGreen, CHAT_ACTION_NEWBIE);
+                        }
                         break;
                     case PlayerChatMessageType.ME:
                         string CHAT_ACTION_ME = String.Format("* {0} {1} *", character.GetCharacterName(), text);

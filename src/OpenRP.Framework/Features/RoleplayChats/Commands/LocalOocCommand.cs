@@ -1,5 +1,4 @@
 ﻿using OpenRP.Framework.Features.Commands.Attributes;
-using OpenRP.Framework.Features.Discord.Services;
 using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Services;
@@ -17,7 +16,7 @@ namespace OpenRP.Framework.Features.RoleplayChats.Commands
     {
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Send a message to the local Out-Of-Character (OOC) chat. Use /b followed by your message to communicate OOCly with players in your vicinity.",
-            CommandGroups = new[] { "Chat" } )]
+            CommandGroups = new[] { "Chat" })]
 
         public void B(Player player, IChatService chatService, string text)
         { 

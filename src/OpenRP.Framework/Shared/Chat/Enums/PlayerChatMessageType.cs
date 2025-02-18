@@ -18,6 +18,7 @@ namespace OpenRP.Framework.Shared.Chat.Enums
         TALK,
         MEGAPHONE,
         OOC,
-        LOOC
+        LOOC,
+        NEWBIE
     }
 }
