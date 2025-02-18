@@ -1,7 +1,9 @@
-﻿using OpenRP.Framework.Features.Commands.Attributes;
+﻿using OpenRP.Framework.Features.AccountSettingsFeature.Components;
+using OpenRP.Framework.Features.Commands.Attributes;
 using OpenRP.Framework.Features.Discord.Services;
 using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Shared.Chat.Enums;
+using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.Chat.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
@@ -20,11 +22,15 @@ namespace OpenRP.Framework.Features.RoleplayChats.Commands
             CommandGroups = new[] { "Chat" })]
         public void Ooc(Player player, IChatService chatService, IDiscordService discordService, string text)
         {
-            if (player.IsPlayerPlayingAsCharacter())
+            var accountSettings = player.GetComponent<AccountSettings>();
+            if (accountSettings != null && !accountSettings.GetGlobalChatEnabled())
             {
-                chatService.SendPlayerChatMessage(player, PlayerChatMessageType.OOC, text);
-                discordService.SendGlobalOocChatMessage(player, text);
+                player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You can't chat in OOC because you have it disabled in /settings!");
+                return;
             }
+
+            chatService.SendPlayerChatMessage(player, PlayerChatMessageType.OOC, text);
+            discordService.SendGlobalOocChatMessage(player, text);
         }
 
         [ServerCommand(PermissionGroups = new string[] { "Default" },
