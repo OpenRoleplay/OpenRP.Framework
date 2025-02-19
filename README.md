@@ -166,6 +166,7 @@ For more information or to get involved, contact **Corne** (Username is *plutore
 
 ### 👏 Direct Involvement
 - [Koert Lichtendonk](https://github.com/KoertLichtendonk) for leading the project, paying for the hosting, and most of the contributions towards the project.
+- [Ben](https://github.com/Benj98) for making contributions towards the project and helping to add new features.
 - **Dovis** for managing the Discord and helping to test the gamemode.
 - A huge thank you to our Patreon supporters! Running a dedicated server comes with costs, and while this passion project thrives on love and dedication and I can afford to pay for it, your contributions enable us to invest in extras like a professional logo and other enhancements that make the project even better.
 
