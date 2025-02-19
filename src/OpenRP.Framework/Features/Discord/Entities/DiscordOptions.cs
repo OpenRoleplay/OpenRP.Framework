@@ -10,5 +10,6 @@ namespace OpenRP.Framework.Features.Discord.Entities
     {
         public string DiscordBotToken { get; set; }
         public ulong GeneralChatChannelId { get; set; }
+        public ulong PlayerCountChannelId { get; set; }
     }
 }

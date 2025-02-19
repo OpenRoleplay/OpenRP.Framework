@@ -11,6 +11,7 @@ using OpenRP.Framework.Features.CDN.Entities;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using OpenRP.Framework.Features.Discord.Entities;
+using System.Threading.Channels;
 
 namespace OpenRP.Framework.Features.Discord.Services
 {
@@ -20,14 +21,16 @@ namespace OpenRP.Framework.Features.Discord.Services
         private readonly IEntityManager _entityManager;
         private readonly DiscordOptions _options;
         private readonly Task _initializationTask;
+        private readonly IServerService _serverService;
 
         // Private constructor to enforce the use of the factory method
-        public DiscordService(IOptions<DiscordOptions> options, IEntityManager entityManager)
+        public DiscordService(IOptions<DiscordOptions> options, IEntityManager entityManager, IServerService serverService)
         {
-            _initializationTask = InitializeAsync();
             _entityManager = entityManager;
+            _serverService = serverService;
             _options = options.Value;
             ValidateOptions();
+            _initializationTask = InitializeAsync();
         }
         private void ValidateOptions()
         {
@@ -53,8 +56,6 @@ namespace OpenRP.Framework.Features.Discord.Services
             _discordClient.MessageCreated += DiscordClient_MessageCreated;
 
             await _discordClient.ConnectAsync();
-            // If you need to keep the bot running, consider handling it differently
-            // For example, integrate with your application's lifecycle
         }
 
         // Method to send a general chat message
@@ -146,7 +147,7 @@ namespace OpenRP.Framework.Features.Discord.Services
         private Task DiscordClient_MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
         {
             // Discord OOC
-            if (e.Channel.Id == 477898678561144843)
+            if (e.Channel.Id == _options.GeneralChatChannelId)
             {
                 if (!e.Author.IsBot)
                 {
@@ -167,6 +168,44 @@ namespace OpenRP.Framework.Features.Discord.Services
             }
             return System.Threading.Tasks.Task.CompletedTask;
         }
-    }
 
+        public async Task<bool> UpdatePlayerCount(bool decrease = false)
+        {
+            // Ensure the client is initialized and connected
+            await _initializationTask;
+
+            // Get player count
+            int playerCount = _entityManager.GetComponents<Player>().Count();
+            if(decrease)
+            {
+                playerCount--;
+            }
+
+            string playerCountString = $"Players Online: {playerCount}/{_serverService.MaxPlayers}";
+
+
+            try
+            {
+                // Get the channel by its ID
+                // Retrieve the channel
+                var channel = await _discordClient.GetChannelAsync(_options.PlayerCountChannelId);
+                if (channel == null)
+                {
+                    Console.WriteLine($"Channel with ID {_options.PlayerCountChannelId} not found.");
+                    return false;
+                }
+
+                // Change its name to "new-channel-name"
+                await channel.ModifyAsync(x => x.Name = playerCountString);
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating channel: {ex}");
+                return false;
+            }
+        }
+    }
 }

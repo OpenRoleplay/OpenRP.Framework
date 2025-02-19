@@ -14,6 +14,13 @@ namespace OpenRP.Framework.Features.Discord.Systems
         [Event]
         public void OnGameModeInit(IDiscordService discordService)
         {
+            discordService.UpdatePlayerCount();
+        }
+
+        [Event]
+        public void OnPlayerConnect(Player player, IDiscordService discordService)
+        {
+            discordService.UpdatePlayerCount();
         }
 
         [Event]
@@ -27,6 +34,7 @@ namespace OpenRP.Framework.Features.Discord.Systems
                         discordService.SendGeneralChatMessage($"## {player.Name.Replace("_", " ")} is no longer playing on the server.");
                     }
                 #endif
+                discordService.UpdatePlayerCount(true);
             }
             catch (Exception ex)
             {

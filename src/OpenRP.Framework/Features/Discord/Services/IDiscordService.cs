@@ -11,5 +11,6 @@ namespace OpenRP.Framework.Features.Discord.Services
     {
         Task SendGeneralChatMessage(string text);
         Task SendGlobalOocChatMessage(Player player, string text);
+        Task<bool> UpdatePlayerCount(bool decrease = false);
     }
 }
