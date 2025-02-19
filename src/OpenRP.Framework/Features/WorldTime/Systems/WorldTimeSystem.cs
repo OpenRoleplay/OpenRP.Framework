@@ -24,8 +24,6 @@ namespace OpenRP.Framework.Features.WorldTime.Systems
                 TimeSpan ingameTime = worldTimeService.GetCurrentIngameTime();
 
                 player.SetTime(simulationTime.Hours, simulationTime.Minutes);
-
-                player.SendPlayerInfoMessage(Shared.Chat.Enums.PlayerInfoMessageType.INFO, $"Ingame time: {ingameTime.ToString()} | Simulation Time: {simulationTime.ToString()}");
             }
         }
     }
