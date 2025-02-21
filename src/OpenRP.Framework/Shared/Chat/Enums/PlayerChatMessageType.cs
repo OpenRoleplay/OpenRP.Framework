@@ -17,6 +17,8 @@ namespace OpenRP.Framework.Shared.Chat.Enums
         AME,
         TALK,
         MEGAPHONE,
-        OOC
+        OOC,
+        LOOC,
+        NEWBIE
     }
 }

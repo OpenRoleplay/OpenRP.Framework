@@ -140,6 +140,19 @@ namespace OpenRP.Framework.Shared.Chat.Services
                             }
                         }
                         break;
+                    case PlayerChatMessageType.LOOC:
+                        string CHAT_ACTION_LOOC = String.Format("(( L-OOC | {0}: {1} ))", character.GetCharacterName(),text);
+
+                        SendClientRangedMessage(player, Color.LightGray, 20, CHAT_ACTION_LOOC);
+                        break;
+                    case PlayerChatMessageType.NEWBIE:
+                        string CHAT_ACTION_NEWBIE = String.Format("(( Newbie | {0}[1]: {2} ))", character.GetCharacterName(), player.Entity.Handle,text);
+                        
+                        foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
+                        {
+                            foreachPlayer.SendClientMessage(Color.LightGreen, CHAT_ACTION_NEWBIE);
+                        }
+                        break;
                     case PlayerChatMessageType.ME:
                         string CHAT_ACTION_ME = String.Format("* {0} {1} *", character.GetCharacterName(), text);
 
@@ -167,7 +180,6 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         SendTalkMessage(player, text);
                         break;
                     case PlayerChatMessageType.LOW:
-                        // TODO: Find a good color.
                         string CHAT_ACTION_LOW = String.Format("{0} says quietly: {1}", character.GetCharacterName(), text);
 
                         SendClientRangedMessage(player, Color.LightSlateGray, 3, CHAT_ACTION_LOW);
@@ -175,7 +187,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
                     case PlayerChatMessageType.SHOUT:
                         string CHAT_ACTION_SHOUT = String.Format("{0} shouts: {1}", character.GetCharacterName(), text);
 
-                        SendClientRangedMessage(player, Color.OrangeRed, 30, CHAT_ACTION_SHOUT);
+                        SendClientRangedMessage(player, Color.LightSteelBlue, 30, CHAT_ACTION_SHOUT);
                         break;
                 }
             }
