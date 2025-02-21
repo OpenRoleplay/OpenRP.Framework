@@ -8,6 +8,7 @@ using OpenRP.Framework.Features.DroppedItems.Models.Configurations;
 using OpenRP.Framework.Features.Fishing.Models;
 using OpenRP.Framework.Features.Inventories.Models.Configurations;
 using OpenRP.Framework.Features.Items.Models.Configurations;
+using OpenRP.Framework.Features.Items.Models.DefaultData;
 using OpenRP.Framework.Features.Permissions.Models.Configurations;
 using OpenRP.Framework.Features.Vehicles.Models.Configurations;
 using System;
@@ -38,6 +39,7 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new InventoryItemModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new ItemModelConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemModelDefaultData());
 
             modelBuilder.ApplyConfiguration(new CharacterPermissionGroupModelConfiguration());
             modelBuilder.ApplyConfiguration(new PermissionGroupModelConfiguration());
