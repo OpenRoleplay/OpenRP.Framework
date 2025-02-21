@@ -18,7 +18,7 @@ namespace OpenRP.Framework.Features.Permissions.Models.Configurations
 
             // Configure relationship to PermissionGroupModel
             builder.HasOne(pgpm => pgpm.PermissionGroup)
-                   .WithMany() // Replace with a collection property if PermissionGroupModel has one, e.g., .WithMany(pg => pg.PermissionGroupPermissions)
+                   .WithMany(pgpm => pgpm.Permissions) 
                    .HasForeignKey(pgpm => pgpm.PermissionGroupId)
                    .OnDelete(DeleteBehavior.Cascade); // Adjust as needed
 
