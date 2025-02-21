@@ -23,6 +23,7 @@ namespace OpenRP.Framework.Features.RoleplayChats.Commands
         { 
             chatService.SendPlayerChatMessage(player, PlayerChatMessageType.NEWBIE, text);
         }
+
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Short alias for /newbie. Example: /n [text]",
             CommandGroups = new[] { "Chat" })]
