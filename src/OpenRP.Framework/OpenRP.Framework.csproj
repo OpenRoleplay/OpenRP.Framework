@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="DSharpPlus" Version="4.5.0" />
+    <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="4.9.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.20" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />

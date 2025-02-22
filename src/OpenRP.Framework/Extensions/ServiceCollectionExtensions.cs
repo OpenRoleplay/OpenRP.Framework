@@ -2,6 +2,7 @@
 using OpenRP.Framework.Database.Extensions;
 using OpenRP.Framework.Features.Accounts.Extensions;
 using OpenRP.Framework.Features.AccountSettingsFeature.Extensions;
+using OpenRP.Framework.Features.Actors.Extensions;
 using OpenRP.Framework.Features.Animations.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
 using OpenRP.Framework.Features.Fishing.Extensions;
@@ -38,6 +39,7 @@ namespace OpenRP.Framework.Extensions
                 .AddPermissions()
                 .AddFishing()
                 .AddVehicles()
+                .AddActors()
                 .AddCommands()
                 .AddServerSystemEvents()
                 .AddSystemsInAssembly();
