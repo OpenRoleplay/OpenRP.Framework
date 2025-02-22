@@ -97,7 +97,7 @@ namespace OpenRP.Framework.Features.WorldWeather.Services
             // Configure smoother noise for wind
             _windNoise = new FastNoiseLite();
             _windNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-            _windNoise.SetFrequency(0.005f);
+            _windNoise.SetFrequency(0.0005f);
             _windNoise.SetSeed(_options.Seed + 1); // Different seed
             _windTimeOffset = 0f;
         }
