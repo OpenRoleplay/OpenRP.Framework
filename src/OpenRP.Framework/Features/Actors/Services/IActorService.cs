@@ -1,4 +1,5 @@
 ﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Features.Actors.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace OpenRP.Framework.Features.Actors.Services
     {
         List<ActorModel> GetActors();
         void LoadActors();
+        List<ServerActor> GetServerActors();
     }
 }

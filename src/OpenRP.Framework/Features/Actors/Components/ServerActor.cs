@@ -28,6 +28,11 @@ namespace OpenRP.Framework.Features.Actors.Components
             return this.GetComponentInChildren<DynamicTextLabel>();
         }
 
+        public ulong GetId()
+        {
+            return _actorModel.Id;
+        }
+
         public string GetName()
         {
             if (_actorModel.ActorCharacter != null)
@@ -35,6 +40,15 @@ namespace OpenRP.Framework.Features.Actors.Components
                 return String.Format("{0} {1}", _actorModel.ActorCharacter.FirstName, _actorModel.ActorCharacter.LastName);
             }
             return null;
+        }
+
+        public string GetActorPrompt()
+        {
+            if (_actorModel.ActorPrompt != null)
+            {
+                return _actorModel.ActorPrompt.Prompt;
+            }
+            return String.Empty;
         }
     }
 }
