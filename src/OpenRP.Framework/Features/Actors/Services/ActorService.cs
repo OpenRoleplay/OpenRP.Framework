@@ -77,5 +77,10 @@ namespace OpenRP.Framework.Features.Actors.Services
                 }
             }
         }
+
+        public List<ServerActor> GetServerActors()
+        {
+            return _entityManager.GetComponents<ServerActor>().ToList();
+        }
     }
 }
