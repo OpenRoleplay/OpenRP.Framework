@@ -1,4 +1,5 @@
-﻿using SampSharp.Entities;
+﻿using OpenRP.Framework.Database.Models;
+using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,10 @@ namespace OpenRP.Framework.Features.Inventories.Components
 {
     public class Inventory : Component
     {
-        public Inventory()
+        private InventoryModel _inventoryModel;
+        public Inventory(InventoryModel inventoryModel)
         {
-
+            _inventoryModel = inventoryModel;
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Inventories.Services
 {
-    public interface ITempInventoryService
+    public interface IInventoryService
     {
         InventoryModel CreateInventory(string inventoryName, uint? maxWeightInGrams);
     }

@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Inventories.Services
 {
-    public class TempInventoryService : ITempInventoryService
+    public class InventoryService : IInventoryService
     {
         private BaseDataContext _dataContext;
-        public TempInventoryService(BaseDataContext dataContext)
+        public InventoryService(BaseDataContext dataContext)
         {
             _dataContext = dataContext;
         }

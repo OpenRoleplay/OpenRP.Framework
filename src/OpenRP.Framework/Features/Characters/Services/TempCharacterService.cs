@@ -18,8 +18,8 @@ namespace OpenRP.Framework.Features.Characters.Services
     {
         private BaseDataContext _dataContext;
         private IEntityManager _entityManager;
-        private ITempInventoryService _inventoryService;
-        public TempCharacterService(BaseDataContext dataContext, IEntityManager entityManager, ITempInventoryService inventoryService)
+        private IInventoryService _inventoryService;
+        public TempCharacterService(BaseDataContext dataContext, IEntityManager entityManager, IInventoryService inventoryService)
         {
             _dataContext = dataContext;
             _entityManager = entityManager;
