@@ -38,6 +38,8 @@ namespace OpenRP.Framework.Features.Discord.Services
                 throw new ArgumentNullException(nameof(DiscordOptions.DiscordBotToken));
             if (_options.GeneralChatChannelId == default)
                 throw new ArgumentException(nameof(DiscordOptions.GeneralChatChannelId));
+            if (_options.SupportChannelId == default)
+                throw new ArgumentException(nameof(DiscordOptions.SupportChannelId));
         }
 
         // Asynchronous initialization method
@@ -80,6 +82,28 @@ namespace OpenRP.Framework.Features.Discord.Services
             await _discordClient.SendMessageAsync(channel, text.Replace("@", "@​"));
         }
 
+        // Method to send a newbie chat message
+        public async Task SendSupportChatMessage(string text)
+        {
+            // Ensure the client is initialized and connected
+            await _initializationTask;
+
+            if (_discordClient == null)
+            {
+                throw new InvalidOperationException("Discord client is not initialized.");
+            }
+
+            // Attempt to get the channel
+            var channel = await _discordClient.GetChannelAsync(_options.SupportChannelId);
+            if (channel is null)
+            {
+                throw new InvalidOperationException($"Channel with ID {_options.SupportChannelId} not found.");
+            }
+
+            // Send the message
+            await _discordClient.SendMessageAsync(channel, text.Replace("@", "@​"));
+        }
+
         public async Task SendGlobalOocChatMessage(Player player, string text)
         {
             // Ensure the client is initialized and connected
@@ -99,6 +123,27 @@ namespace OpenRP.Framework.Features.Discord.Services
             stringBuilder.AppendLine($"**{player.Name.Replace("_", " ")}:** {text}");
 
             await SendGeneralChatMessage(stringBuilder.ToString());
+        }
+
+        public async Task SendNewbieChatMessage(Player player, string text)
+        {
+            // Ensure the client is initialized and connected
+            await _initializationTask;
+
+            if (_discordClient == null)
+            {
+                throw new InvalidOperationException("Discord client is not initialized.");
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+            if (!await IsLastMessageFromBotAsync(_options.SupportChannelId))
+            {
+                stringBuilder.AppendLine("## [In-Game Newbie Chat]");
+            }
+
+            stringBuilder.AppendLine($"**{player.Name.Replace("_", " ")}:** {text}");
+
+            await SendSupportChatMessage(stringBuilder.ToString());
         }
 
         public async Task<bool> IsLastMessageFromBotAsync(ulong channelId)
@@ -163,6 +208,26 @@ namespace OpenRP.Framework.Features.Discord.Services
                         string CHAT_ACTION_OOC = String.Format("(( Discord OOC | {0}: {1} ))", nameToUse, e.Message.Content);
 
                         foreachPlayer.SendClientMessage(Color.FromString("7289DA", ColorFormat.RGB), CHAT_ACTION_OOC);
+                    }
+                }
+            }
+
+            if(e.Channel.Id == _options.SupportChannelId)
+            {
+                if (!e.Author.IsBot)
+                {
+                    foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
+                    {
+                        string nameToUse = e.Author.Username;
+
+                        if (e.Author is DiscordMember member)
+                        {
+                            nameToUse = member.DisplayName;
+                        }
+
+                        string CHAT_ACTION_NEWBIE = String.Format("(( Newbie | {0} [Discord]: {1} ))", nameToUse, e.Message.Content);
+
+                        foreachPlayer.SendClientMessage(Color.LightGreen, CHAT_ACTION_NEWBIE);
                     }
                 }
             }

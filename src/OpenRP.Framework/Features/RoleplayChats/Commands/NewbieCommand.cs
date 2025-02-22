@@ -1,4 +1,5 @@
 ﻿using OpenRP.Framework.Features.Commands.Attributes;
+using OpenRP.Framework.Features.Discord.Services;
 using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
@@ -19,17 +20,18 @@ namespace OpenRP.Framework.Features.RoleplayChats.Commands
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Send a message to the newbie chat. Use /newbie followed by your message to ask other players server-related questions.",
             CommandGroups = new[] { "Chat" })]
-        public void Newbie(Player player, IChatService chatService, string text)
+        public void Newbie(Player player, IChatService chatService, IDiscordService discordService, string text)
         { 
             chatService.SendPlayerChatMessage(player, PlayerChatMessageType.NEWBIE, text);
+            discordService.SendNewbieChatMessage(player, text);
         }
 
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Short alias for /newbie. Example: /n [text]",
             CommandGroups = new[] { "Chat" })]
-        public void N(Player player, IChatService chatService, string text)
+        public void N(Player player, IChatService chatService, IDiscordService discordService, string text)
         {
-            Newbie(player, chatService, text);
+            Newbie(player, chatService, discordService, text);
         }
     }
 }
