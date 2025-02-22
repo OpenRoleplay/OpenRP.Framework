@@ -8,17 +8,12 @@ using OpenRP.Framework.Features.VirtualWorlds.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using SampSharp.Streamer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
 
 namespace OpenRP.Framework.Features.Actors.Services
 {
     public class ActorService : IActorService
     {
+        // Dependency Injection Properties
         private BaseDataContext _dataContext;
         private IWorldService _worldService;
         private IStreamerService _streamerService;
@@ -32,6 +27,9 @@ namespace OpenRP.Framework.Features.Actors.Services
             _streamerService = streamerService;
             _virtualWorldService = virtualWorldService;
             _entityManager = entityManager;
+
+            // First Time Loading
+            LoadActors();
         }
 
         public List<ActorModel> GetActors()

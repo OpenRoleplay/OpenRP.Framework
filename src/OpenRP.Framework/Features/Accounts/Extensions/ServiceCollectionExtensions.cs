@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Accounts.Services;
+using OpenRP.Framework.Features.Accounts.Services.Dialogs;
 using OpenRP.Framework.Features.Animations.Services;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,8 @@ namespace OpenRP.Framework.Features.Accounts.Extensions
         public static IServiceCollection AddAccounts(this IServiceCollection self)
         {
             return self
-                .AddSingleton<IAccountService, AccountService>();
+                .AddSingleton<IAccountService, AccountService>()
+                .AddTransient<IAccountDialogService, AccountDialogService>();
         }
     }
 }

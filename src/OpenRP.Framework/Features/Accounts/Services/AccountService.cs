@@ -121,5 +121,25 @@ namespace OpenRP.Framework.Features.Accounts.Services
 
             return null;
         }
+
+        public bool CreateAccount(Player player, string username, string password)
+        {
+            AccountCreation accountCreation = player.GetComponent<AccountCreation>();
+
+            if (accountCreation != null)
+            {
+                AccountModel createdAccount = new AccountModel();
+                createdAccount.Username = accountCreation.Account.Username;
+                createdAccount.Password = accountCreation.Account.Password;
+
+                _dataContext.Accounts.Add(createdAccount);
+                int changes = _dataContext.SaveChanges();
+
+                player.DestroyComponents<AccountCreation>();
+
+                return changes > 0;
+            }
+            return false;
+        }
     }
 }

@@ -2,11 +2,13 @@
 using OpenRP.Framework.Database.Extensions;
 using OpenRP.Framework.Features.Accounts.Extensions;
 using OpenRP.Framework.Features.AccountSettingsFeature.Extensions;
+using OpenRP.Framework.Features.ActorConversations.Extensions;
 using OpenRP.Framework.Features.Actors.Extensions;
 using OpenRP.Framework.Features.Animations.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
 using OpenRP.Framework.Features.Fishing.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
+using OpenRP.Framework.Features.MainMenu.Extensions;
 using OpenRP.Framework.Features.Permissions.Extensions;
 using OpenRP.Framework.Features.Vehicles.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
@@ -29,6 +31,7 @@ namespace OpenRP.Framework.Extensions
         {
             return self
                 .AddDatabase()
+                .AddActors()
                 .AddAnimations()
                 .AddVirtualWorldManager()
                 .AddCharacters()
@@ -39,7 +42,7 @@ namespace OpenRP.Framework.Extensions
                 .AddPermissions()
                 .AddFishing()
                 .AddVehicles()
-                .AddActors()
+                .AddMainMenu()
                 .AddCommands()
                 .AddServerSystemEvents()
                 .AddSystemsInAssembly();

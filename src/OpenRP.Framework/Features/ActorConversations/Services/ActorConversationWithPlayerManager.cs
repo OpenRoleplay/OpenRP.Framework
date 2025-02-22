@@ -37,9 +37,10 @@ namespace OpenRP.Framework.Features.ActorConversations.Services
         public ActorConversationWithPlayerHelper CreateConversation(string conversationName, List<ulong> actorIds)
         {
             List<ServerActor> actorList = new List<ServerActor>();
+            List<ServerActor> loadedActors = _actorService.GetServerActors();
             foreach (ulong actorId in actorIds)
             {
-                ServerActor serverActor = _actorService.GetServerActors().FirstOrDefault(i => i.GetId() == actorId);
+                ServerActor serverActor = loadedActors.FirstOrDefault(i => i.GetId() == actorId);
                 actorList.Add(serverActor);
             }
 
