@@ -1,8 +1,9 @@
-﻿using OpenRP.Framework.Features.Items.Enums;
+﻿using OpenRP.Framework.Database.Entities;
+using OpenRP.Framework.Features.Items.Enums;
 
 namespace OpenRP.Framework.Database.Models
 {
-    public class ItemModel
+    public class ItemModel : BaseEntity
     {
         public ulong Id { get; set; }
         public string Name { get; set; }
