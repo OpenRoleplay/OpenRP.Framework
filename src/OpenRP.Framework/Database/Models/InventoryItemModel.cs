@@ -1,6 +1,8 @@
-﻿namespace OpenRP.Framework.Database.Models
+﻿using OpenRP.Framework.Database.Entities;
+
+namespace OpenRP.Framework.Database.Models
 {
-    public class InventoryItemModel
+    public class InventoryItemModel : BaseEntity
     {
         public ulong Id { get; set; }
         public ulong ItemId { get; set; }

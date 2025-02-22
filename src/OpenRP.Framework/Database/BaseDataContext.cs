@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OpenRP.Framework.Database.Entities;
 using OpenRP.Framework.Database.Models;
 using System;
 using System.Collections.Generic;
@@ -45,5 +46,35 @@ namespace OpenRP.Framework.Database
 
         // Constructor accepting options
         public BaseDataContext(DbContextOptions options) : base(options) { }
+
+        public override int SaveChanges()
+        {
+            UpdateTimestamps();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            UpdateTimestamps();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void UpdateTimestamps()
+        {
+            // Only update entities that inherit from BaseEntity
+            var entries = ChangeTracker.Entries<BaseEntity>();
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedOn = DateTime.UtcNow;
+                    entry.Entity.UpdatedOn = DateTime.UtcNow;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.UpdatedOn = DateTime.UtcNow;
+                }
+            }
+        }
     }
 }

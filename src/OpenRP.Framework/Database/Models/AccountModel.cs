@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenRP.Framework.Database.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Database.Models
 {
-    public class AccountModel
+    public class AccountModel : BaseEntity
     {
         public ulong Id { get; set; }
         public string Username { get; set; }
