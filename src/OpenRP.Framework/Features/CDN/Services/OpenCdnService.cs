@@ -80,5 +80,17 @@ namespace OpenRP.Framework.Features.CDN.Services
             string link = GetLink(subDir, path);
             player.PlayAudioStream(link, position, range);
         }
+
+        public void PlayBase64(Player player, string subDir, string path)
+        {
+            string link = GetBase64Link(subDir, path);
+            player.PlayAudioStream(link);
+        }
+
+        public void PlayBase64(Player player, string subDir, string path, Vector3 position, float range)
+        {
+            string link = GetBase64Link(subDir, path);
+            player.PlayAudioStream(link, position, range);
+        }
     }
 }
