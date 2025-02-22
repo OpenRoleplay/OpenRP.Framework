@@ -2,6 +2,7 @@
 using OpenRP.Framework.Features.CDN.Entities;
 using SampSharp.Entities.SAMP;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -27,6 +28,25 @@ namespace OpenRP.Framework.Features.CDN.Services
             string hash = ComputeSHA256Hash(plainString);
             string encodedFilePath = Uri.EscapeDataString(filePath);
             return $"{_options.BaseUrl}/{hash}/{subDir}/{encodedFilePath}";
+        }
+
+        public string GetBase64Link(string subDir, string base64FilePath)
+        {
+            if (string.IsNullOrWhiteSpace(base64FilePath))
+                throw new ArgumentException("File path cannot be null or empty.", nameof(base64FilePath));
+
+            string decodedFilePath;
+            try
+            {
+                byte[] bytes = Convert.FromBase64String(base64FilePath);
+                decodedFilePath = Encoding.UTF8.GetString(bytes);
+            }
+            catch (FormatException ex)
+            {
+                throw new ArgumentException("The provided file path is not a valid base64 string.", nameof(base64FilePath), ex);
+            }
+
+            return GetLink(subDir, decodedFilePath);
         }
 
         private static string ComputeSHA256Hash(string rawData)
