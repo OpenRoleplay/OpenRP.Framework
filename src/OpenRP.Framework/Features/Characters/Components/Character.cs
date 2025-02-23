@@ -10,6 +10,8 @@ using OpenRP.Framework.Database;
 using OpenRP.Framework.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using OpenRP.Framework.Features.Inventories.Components;
+using OpenRP.Framework.Features.Inventories.Entities;
 
 namespace OpenRP.Framework.Features.Characters.Components
 {
@@ -32,6 +34,13 @@ namespace OpenRP.Framework.Features.Characters.Components
                 _player = this.GetComponent<Player>();
             }
             return _player;
+        }
+
+        public Inventory GetInventory()
+        {
+            EntityId entityId = InventoryEntities.GetInventoryId((int)_characterModel.InventoryId);
+
+            return Manager.GetComponent<Inventory>(entityId);
         }
 
         /// <summary>
