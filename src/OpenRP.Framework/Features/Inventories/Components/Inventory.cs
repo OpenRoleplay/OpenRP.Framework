@@ -56,5 +56,10 @@ namespace OpenRP.Framework.Features.Inventories.Components
                         item.GetAdditionalData().GetString("INVENTORY") == inv.GetId().ToString();
                 }));
         }
+
+        public bool DoesItemFit(Item item, uint amount)
+        {
+
+        }
     }
 }
