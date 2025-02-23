@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Database;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Actors.Components;
@@ -18,15 +19,21 @@ namespace OpenRP.Framework.Features.Items.Services
     {
         private BaseDataContext _dataContext;
         private IEntityManager _entityManager;
+        private ILogger<ItemManager> _logger;
         private DateTime _lastUpdate;
 
         public ItemManager(
             BaseDataContext dataContext, 
-            IEntityManager entityManager
+            IEntityManager entityManager,
+            ILogger<ItemManager> logger
         )
         {
             _dataContext = dataContext;
             _entityManager = entityManager;
+            _logger = logger;
+
+            // Change last update
+            _lastUpdate = DateTime.UtcNow;
         }
 
         public void ProcessChanges()
@@ -34,11 +41,35 @@ namespace OpenRP.Framework.Features.Items.Services
             DateTime changesSince = _lastUpdate;
             _lastUpdate = DateTime.Now;
 
-            int itemsAdded = LoadItems(changesSince);
+            int itemsAdded = LoadNewItems(changesSince);
             int itemsUpdated = UpdateItems(changesSince);
         }
 
-        private int LoadItems(DateTime changesSince)
+        public int LoadItems()
+        {
+            _logger.LogInformation("Begin loading items from database.");
+            List<ItemModel> itemModels = _dataContext.Items
+                .AsNoTracking()
+                .ToList();
+
+            int amountLoaded = 0;
+            foreach (ItemModel itemModel in itemModels)
+            {
+                EntityId itemEntityId = ItemEntities.GetItemId((int)itemModel.Id);
+                _entityManager.Create(itemEntityId);
+
+                Item item = _entityManager.AddComponent<Item>(itemEntityId, itemModel);
+
+                amountLoaded++;
+            }
+
+            _logger.LogInformation("Loaded {0} items.", amountLoaded);
+
+            _logger.LogInformation("Finished loading items from database.");
+            return amountLoaded;
+        }
+
+        private int LoadNewItems(DateTime changesSince)
         {
             List<ItemModel> itemModels = _dataContext.Items
                 .Where(i => i.CreatedOn > changesSince)

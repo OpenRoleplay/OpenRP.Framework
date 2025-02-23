@@ -9,5 +9,6 @@ namespace OpenRP.Framework.Features.Items.Services
     public interface IItemManager
     {
         void ProcessChanges();
+        int LoadItems();
     }
 }
