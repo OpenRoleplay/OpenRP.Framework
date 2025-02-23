@@ -36,5 +36,10 @@ namespace OpenRP.Framework.Features.Inventories.Components
         {
             return _inventoryModel.MaxWeight;
         }
+
+        public List<InventoryItem> GetInventoryItems()
+        {
+            return GetComponentsInChildren<InventoryItem>().ToList();
+        }
     }
 }

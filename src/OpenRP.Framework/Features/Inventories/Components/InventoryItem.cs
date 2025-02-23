@@ -1,4 +1,6 @@
 ﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Features.Inventories.Entities;
+using OpenRP.Framework.Features.Items.Components;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -30,6 +32,18 @@ namespace OpenRP.Framework.Features.Inventories.Components
         public ulong GetId()
         {
             return _inventoryItemModel.Id;
+        }
+
+        public Item GetItem()
+        {
+            EntityId entityId = InventoryEntities.GetInventoryItemId((int)GetId());
+
+            return Manager.GetComponent<Item>(entityId);
+        }
+
+        public Inventory GetInventory()
+        {
+            return GetComponentInParent<Inventory>();
         }
     }
 }

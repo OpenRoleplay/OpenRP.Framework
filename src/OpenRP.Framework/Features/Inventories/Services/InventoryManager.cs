@@ -67,7 +67,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
 
             _logger.LogInformation("Loaded {0} inventories.", amountLoaded);
 
-            _logger.LogInformation("Finished inventories items from database.");
+            _logger.LogInformation("Finished loading inventories from database.");
             return amountLoaded;
         }
 
