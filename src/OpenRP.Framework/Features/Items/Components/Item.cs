@@ -22,9 +22,19 @@ namespace OpenRP.Framework.Features.Items.Components
             return _itemModel.Id;
         }
 
+        public string GetName()
+        {
+            return _itemModel.Name;
+        }
+
         public ItemModel GetItemModel()
         {
             return _itemModel;
+        }
+
+        public uint GetWeight()
+        {
+            return _itemModel.Weight;
         }
 
         public bool IsItemWallet()

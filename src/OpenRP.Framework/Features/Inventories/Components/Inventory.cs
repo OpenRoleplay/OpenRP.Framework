@@ -1,4 +1,5 @@
 ﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Features.Items.Components;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -44,9 +45,16 @@ namespace OpenRP.Framework.Features.Inventories.Components
 
         public Inventory GetParentInventory()
         {
+            List<Inventory> allInventories = Manager.GetComponents<Inventory>().ToList();
 
+            return allInventories.SingleOrDefault(inv =>
+                inv.GetInventoryItems().Any(item =>
+                {
+                    Item itemInstance = item.GetItem();
+                    // Check that this item is an inventory item and that its AdditionalData contains a reference to the given inventory's ID.
+                    return itemInstance.IsItemInventory() &&
+                        item.GetAdditionalData().GetString("INVENTORY") == inv.GetId().ToString();
+                }));
         }
-
-        public uint Ge
     }
 }

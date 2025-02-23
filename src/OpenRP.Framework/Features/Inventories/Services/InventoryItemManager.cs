@@ -138,5 +138,5 @@ namespace OpenRP.Framework.Features.Inventories.Services
 
             return amountLoaded;
         }
-
     }
+}
