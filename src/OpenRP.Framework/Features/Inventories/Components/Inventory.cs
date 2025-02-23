@@ -41,5 +41,12 @@ namespace OpenRP.Framework.Features.Inventories.Components
         {
             return GetComponentsInChildren<InventoryItem>().ToList();
         }
+
+        public Inventory GetParentInventory()
+        {
+
+        }
+
+        public uint Ge
     }
 }
