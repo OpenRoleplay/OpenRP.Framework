@@ -14,7 +14,8 @@ namespace OpenRP.Framework.Features.Inventories.Extensions
         public static IServiceCollection AddInventories(this IServiceCollection self)
         {
             return self
-                .AddTransient<IInventoryService, InventoryService>();
+                .AddTransient<IInventoryService, InventoryService>()
+                .AddTransient<IInventoryManager, InventoryManager>();
         }
     }
 }
