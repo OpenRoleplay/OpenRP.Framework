@@ -109,18 +109,20 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return sb.ToString();
         }
 
-        public bool HasItem(Item item)
+        public bool HasItem(Item item, uint amount = 0)
         {
             List<InventoryItem> inventoryItems = GetInventoryItems();
 
-            if(inventoryItems.Any(i => i.GetItem().GetId() == item.GetId()))
+            if(inventoryItems.Any(i => i.GetItem().GetId() == item.GetId()
+                && (amount != 0 && i.GetAmount() >= amount) 
+            ))
             {
                 return true;
             }
             return false;
         }
 
-        public InventoryItem FindItem(InventoryItem inventoryItem)
+        public InventoryItem FindItem(InventoryItem inventoryItem, uint amount = 0)
         {
             List<InventoryItem> inventoryItems = GetInventoryItems();
 
@@ -161,15 +163,20 @@ namespace OpenRP.Framework.Features.Inventories.Components
                         continue;
                     }
 
+                    if(amount != 0 && inventoryItemModelToCompareWith.Amount >= amount)
+                    {
+                        continue;
+                    }
+
                     return inventoryItemToCompareWith;
                 }
             }
             return null;
         }
 
-        public bool HasItem(InventoryItem inventoryItem)
+        public bool HasItem(InventoryItem inventoryItem, uint amount = 0)
         {
-            if (FindItem(inventoryItem) != null)
+            if (FindItem(inventoryItem, amount) != null)
             {
                 return true;
             }
