@@ -74,6 +74,29 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return _inventoryItemModel.Amount;
         }
 
+        public bool HasAmount(uint amount)
+        {
+            return GetAmount() >= amount;
+        }
+
+        public bool Subtract(uint amount)
+        {
+            if(HasAmount(amount))
+            {
+                _inventoryItemModel.Amount -= amount; 
+                ProcessChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public bool Add(uint amount)
+        {
+            _inventoryItemModel.Amount += amount;
+            ProcessChanges();
+            return true;
+        }
+
         public ItemAdditionalData GetAdditionalData()
         {
             return ItemAdditionalData.Parse(_inventoryItemModel.AdditionalData);
