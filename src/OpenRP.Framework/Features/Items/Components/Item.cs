@@ -17,6 +17,11 @@ namespace OpenRP.Framework.Features.Items.Components
             _itemModel = itemModel;
         }
 
+        public ItemModel GetRawItemModel()
+        {
+            return _itemModel;
+        }
+
         public ulong GetId()
         {
             return _itemModel.Id;

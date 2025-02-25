@@ -174,6 +174,59 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return null;
         }
 
+        public InventoryItem FindItem(Item item, uint amount = 0)
+        {
+            List<InventoryItem> inventoryItems = GetInventoryItems();
+
+            foreach (InventoryItem inventoryItemToCompareWith in inventoryItems)
+            {
+                if (item.GetId() == inventoryItemToCompareWith.GetItem().GetId())
+                {
+                    ItemModel itemModel = item.GetRawItemModel();
+                    ItemModel itemModelToCompareWith = inventoryItemToCompareWith.GetItem().GetRawItemModel();
+                    InventoryItemModel inventoryItemModelToCompareWith = inventoryItemToCompareWith.GetRawInventoryItemModel();
+
+                    if (itemModel.Id != itemModelToCompareWith.Id)
+                    {
+                        continue;
+                    }
+
+                    if (itemModel.CanDestroy != inventoryItemModelToCompareWith.CanDestroy)
+                    {
+                        continue;
+                    }
+
+                    if (itemModel.CanDrop != inventoryItemModelToCompareWith.CanDrop)
+                    {
+                        continue;
+                    }
+
+                    if (itemModel.KeepOnDeath != inventoryItemModelToCompareWith.KeepOnDeath)
+                    {
+                        continue;
+                    }
+
+                    if (itemModel.MaxUses != inventoryItemModelToCompareWith.UsesRemaining)
+                    {
+                        continue;
+                    }
+
+                    if (inventoryItemModelToCompareWith.Weight != null)
+                    {
+                        continue;
+                    }
+
+                    if (amount != 0 && inventoryItemToCompareWith.HasAmount(amount))
+                    {
+                        continue;
+                    }
+
+                    return inventoryItemToCompareWith;
+                }
+            }
+            return null;
+        }
+
         public bool HasItem(InventoryItem inventoryItem, uint amount = 0)
         {
             if (FindItem(inventoryItem, amount) != null)

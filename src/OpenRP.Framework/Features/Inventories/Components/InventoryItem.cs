@@ -83,6 +83,10 @@ namespace OpenRP.Framework.Features.Inventories.Components
         {
             if(HasAmount(amount))
             {
+                if (amount == 0)
+                {
+                    amount = _inventoryItemModel.Amount;
+                }
                 _inventoryItemModel.Amount -= amount; 
                 ProcessChanges();
                 return true;
