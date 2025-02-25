@@ -118,7 +118,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
             int amountLoaded = 0;
             foreach (Inventory inventory in _entityManager.GetComponents<Inventory>())
             {
-                if(inventory.IsScheduledForSaving())
+                if(inventory.HasChanges())
                 {
                     InventoryModel inventoryModel = _dataContext.Inventories.FirstOrDefault(i => i.Id == inventory.GetId());
 
@@ -127,7 +127,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
                         inventoryModel.MaxWeight = inventory.GetMaxWeight();
                         if (_dataContext.SaveChanges() > 0)
                         {
-                            inventory.ScheduleForSaving(false);
+                            inventory.ProcessChanges(false);
                             amountLoaded++;
                         }
                     }

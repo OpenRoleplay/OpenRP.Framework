@@ -1,5 +1,6 @@
 ﻿using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Database.Services;
+using OpenRP.Framework.Features.Inventories.Helpers;
 using OpenRP.Framework.Features.Items.Components;
 using SampSharp.Entities;
 using System;
@@ -13,20 +14,25 @@ namespace OpenRP.Framework.Features.Inventories.Components
     public class Inventory : Component
     {
         private InventoryModel _inventoryModel;
-        private bool _scheduledForSaving;
+        private bool _hasChanges;
         public Inventory(InventoryModel inventoryModel)
         {
             _inventoryModel = inventoryModel;
         }
 
-        public bool IsScheduledForSaving()
+        public bool HasChanges()
         {
-            return _scheduledForSaving;
+            return _hasChanges;
         }
 
-        public void ScheduleForSaving(bool save = true)
+        public void ProcessChanges(bool processChanges = true)
         {
-            _scheduledForSaving = save;
+            _hasChanges = processChanges;
+        }
+
+        public InventoryModel GetRawInventoryModel()
+        {
+            return _inventoryModel;
         }
 
         public ulong GetId()
@@ -103,9 +109,71 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return sb.ToString();
         }
 
-        public bool DoesItemFit(Item item, uint amount)
+        public bool HasItem(Item item)
         {
+            List<InventoryItem> inventoryItems = GetInventoryItems();
 
+            if(inventoryItems.Any(i => i.GetItem().GetId() == item.GetId()))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public InventoryItem FindItem(InventoryItem inventoryItem)
+        {
+            List<InventoryItem> inventoryItems = GetInventoryItems();
+
+            foreach (InventoryItem inventoryItemToCompareWith in inventoryItems)
+            {
+                if(inventoryItem.GetItem().GetId() == inventoryItemToCompareWith.GetItem().GetId())
+                {
+                    InventoryItemModel inventoryItemModel = inventoryItem.GetRawInventoryItemModel();
+                    InventoryItemModel inventoryItemModelToCompareWith = inventoryItemToCompareWith.GetRawInventoryItemModel();
+
+                    if (inventoryItemModel.CanDestroy != inventoryItemModelToCompareWith.CanDestroy)
+                    {
+                        continue;
+                    }
+
+                    if (inventoryItemModel.CanDrop != inventoryItemModelToCompareWith.CanDrop)
+                    {
+                        continue;
+                    }
+
+                    if (inventoryItemModel.KeepOnDeath != inventoryItemModelToCompareWith.KeepOnDeath)
+                    {
+                        continue;
+                    }
+
+                    if (inventoryItemModel.UsesRemaining != inventoryItemModelToCompareWith.UsesRemaining)
+                    {
+                        continue;
+                    }
+
+                    if (inventoryItemModel.Weight != inventoryItemModelToCompareWith.Weight)
+                    {
+                        continue;
+                    }
+
+                    if(!ItemAdditionalData.Equals(inventoryItemModel.AdditionalData, inventoryItemModelToCompareWith.AdditionalData))
+                    {
+                        continue;
+                    }
+
+                    return inventoryItemToCompareWith;
+                }
+            }
+            return null;
+        }
+
+        public bool HasItem(InventoryItem inventoryItem)
+        {
+            if (FindItem(inventoryItem) != null)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

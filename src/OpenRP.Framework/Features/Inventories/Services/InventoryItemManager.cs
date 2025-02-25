@@ -121,7 +121,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
             int amountLoaded = 0;
             foreach (InventoryItem inventoryItem in _entityManager.GetComponents<InventoryItem>())
             {
-                if (inventoryItem.IsScheduledForSaving())
+                if (inventoryItem.HasChanges())
                 {
                     InventoryItemModel inventoryItemModel = _dataContext.InventoryItems.FirstOrDefault(i => i.Id == inventoryItem.GetId());
 
@@ -129,7 +129,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
                     {
                         if (_dataContext.SaveChanges() > 0)
                         {
-                            inventoryItem.ScheduleForSaving(false);
+                            inventoryItem.ProcessChanges(false);
                             amountLoaded++;
                         }
                     }

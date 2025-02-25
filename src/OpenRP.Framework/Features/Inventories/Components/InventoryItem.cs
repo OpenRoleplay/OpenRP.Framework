@@ -16,20 +16,25 @@ namespace OpenRP.Framework.Features.Inventories.Components
     public class InventoryItem : Component
     {
         private readonly InventoryItemModel _inventoryItemModel;
-        private bool _scheduledForSaving;
+        private bool _hasChanges;
         public InventoryItem(InventoryItemModel inventoryItemModel)
         {
             _inventoryItemModel = inventoryItemModel;
         }
 
-        public bool IsScheduledForSaving()
+        public bool HasChanges()
         {
-            return _scheduledForSaving;
+            return _hasChanges;
         }
 
-        public void ScheduleForSaving(bool save = true)
+        public void ProcessChanges(bool processChanges = true)
         {
-            _scheduledForSaving = save;
+            _hasChanges = processChanges;
+        }
+
+        public InventoryItemModel GetRawInventoryItemModel()
+        {
+            return _inventoryItemModel;
         }
 
         public ulong GetId()
