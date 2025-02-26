@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace OpenRP.Framework.Features.Inventories.Services
 {
-    public class InventoryItemManager : IInventoryManager
+    public class InventoryItemManager : IInventoryItemManager
     {
         private BaseDataContext _dataContext;
         private IEntityManager _entityManager;
@@ -42,6 +42,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
             int inventoriesAdded = LoadNewInventoryItems(changesSince);
             int inventoriesUpdated = UpdateInventoryItems(changesSince);
             int inventoriesSaved = await SaveInventoryItems();
+            int inventoriesCreated = await CreateInventoryItems();
         }
 
         public int LoadInventoryItems()
@@ -139,6 +140,41 @@ namespace OpenRP.Framework.Features.Inventories.Services
             }
 
             return amountLoaded;
+        }
+
+        private async Task<int> CreateInventoryItems()
+        {
+            int amountCreated = 0;
+            foreach (InventoryItem inventoryItem in _entityManager.GetComponents<InventoryItem>())
+            {
+                if (inventoryItem.GetId() == 0)
+                {
+                    InventoryItemModel inventoryItemModel = inventoryItem.GetRawInventoryItemModel();
+
+                    if (inventoryItemModel != null)
+                    {
+                        var createdInventoryItemModel = _dataContext.InventoryItems.Update(inventoryItemModel);
+
+                        if (await _dataContext.SaveChangesAsync() > 0)
+                        {
+                            inventoryItem.ProcessChanges(false);
+
+                            inventoryItem.Destroy();
+
+                            EntityId inventoryEntityId = InventoryEntities.GetInventoryId((int)createdInventoryItemModel.Entity.InventoryId);
+                            EntityId inventoryItemEntityId = InventoryEntities.GetInventoryItemId((int)createdInventoryItemModel.Entity.Id);
+
+                            _entityManager.Create(inventoryItemEntityId, inventoryEntityId);
+
+                            InventoryItem newInventoryItem = _entityManager.AddComponent<InventoryItem>(inventoryItemEntityId, inventoryItemModel);
+
+                            amountCreated++;
+                        }
+                    }
+                }
+            }
+
+            return amountCreated;
         }
     }
 }
