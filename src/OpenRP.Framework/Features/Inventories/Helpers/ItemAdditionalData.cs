@@ -182,6 +182,46 @@ namespace OpenRP.Framework.Features.Inventories.Helpers
             return ItemAdditionalData.Parse(newCustomData);
         }
 
+        public static ItemAdditionalData Combine(string primaryDataString, string secondaryDataString)
+        {
+            // Parse both additional data strings.
+            ItemAdditionalData primaryData = ItemAdditionalData.Parse(primaryDataString);
+            ItemAdditionalData secondaryData = ItemAdditionalData.Parse(secondaryDataString);
+
+            // Retrieve the underlying dictionaries.
+            Dictionary<string, string> primaryDict = primaryData.GetAllCustomData();
+            Dictionary<string, string> secondaryDict = secondaryData.GetAllCustomData();
+
+            // Start with the primary dictionary.
+            Dictionary<string, string> combined = new Dictionary<string, string>(primaryDict);
+
+            // Add keys from the secondary dictionary only if they don't exist in primary.
+            foreach (var kvp in secondaryDict)
+            {
+                if (!combined.ContainsKey(kvp.Key))
+                {
+                    combined[kvp.Key] = kvp.Value;
+                }
+            }
+
+            // Rebuild the custom data string in the expected format: "[KEY=VALUE];[KEY=VALUE];..."
+            // Sort keys for consistency and convert keys to uppercase.
+            var sortedData = combined.OrderBy(kvp => kvp.Key);
+            StringBuilder sb = new StringBuilder();
+            bool first = true;
+            foreach (var kvp in sortedData)
+            {
+                if (!first)
+                {
+                    sb.Append(";");
+                }
+                sb.Append($"[{kvp.Key.ToUpper()}={kvp.Value}]");
+                first = false;
+            }
+
+            string newCustomData = sb.ToString();
+            return ItemAdditionalData.Parse(newCustomData);
+        }
 
         public override string ToString()
         {
