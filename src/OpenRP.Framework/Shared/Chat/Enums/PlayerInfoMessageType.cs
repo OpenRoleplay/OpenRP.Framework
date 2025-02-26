@@ -11,5 +11,7 @@ namespace OpenRP.Framework.Shared.Chat.Enums
         INFO,
         ERROR,
         SYNTAX,
+        DEBUG,
+        ADMIN
     }
 }

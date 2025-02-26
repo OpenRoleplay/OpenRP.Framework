@@ -1,4 +1,6 @@
-﻿using OpenRP.Framework.Features.WorldTime.Services;
+﻿using OpenRP.Framework.Features.DebugSettingsFeature.Components;
+using OpenRP.Framework.Features.DebugSettingsFeature.Services;
+using OpenRP.Framework.Features.WorldTime.Services;
 using OpenRP.Framework.Features.WorldWeather.Services;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
@@ -14,6 +16,13 @@ namespace OpenRP.Framework.Features.WorldWeather.Systems
 {
     public class WorldWeatherSystem : ISystem
     {
+        private readonly IDebugSettingsService _debugSettingsService;
+
+        public WorldWeatherSystem(IDebugSettingsService debugSettingsService)
+        {
+            _debugSettingsService = debugSettingsService;
+        }
+
         [Timer(5000)]
         public void UpdateWorldWeather(IEntityManager entityManager, IWorldWeatherService worldWeatherService)
         {
@@ -24,17 +33,22 @@ namespace OpenRP.Framework.Features.WorldWeather.Systems
                 int weatherId = worldWeatherService.GetWeatherAt(pos);
                 player.SetWeather(weatherId);
 
-                bool isHumid = worldWeatherService.IsPositionHumid(pos);
-                bool isArid = worldWeatherService.IsPositionArid(pos);
-                double windSpeed = worldWeatherService.GetWindSpeedAt(pos);
-                double temp = worldWeatherService.GetTemperatureAt(pos);
+                DebugSettings debugSettings = _debugSettingsService.GetDebugSettings(player);
 
-                player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO,
-                    $"Weather: {weatherId} | " +
-                    $"Humid: {(isHumid ? "Yes" : "No")} | " +
-                    $"Arid: {(isArid ? "Yes" : "No")} | " +
-                    $"Wind: {windSpeed:F1} m/s | " +
-                    $"Temp: {temp:F1} degrees Celsius");
+                if (debugSettings != null && debugSettings.ShowWeatherDebugMessages)
+                {
+                    bool isHumid = worldWeatherService.IsPositionHumid(pos);
+                    bool isArid = worldWeatherService.IsPositionArid(pos);
+                    double windSpeed = worldWeatherService.GetWindSpeedAt(pos);
+                    double temp = worldWeatherService.GetTemperatureAt(pos);
+
+                    player.SendPlayerInfoMessage(PlayerInfoMessageType.DEBUG,
+                        $"Weather: {weatherId} | " +
+                        $"Humid: {(isHumid ? "Yes" : "No")} | " +
+                        $"Arid: {(isArid ? "Yes" : "No")} | " +
+                        $"Wind: {windSpeed:F1} m/s | " +
+                        $"Temp: {temp:F1} degrees Celsius");
+                }
             }
         }
     }
