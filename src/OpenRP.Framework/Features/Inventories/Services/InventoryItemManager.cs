@@ -34,14 +34,14 @@ namespace OpenRP.Framework.Features.Inventories.Services
             _lastUpdate = DateTime.UtcNow;
         }
 
-        public void ProcessChanges()
+        public async void ProcessChanges()
         {
             DateTime changesSince = _lastUpdate;
             _lastUpdate = DateTime.Now;
 
             int inventoriesAdded = LoadNewInventoryItems(changesSince);
             int inventoriesUpdated = UpdateInventoryItems(changesSince);
-            int inventoriesSaved = SaveInventoryItems();
+            int inventoriesSaved = await SaveInventoryItems();
         }
 
         public int LoadInventoryItems()
@@ -116,18 +116,20 @@ namespace OpenRP.Framework.Features.Inventories.Services
             return amountLoaded;
         }
 
-        private int SaveInventoryItems()
+        private async Task<int> SaveInventoryItems()
         {
             int amountLoaded = 0;
             foreach (InventoryItem inventoryItem in _entityManager.GetComponents<InventoryItem>())
             {
                 if (inventoryItem.HasChanges())
                 {
-                    InventoryItemModel inventoryItemModel = _dataContext.InventoryItems.FirstOrDefault(i => i.Id == inventoryItem.GetId());
+                    InventoryItemModel inventoryItemModel = inventoryItem.GetRawInventoryItemModel();
 
                     if (inventoryItemModel != null)
                     {
-                        if (_dataContext.SaveChanges() > 0)
+                        _dataContext.InventoryItems.Update(inventoryItemModel);
+
+                        if (await _dataContext.SaveChangesAsync() > 0)
                         {
                             inventoryItem.ProcessChanges(false);
                             amountLoaded++;
