@@ -1,4 +1,5 @@
 ﻿using OpenRP.Framework.Features.CDN.Services;
+using OpenRP.Framework.Features.DebugSettingsFeature.Components;
 using OpenRP.Framework.Features.DebugSettingsFeature.Services;
 using OpenRP.Framework.Features.WorldTime.Services;
 using OpenRP.Framework.Shared.Chat.Enums;
@@ -40,7 +41,7 @@ namespace OpenRP.Framework.Features.WorldTime.Systems
 
                 player.SetTime(simulationHours, simulationMinutes);
 
-                var debugSettings = _debugSettingsService.GetDebugSettings(player);
+                DebugSettings debugSettings = _debugSettingsService.GetDebugSettings(player);
                 if (debugSettings != null && debugSettings.ShowTimeDebugMessages)
                 {
                     // Format with leading zeros using :D2 format specifier

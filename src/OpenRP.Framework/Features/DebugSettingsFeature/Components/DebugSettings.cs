@@ -1,4 +1,5 @@
 ﻿using SampSharp.Entities;
+using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,10 @@ namespace OpenRP.Framework.Features.DebugSettingsFeature.Components
         public bool ShowTemperatureDebugMessages { get; set; }
         public bool ShowTimeDebugMessages { get; set; }
         public bool ShowWeatherDebugMessages { get; set; }
+
+        public Player GetPlayer()
+        {
+            return GetComponent<Player>();
+        }
     }
 }

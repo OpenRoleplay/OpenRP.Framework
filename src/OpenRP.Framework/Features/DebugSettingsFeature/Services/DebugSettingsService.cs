@@ -25,8 +25,7 @@ namespace OpenRP.Framework.Features.DebugSettingsFeature.Services
 
         public DebugSettings GetDebugSettings(Player player)
         {
-            return player.GetComponent<DebugSettings>()
-                ?? ReloadDebugSettings(player);
+            return player.GetComponent<DebugSettings>();
         }
         
         public void ToggleDebugMessage(Player player, DebugSettings debugSettings, DebugMessageType messageType)

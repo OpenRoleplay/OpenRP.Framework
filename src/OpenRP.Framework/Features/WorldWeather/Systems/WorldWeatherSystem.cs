@@ -1,4 +1,5 @@
-﻿using OpenRP.Framework.Features.DebugSettingsFeature.Services;
+﻿using OpenRP.Framework.Features.DebugSettingsFeature.Components;
+using OpenRP.Framework.Features.DebugSettingsFeature.Services;
 using OpenRP.Framework.Features.WorldTime.Services;
 using OpenRP.Framework.Features.WorldWeather.Services;
 using OpenRP.Framework.Shared.Chat.Enums;
@@ -32,14 +33,15 @@ namespace OpenRP.Framework.Features.WorldWeather.Systems
                 int weatherId = worldWeatherService.GetWeatherAt(pos);
                 player.SetWeather(weatherId);
 
-                bool isHumid = worldWeatherService.IsPositionHumid(pos);
-                bool isArid = worldWeatherService.IsPositionArid(pos);
-                double windSpeed = worldWeatherService.GetWindSpeedAt(pos);
-                double temp = worldWeatherService.GetTemperatureAt(pos);
+                DebugSettings debugSettings = _debugSettingsService.GetDebugSettings(player);
 
-                var debugSettings = _debugSettingsService.GetDebugSettings(player);
                 if (debugSettings != null && debugSettings.ShowWeatherDebugMessages)
                 {
+                    bool isHumid = worldWeatherService.IsPositionHumid(pos);
+                    bool isArid = worldWeatherService.IsPositionArid(pos);
+                    double windSpeed = worldWeatherService.GetWindSpeedAt(pos);
+                    double temp = worldWeatherService.GetTemperatureAt(pos);
+
                     player.SendPlayerInfoMessage(PlayerInfoMessageType.DEBUG,
                         $"Weather: {weatherId} | " +
                         $"Humid: {(isHumid ? "Yes" : "No")} | " +
