@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Features.DebugSettingsFeature.Services;
-using OpenRP.Framework.Features.DebugFeature.Services;
 
 namespace OpenRP.Framework.Features.DebugSettingsFeature.Commands
 {

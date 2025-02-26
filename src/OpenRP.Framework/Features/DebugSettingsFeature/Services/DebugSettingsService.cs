@@ -1,5 +1,4 @@
-﻿using OpenRP.Framework.Features.DebugFeature.Services;
-using OpenRP.Framework.Features.DebugSettingsFeature.Components;
+﻿using OpenRP.Framework.Features.DebugSettingsFeature.Components;
 using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Features.DebugSettingsFeature.Enums;
