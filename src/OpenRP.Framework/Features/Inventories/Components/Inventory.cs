@@ -1,5 +1,6 @@
 ﻿using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Database.Services;
+using OpenRP.Framework.Features.Inventories.Entities;
 using OpenRP.Framework.Features.Inventories.Helpers;
 using OpenRP.Framework.Features.Items.Components;
 using SampSharp.Entities;
@@ -252,6 +253,48 @@ namespace OpenRP.Framework.Features.Inventories.Components
             if ((itemToCheck.GetWeight() * amountToCheck) < GetAvailableWeight())
             {
                 return true;
+            }
+            return false;
+        }
+
+        public bool AddItem(Item item, uint amount, ItemAdditionalData? customAdditionalData = null)
+        {
+            if (DoesItemFit(item, amount))
+            {
+                bool hasItem = HasItem(item, amount);
+
+                if (hasItem)
+                {
+                    InventoryItem existingItem = FindItem(item, amount);
+                    existingItem.Add(amount);
+                } 
+                else
+                {
+                    ItemModel itemModel = item.GetRawItemModel();
+
+                    InventoryItemModel inventoryItemModel = new InventoryItemModel()
+                    {
+                        ItemId = item.GetId(),
+                        Amount = amount,
+                        CanDestroy = itemModel.CanDestroy,
+                        CanDrop = itemModel.CanDrop,
+                        KeepOnDeath = itemModel.KeepOnDeath,
+                        InventoryId = GetId(),
+                        UsesRemaining = itemModel.MaxUses,
+                    };
+
+                    if (customAdditionalData != null)
+                    {
+                        string requestedAdditionalData = customAdditionalData.ToString().Trim();
+                        string itemAdditionalData = itemModel.UseValue.Trim();
+
+                        string combined = ItemAdditionalData.Combine(requestedAdditionalData, itemAdditionalData).ToString();
+
+                        inventoryItemModel.AdditionalData = combined;
+                    }
+
+                    // To be continued
+                }
             }
             return false;
         }
