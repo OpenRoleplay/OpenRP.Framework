@@ -15,7 +15,7 @@ namespace OpenRP.Framework.Features.DebugSettingsFeature.Systems
     public class DebugSettingsServerSystem : IServerSystem
     {
         [ServerEvent]
-        public static void OnCharacterSelectedEventArgs(OnCharacterSelectedEventArgs args, IDebugSettingsService debugSettingsService)
+        public void OnCharacterSelected(OnCharacterSelectedEventArgs args, IDebugSettingsService debugSettingsService)
         {
             Character character = args.Character;
 
@@ -23,7 +23,7 @@ namespace OpenRP.Framework.Features.DebugSettingsFeature.Systems
             {
                 CharacterPermissions characterPermissions = character.GetComponent<CharacterPermissions>();
 
-                if (characterPermissions != null && characterPermissions.DoesPlayerHaveCommandPermission("cmd.debug"))
+                if (characterPermissions != null && characterPermissions.DoesPlayerHaveCommandPermission("debug"))
                 {
                     debugSettingsService.ReloadDebugSettings(args.Player);
                 }

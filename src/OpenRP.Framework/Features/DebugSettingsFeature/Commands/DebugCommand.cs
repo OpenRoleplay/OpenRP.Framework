@@ -12,7 +12,7 @@ namespace OpenRP.Framework.Features.DebugSettingsFeature.Commands
 {
     public class DebugCommand : ISystem
     {
-        [ServerCommand(PermissionGroups = new string[] { "Tester" },
+        [ServerCommand(PermissionGroups = new string[] { "Tester", "Admin" },
             Description = "Open the debug settings dialog.",
             CommandGroups = new string[] { "Debug" } )]
         public void Debug(Player player, IDebugSettingsService debugSettingsService)

@@ -25,6 +25,12 @@ namespace OpenRP.Framework.Shared.Chat.Helpers
                 case PlayerInfoMessageType.SYNTAX:
                     message = String.Format("{0}{1}", PlayerInfoMessagePrefix.SYNTAX, text);
                     break;
+                case PlayerInfoMessageType.DEBUG:
+                    message = String.Format("{0}{1}", PlayerInfoMessagePrefix.DEBUG, text);
+                    break;
+                case PlayerInfoMessageType.ADMIN:
+                    message = String.Format("{0}{1}", PlayerInfoMessagePrefix.ADMIN, text);
+                    break;
             }
 
             return message;

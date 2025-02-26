@@ -3,6 +3,8 @@ using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Features.DebugSettingsFeature.Enums;
 using SampSharp.Entities.SAMP;
+using OpenRP.Framework.Shared.Chat.Extensions;
+using OpenRP.Framework.Shared.Chat.Enums;
 
 namespace OpenRP.Framework.Features.DebugSettingsFeature.Services
 {
@@ -34,15 +36,15 @@ namespace OpenRP.Framework.Features.DebugSettingsFeature.Services
             {
                 case DebugMessageType.Temperature:
                     debugSettings.ShowTemperatureDebugMessages = !debugSettings.ShowTemperatureDebugMessages;
-                    player.SendClientMessage(Color.Yellow, $"Temperature debug messages are now {GetStatusText(debugSettings.ShowTemperatureDebugMessages)}.");
+                    player.SendPlayerInfoMessage(PlayerInfoMessageType.ADMIN, $"Temperature debug messages are now {GetStatusText(debugSettings.ShowTemperatureDebugMessages)}.");
                     break;
                 case DebugMessageType.Time:
                     debugSettings.ShowTimeDebugMessages = !debugSettings.ShowTimeDebugMessages;
-                    player.SendClientMessage(Color.Yellow, $"Time debug messages are now {GetStatusText(debugSettings.ShowTimeDebugMessages)}.");
+                    player.SendPlayerInfoMessage(PlayerInfoMessageType.ADMIN, $"Time debug messages are now {GetStatusText(debugSettings.ShowTimeDebugMessages)}.");
                     break;
                 case DebugMessageType.Weather:
                     debugSettings.ShowWeatherDebugMessages = !debugSettings.ShowWeatherDebugMessages;
-                    player.SendClientMessage(Color.Yellow, $"Weather debug messages are now {GetStatusText(debugSettings.ShowWeatherDebugMessages)}.");
+                    player.SendPlayerInfoMessage(PlayerInfoMessageType.ADMIN, $"Weather debug messages are now {GetStatusText(debugSettings.ShowWeatherDebugMessages)}.");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null);
