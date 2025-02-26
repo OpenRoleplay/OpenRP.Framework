@@ -174,6 +174,8 @@ namespace OpenRP.Framework.Features.Inventories.Services
                 }
             }
 
+            InventoryNewEntities.ResetNewInventoryId();
+
             return amountCreated;
         }
     }
