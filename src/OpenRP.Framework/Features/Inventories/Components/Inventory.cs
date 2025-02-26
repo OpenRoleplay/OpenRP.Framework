@@ -235,5 +235,25 @@ namespace OpenRP.Framework.Features.Inventories.Components
             }
             return false;
         }
+
+        public bool DoesInventoryItemFit(InventoryItem inventoryItemToCheck, uint amountToCheck)
+        {
+            // Check if amount of inventoryitem fits in the inventory 
+            if (inventoryItemToCheck.GetTotalWeight(amountToCheck) < GetAvailableWeight())
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool DoesItemFit(Item itemToCheck, uint amountToCheck)
+        {
+            // Check if amount of inventoryitem fits in the inventory 
+            if ((itemToCheck.GetWeight() * amountToCheck) < GetAvailableWeight())
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
