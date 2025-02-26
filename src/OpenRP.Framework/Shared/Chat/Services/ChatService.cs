@@ -187,7 +187,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
                     case PlayerChatMessageType.SHOUT:
                         string CHAT_ACTION_SHOUT = String.Format("{0} shouts: {1}", character.GetCharacterName(), text);
 
-                        SendClientRangedMessage(player, Color.LightSteelBlue, 30, CHAT_ACTION_SHOUT);
+                        SendClientRangedMessage(player, Color.Orange, 30, CHAT_ACTION_SHOUT);
                         break;
                 }
             }

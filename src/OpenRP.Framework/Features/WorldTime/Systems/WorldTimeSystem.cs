@@ -1,4 +1,6 @@
 ﻿using OpenRP.Framework.Features.CDN.Services;
+using OpenRP.Framework.Features.DebugSettingsFeature.Components;
+using OpenRP.Framework.Features.DebugSettingsFeature.Services;
 using OpenRP.Framework.Features.WorldTime.Services;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
@@ -14,6 +16,13 @@ namespace OpenRP.Framework.Features.WorldTime.Systems
 {
     public class WorldTimeSystem : ISystem
     {
+        private readonly IDebugSettingsService _debugSettingsService;
+
+        public WorldTimeSystem(IDebugSettingsService debugSettingsService)
+        {
+            _debugSettingsService = debugSettingsService;
+        }
+
         [Timer(30000)]
         public void UpdateWorldTime(IEntityManager entityManager, IWorldTimeService worldTimeService)
         {
@@ -32,9 +41,13 @@ namespace OpenRP.Framework.Features.WorldTime.Systems
 
                 player.SetTime(simulationHours, simulationMinutes);
 
-                // Format with leading zeros using :D2 format specifier
-                player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO,
-                    $"In-Game Time: {ingameHours:D2}:{ingameMinutes:D2} | Simulation Time: {simulationHours:D2}:{simulationMinutes:D2}");
+                DebugSettings debugSettings = _debugSettingsService.GetDebugSettings(player);
+                if (debugSettings != null && debugSettings.ShowTimeDebugMessages)
+                {
+                    // Format with leading zeros using :D2 format specifier
+                    player.SendPlayerInfoMessage(PlayerInfoMessageType.DEBUG,
+                        $"In-Game Time: {ingameHours:D2}:{ingameMinutes:D2} | Simulation Time: {simulationHours:D2}:{simulationMinutes:D2}");
+                }
             }
         }
     }

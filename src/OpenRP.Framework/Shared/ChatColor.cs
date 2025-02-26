@@ -18,6 +18,9 @@ namespace OpenRP.Framework.Shared
         public const string Red = "{FF0000}";
         public const string CornflowerBlue = "{6495ED}";
         public const string ChromeYellow = "{FFA500}";
+        public const string EstorilBlue = "{2F539B}";
+        public const string WarmYellow = "{9C772F}";
+        public const string ButterflyBlue = "{38ACEC}";
 
         // Open Roleplay Colors
         public const string Main = CornflowerBlue; // Reusing the value from CornflowerBlue

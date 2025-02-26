@@ -6,6 +6,7 @@ using OpenRP.Framework.Features.ActorConversations.Extensions;
 using OpenRP.Framework.Features.Actors.Extensions;
 using OpenRP.Framework.Features.Animations.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
+using OpenRP.Framework.Features.DebugSettingsFeature.Extensions;
 using OpenRP.Framework.Features.Fishing.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
 using OpenRP.Framework.Features.Items.Extensions;
@@ -47,6 +48,7 @@ namespace OpenRP.Framework.Extensions
                 .AddVehicles()
                 .AddMainMenu()
                 .AddItems()
+                .AddDebugSettings()
                 .AddCommands()
                 .AddServerSystemEvents()
                 .AddSystemsInAssembly();
