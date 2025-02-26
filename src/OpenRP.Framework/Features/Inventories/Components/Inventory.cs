@@ -293,7 +293,11 @@ namespace OpenRP.Framework.Features.Inventories.Components
                         inventoryItemModel.AdditionalData = combined;
                     }
 
-                    // To be continued
+                    int newInventoryItemId = InventoryNewEntities.GenerateNewInventoryItemId();
+                    EntityId newInventoryItemEntityId = InventoryEntities.GetInventoryItemId(newInventoryItemId);
+
+                    Manager.Create(newInventoryItemEntityId, Entity);
+                    Manager.AddComponent<InventoryItem>(newInventoryItemEntityId, inventoryItemModel);
                 }
             }
             return false;
