@@ -109,7 +109,7 @@ namespace OpenRP.Framework.Features.Inventories.Helpers
             {
                 return Convert.ToBoolean(this.GetInt(key.ToUpper()));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }

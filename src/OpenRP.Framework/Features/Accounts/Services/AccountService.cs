@@ -34,12 +34,12 @@ namespace OpenRP.Framework.Features.Accounts.Services
             return false;
         }
 
-        public AccountModel GetAccountByUsername(string username)
+        public AccountModel? GetAccountByUsername(string username)
         {
             return _dataContext.Accounts.FirstOrDefault(a => a.Username == username);
         }
 
-        public AccountModel GetAccountById(ulong accountId)
+        public AccountModel? GetAccountById(ulong accountId)
         {
             return _dataContext.Accounts.FirstOrDefault(a => a.Id == accountId);
         }

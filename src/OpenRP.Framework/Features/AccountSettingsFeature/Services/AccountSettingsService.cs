@@ -30,7 +30,7 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
             _dataContext = dataContext;
         }
 
-        public AccountSettings ReloadAccountSettings(Player player)
+        public AccountSettings? ReloadAccountSettings(Player player)
         {
             Account account = player.GetPlayerCurrentlyLoggedInAccount();
 
@@ -47,7 +47,7 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
             return null;
         }
 
-        public AccountSettings GetAccountSettings(Player player)
+        public AccountSettings? GetAccountSettings(Player player)
         {
             Account account = player.GetPlayerCurrentlyLoggedInAccount();
 
