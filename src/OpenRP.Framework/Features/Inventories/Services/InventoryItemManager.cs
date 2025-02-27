@@ -43,6 +43,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
             int inventoriesUpdated = UpdateInventoryItems(changesSince);
             int inventoriesSaved = await SaveInventoryItems();
             int inventoriesCreated = await CreateInventoryItems();
+            int inventoriesDeleted = await DeleteInventoryItems();
         }
 
         public int LoadInventoryItems()
@@ -177,6 +178,31 @@ namespace OpenRP.Framework.Features.Inventories.Services
             InventoryNewEntities.ResetNewInventoryId();
 
             return amountCreated;
+        }
+
+        private async Task<int> DeleteInventoryItems()
+        {
+            int amountLoaded = 0;
+            foreach (InventoryItem inventoryItem in _entityManager.GetComponents<InventoryItem>())
+            {
+                if (inventoryItem.IsDeleted())
+                {
+                    InventoryItemModel inventoryItemModel = inventoryItem.GetRawInventoryItemModel();
+
+                    if (inventoryItemModel != null)
+                    {
+                        _dataContext.InventoryItems.Remove(inventoryItemModel);
+
+                        if (await _dataContext.SaveChangesAsync() > 0)
+                        {
+                            inventoryItem.ProcessChanges(false);
+                            amountLoaded++;
+                        }
+                    }
+                }
+            }
+
+            return amountLoaded;
         }
     }
 }
