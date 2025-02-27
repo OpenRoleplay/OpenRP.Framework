@@ -17,6 +17,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
     {
         private readonly InventoryItemModel _inventoryItemModel;
         private bool _hasChanges;
+        private bool _isDeleted;
         public InventoryItem(InventoryItemModel inventoryItemModel)
         {
             _inventoryItemModel = inventoryItemModel;
@@ -30,6 +31,16 @@ namespace OpenRP.Framework.Features.Inventories.Components
         public void ProcessChanges(bool processChanges = true)
         {
             _hasChanges = processChanges;
+        }
+
+        public bool IsDeleted()
+        {
+            return _isDeleted;
+        }
+
+        public void ProcessDeletion(bool processDeletion = true)
+        {
+            _isDeleted = processDeletion;
         }
 
         public InventoryItemModel GetRawInventoryItemModel()
@@ -136,6 +147,47 @@ namespace OpenRP.Framework.Features.Inventories.Components
         public uint GetTotalWeight()
         {
             return GetTotalWeight(GetAmount());
+        }
+
+        public bool Transfer(Inventory targetInventory, uint amount = 0)
+        {
+            // Determine how many units to transfer (0 means full stack).
+            uint transferAmount = (amount == 0) ? this.GetAmount() : amount;
+
+            // Check if the target inventory has enough available weight to accept the item.
+            // Here we use the item's own weight check.
+            if (!targetInventory.DoesInventoryItemFit(this, transferAmount))
+            {
+                return false;
+            }
+
+            // Attempt to subtract the transfer amount from the source InventoryItem.
+            if (!this.Subtract(transferAmount))
+            {
+                return false;
+            }
+
+            // If subtracting reduced the item count to 0, schedule its deletion.
+            if (this.GetAmount() == 0)
+            {
+                this.ProcessDeletion();
+            }
+
+            // Add the item to the target inventory.
+            // Pass along the additional data so that any extra properties are preserved.
+            bool added = targetInventory.AddItem(this.GetItem(), transferAmount, this.GetAdditionalData());
+            if (!added)
+            {
+                // Roll back the subtraction in case adding to the target inventory fails.
+                this.Add(transferAmount);
+                return false;
+            }
+
+            // Mark that both inventories have changed.
+            this.ProcessChanges();
+            targetInventory.ProcessChanges();
+
+            return true;
         }
     }
 }

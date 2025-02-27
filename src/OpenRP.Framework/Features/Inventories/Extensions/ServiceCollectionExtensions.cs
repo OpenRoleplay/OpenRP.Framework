@@ -15,7 +15,8 @@ namespace OpenRP.Framework.Features.Inventories.Extensions
         {
             return self
                 .AddTransient<IInventoryService, InventoryService>()
-                .AddTransient<IInventoryManager, InventoryManager>();
+                .AddSingleton<IInventoryItemManager, InventoryItemManager>()
+                .AddSingleton<IInventoryManager, InventoryManager>();
         }
     }
 }

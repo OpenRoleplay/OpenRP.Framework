@@ -4,6 +4,7 @@ using OpenRP.Framework.Features.Inventories.Entities;
 using OpenRP.Framework.Features.Inventories.Helpers;
 using OpenRP.Framework.Features.Items.Components;
 using SampSharp.Entities;
+using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -129,7 +130,12 @@ namespace OpenRP.Framework.Features.Inventories.Components
 
             foreach (InventoryItem inventoryItemToCompareWith in inventoryItems)
             {
-                if(inventoryItem.GetItem().GetId() == inventoryItemToCompareWith.GetItem().GetId())
+                if (inventoryItemToCompareWith.IsDeleted())
+                {
+                    continue;
+                }
+
+                if (inventoryItem.GetItem().GetId() == inventoryItemToCompareWith.GetItem().GetId())
                 {
                     InventoryItemModel inventoryItemModel = inventoryItem.GetRawInventoryItemModel();
                     InventoryItemModel inventoryItemModelToCompareWith = inventoryItemToCompareWith.GetRawInventoryItemModel();
@@ -181,6 +187,11 @@ namespace OpenRP.Framework.Features.Inventories.Components
 
             foreach (InventoryItem inventoryItemToCompareWith in inventoryItems)
             {
+                if(inventoryItemToCompareWith.IsDeleted())
+                {
+                    continue;
+                }
+
                 if (item.GetId() == inventoryItemToCompareWith.GetItem().GetId())
                 {
                     ItemModel itemModel = item.GetRawItemModel();
@@ -302,5 +313,53 @@ namespace OpenRP.Framework.Features.Inventories.Components
             }
             return false;
         }
+
+        public bool RemoveItem(Item item, uint amount = 0)
+        {
+            // Attempt to find the matching InventoryItem in the inventory.
+            InventoryItem inventoryItem = FindItem(item, amount);
+            if (inventoryItem == null)
+            {
+                // Item not found, nothing to remove.
+                return false;
+            }
+
+            uint currentAmount = inventoryItem.GetAmount();
+
+            // If no specific amount is provided or the removal amount is greater than or equal to what's available,
+            // remove the item entirely.
+            if (amount == 0 || currentAmount <= amount)
+            {
+                inventoryItem.ProcessDeletion();
+            }
+            else
+            {
+                // Otherwise, remove only the specified amount.
+                // (Assumes InventoryItem has a Remove method; if not, adjust the amount accordingly.)
+                inventoryItem.Subtract(amount);
+            }
+
+            return true;
+        }
+
+        public bool UseItem(Player player, InventoryItem inventoryItem)
+        {
+            // Retrieve the underlying model from the component.
+            InventoryItemModel inventoryItemModel = inventoryItem.GetRawInventoryItemModel();
+
+            // If the item tracks uses, decrement the count.
+            if (inventoryItemModel.UsesRemaining != null)
+            {
+                inventoryItemModel.UsesRemaining--;
+
+                // If no uses remain, remove the item from the system.
+                if (inventoryItemModel.UsesRemaining == 0)
+                {
+                    inventoryItem.ProcessDeletion();
+                }
+            }
+            return true;
+        }
+
     }
 }
