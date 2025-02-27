@@ -13,6 +13,7 @@ namespace OpenRP.Framework.Database.Models
         public ulong AccountId { get; set; }
         public AccountGraphicPreset AccountGraphicPreset { get; set; }
         public bool GlobalChatEnabled { get; set; }
+        public bool NewbieChatEnabled { get; set; }
 
         // Navigational Properties
         public AccountModel AccountModel { get; set; }

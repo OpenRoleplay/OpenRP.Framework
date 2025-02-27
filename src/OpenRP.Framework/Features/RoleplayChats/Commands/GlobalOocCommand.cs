@@ -22,7 +22,7 @@ namespace OpenRP.Framework.Features.RoleplayChats.Commands
             CommandGroups = new[] { "Chat" })]
         public void Ooc(Player player, IChatService chatService, IDiscordService discordService, string text)
         {
-            var accountSettings = player.GetComponent<AccountSettings>();
+            AccountSettings accountSettings = player.GetComponent<AccountSettings>();
             if (accountSettings != null && !accountSettings.GetGlobalChatEnabled())
             {
                 player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You can't chat in OOC because you have it disabled in /settings!");

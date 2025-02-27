@@ -132,7 +132,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
 
                         foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
                         {
-                            var foreachPlayerSettings = foreachPlayer.GetComponent<AccountSettings>();
+                            AccountSettings foreachPlayerSettings = foreachPlayer.GetComponent<AccountSettings>();
 
                             if (foreachPlayerSettings != null && foreachPlayerSettings.GetGlobalChatEnabled())
                             {
@@ -150,7 +150,12 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         
                         foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
                         {
-                            foreachPlayer.SendClientMessage(Color.LightGreen, CHAT_ACTION_NEWBIE);
+                            AccountSettings foreachPlayerSettings = foreachPlayer.GetComponent<AccountSettings>();
+
+                            if (foreachPlayerSettings != null && foreachPlayerSettings.GetNewbieChatEnabled())
+                            {
+                                foreachPlayer.SendClientMessage(Color.LightGreen, CHAT_ACTION_NEWBIE);
+                            }
                         }
                         break;
                     case PlayerChatMessageType.ME:
