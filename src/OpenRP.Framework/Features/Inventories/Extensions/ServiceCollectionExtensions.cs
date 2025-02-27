@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Inventories.Services;
+using OpenRP.Framework.Features.Inventories.Services.Dialogs;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,8 @@ namespace OpenRP.Framework.Features.Inventories.Extensions
             return self
                 .AddTransient<IInventoryService, InventoryService>()
                 .AddSingleton<IInventoryItemManager, InventoryItemManager>()
-                .AddSingleton<IInventoryManager, InventoryManager>();
+                .AddSingleton<IInventoryManager, InventoryManager>()
+                .AddSingleton<IInventoryDialogService, InventoryDialogService>();
         }
     }
 }

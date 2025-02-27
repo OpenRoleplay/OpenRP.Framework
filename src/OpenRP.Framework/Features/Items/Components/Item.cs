@@ -32,6 +32,20 @@ namespace OpenRP.Framework.Features.Items.Components
             return _itemModel.Name;
         }
 
+        public string GetDescription()
+        {
+            return _itemModel.Description;
+        }
+
+        public bool IsDestroyable()
+        {
+            return _itemModel.CanDestroy;
+        }
+        public bool IsDroppable()
+        {
+            return _itemModel.CanDrop;
+        }
+
         public uint? GetMaxUses()
         {
             return _itemModel.MaxUses;

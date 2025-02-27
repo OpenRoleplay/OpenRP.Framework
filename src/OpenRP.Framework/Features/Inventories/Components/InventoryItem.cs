@@ -3,6 +3,7 @@ using OpenRP.Framework.Database.Services;
 using OpenRP.Framework.Features.Inventories.Entities;
 using OpenRP.Framework.Features.Inventories.Helpers;
 using OpenRP.Framework.Features.Items.Components;
+using OpenRP.Framework.Features.Items.Entities;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -55,7 +56,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
 
         public Item GetItem()
         {
-            EntityId entityId = InventoryEntities.GetInventoryItemId((int)GetId());
+            EntityId entityId = ItemEntities.GetItemId((int)_inventoryItemModel.ItemId);
 
             return Manager.GetComponent<Item>(entityId);
         }

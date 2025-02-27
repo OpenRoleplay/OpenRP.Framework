@@ -11,7 +11,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
     {
         public Inventory OpenedInventory;
         public Dictionary<int, InventoryItem> OpenedInventoryItems;
-        public InventoryItem? OpenedInventoryItem;
+        public InventoryItem? SelectedInventoryItem;
 
         public InventoryOpened(Inventory inventory) 
         { 

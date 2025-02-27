@@ -17,9 +17,11 @@ namespace OpenRP.Framework.Features.Inventories.Components
     {
         private InventoryModel _inventoryModel;
         private bool _hasChanges;
+        private EntityId? _parentInventoryEntityId;
         public Inventory(InventoryModel inventoryModel)
         {
             _inventoryModel = inventoryModel;
+            _parentInventoryEntityId = null;
         }
 
         public bool HasChanges()
@@ -61,18 +63,45 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return GetComponentsInChildren<InventoryItem>().ToList();
         }
 
-        public Inventory GetParentInventory()
+        public Inventory? GetParentInventory()
         {
+            if(_parentInventoryEntityId.HasValue)
+            {
+                return Manager.GetComponent<Inventory>(_parentInventoryEntityId.Value);
+            }
+
+            // Retrieve all Inventory components.
             List<Inventory> allInventories = Manager.GetComponents<Inventory>().ToList();
 
-            return allInventories.SingleOrDefault(inv =>
-                inv.GetInventoryItems().Any(item =>
+            // Loop through each inventory.
+            foreach (Inventory inventory in allInventories)
+            {
+                // Loop through each inventory item in the current inventory.
+                foreach (InventoryItem item in inventory.GetInventoryItems())
                 {
                     Item itemInstance = item.GetItem();
-                    // Check that this item is an inventory item and that its AdditionalData contains a reference to the given inventory's ID.
-                    return itemInstance.IsItemInventory() &&
-                        item.GetAdditionalData().GetString("INVENTORY") == inv.GetId().ToString();
-                }));
+
+                    // Only consider inventory items.
+                    if (!itemInstance.IsItemInventory())
+                    {
+                        continue;
+                    }
+
+                    // Get the reference stored in the item's additional data.
+                    string referencedInventoryId = item.GetAdditionalData().GetString("INVENTORY");
+                    string currentInventoryId = inventory.GetId().ToString();
+
+                    if (referencedInventoryId == currentInventoryId)
+                    {
+                        _parentInventoryEntityId = inventory.Entity;
+
+                        return inventory;
+                    }
+                }
+            }
+
+            // Return null if no matching parent inventory is found.
+            return null;
         }
 
         public uint GetAvailableWeight()
