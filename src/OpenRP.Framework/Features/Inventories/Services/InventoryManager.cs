@@ -120,7 +120,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
             {
                 if(inventory.HasChanges())
                 {
-                    InventoryModel inventoryModel = _dataContext.Inventories.FirstOrDefault(i => i.Id == inventory.GetId());
+                    InventoryModel? inventoryModel = _dataContext.Inventories.FirstOrDefault(i => i.Id == inventory.GetId());
 
                     if (inventoryModel != null)
                     {

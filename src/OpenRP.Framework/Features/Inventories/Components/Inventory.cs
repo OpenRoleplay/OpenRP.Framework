@@ -124,7 +124,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return false;
         }
 
-        public InventoryItem FindItem(InventoryItem inventoryItem, uint amount = 0)
+        public InventoryItem? FindItem(InventoryItem inventoryItem, uint amount = 0)
         {
             List<InventoryItem> inventoryItems = GetInventoryItems();
 
@@ -181,7 +181,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return null;
         }
 
-        public InventoryItem FindItem(Item item, uint amount = 0)
+        public InventoryItem? FindItem(Item item, uint amount = 0)
         {
             List<InventoryItem> inventoryItems = GetInventoryItems();
 
@@ -276,8 +276,12 @@ namespace OpenRP.Framework.Features.Inventories.Components
 
                 if (hasItem)
                 {
-                    InventoryItem existingItem = FindItem(item, amount);
-                    existingItem.Add(amount);
+                    InventoryItem? existingItem = FindItem(item, amount);
+
+                    if (existingItem != null)
+                    {
+                        existingItem.Add(amount);
+                    }
                 } 
                 else
                 {
@@ -317,7 +321,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
         public bool RemoveItem(Item item, uint amount = 0)
         {
             // Attempt to find the matching InventoryItem in the inventory.
-            InventoryItem inventoryItem = FindItem(item, amount);
+            InventoryItem? inventoryItem = FindItem(item, amount);
             if (inventoryItem == null)
             {
                 // Item not found, nothing to remove.

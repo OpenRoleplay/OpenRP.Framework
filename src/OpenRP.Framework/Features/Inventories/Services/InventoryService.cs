@@ -16,7 +16,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
             _dataContext = dataContext;
         }
 
-        public InventoryModel CreateInventory(string inventoryName, uint? maxWeightInGrams)
+        public InventoryModel? CreateInventory(string inventoryName, uint? maxWeightInGrams)
         {
             try
             {
