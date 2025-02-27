@@ -32,6 +32,11 @@ namespace OpenRP.Framework.Features.Items.Components
             return _itemModel.Name;
         }
 
+        public uint? GetMaxUses()
+        {
+            return _itemModel.MaxUses;
+        }
+
         public ItemModel GetItemModel()
         {
             return _itemModel;

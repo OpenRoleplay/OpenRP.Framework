@@ -85,6 +85,21 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return _inventoryItemModel.Amount;
         }
 
+        public bool HasMaxUses()
+        {
+            return _inventoryItemModel.UsesRemaining != null;
+        }
+
+        public bool HasRemainingUses()
+        {
+            return _inventoryItemModel.UsesRemaining.HasValue && _inventoryItemModel.UsesRemaining.Value > 0;
+        }
+
+        public uint? GetRemainingUses()
+        {
+            return _inventoryItemModel.UsesRemaining;
+        }
+
         public bool HasAmount(uint amount)
         {
             return GetAmount() >= amount;
