@@ -145,7 +145,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
             List<InventoryItem> inventoryItems = GetInventoryItems();
 
             if(inventoryItems.Any(i => i.GetItem().GetId() == item.GetId()
-                && (amount != 0 && i.GetAmount() >= amount) 
+                && (amount == 0 || i.GetAmount() >= amount) 
             ))
             {
                 return true;
@@ -303,7 +303,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
             {
                 bool hasItem = HasItem(item, amount);
 
-                if (hasItem)
+                if (hasItem && !item.IsStackable())
                 {
                     InventoryItem? existingItem = FindItem(item, amount);
 

@@ -46,6 +46,11 @@ namespace OpenRP.Framework.Features.Items.Components
             return _itemModel.CanDrop;
         }
 
+        public bool IsStackable()
+        {
+            return _itemModel.Stackable;
+        }
+
         public uint? GetMaxUses()
         {
             return _itemModel.MaxUses;
