@@ -10,12 +10,13 @@ namespace OpenRP.Framework.Features.Inventories.Components
     public class InventoryOpened : Component
     {
         public Inventory OpenedInventory;
-        public Dictionary<uint, InventoryItem> OpenedInventoryItems;
+        public Dictionary<int, InventoryItem> OpenedInventoryItems;
+        public InventoryItem? OpenedInventoryItem;
 
-        public InventoryOpened(Inventory inventory, Dictionary<uint, InventoryItem> inventoryItems) 
+        public InventoryOpened(Inventory inventory) 
         { 
             this.OpenedInventory = inventory;
-            this.OpenedInventoryItems = inventoryItems;
+            this.OpenedInventoryItems = new Dictionary<int, InventoryItem>();
         }
     }
 }
