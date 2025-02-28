@@ -1,8 +1,9 @@
-﻿namespace OpenRP.Framework.Database.Models
+﻿using OpenRP.Framework.Database.Entities;
+
+namespace OpenRP.Framework.Database.Models
 {
-    public class DroppedInventoryItemModel
+    public class DroppedInventoryItemModel : BaseModel
     {
-        public ulong Id { get; set; }
         public ulong InventoryItemId { get; set; }
         public float PosX { get; set; }
         public float PosY { get; set; }

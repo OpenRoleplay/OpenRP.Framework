@@ -2,9 +2,8 @@
 
 namespace OpenRP.Framework.Database.Models
 {
-    public class InventoryItemModel : BaseEntity
+    public class InventoryItemModel : BaseModel
     {
-        public ulong Id { get; set; }
         public ulong ItemId { get; set; }
         public uint Amount { get; set; }
         public uint? UsesRemaining { get; set; }

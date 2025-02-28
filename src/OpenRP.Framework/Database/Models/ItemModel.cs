@@ -3,9 +3,8 @@ using OpenRP.Framework.Features.Items.Enums;
 
 namespace OpenRP.Framework.Database.Models
 {
-    public class ItemModel : BaseEntity
+    public class ItemModel : BaseModel
     {
-        public ulong Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public ItemType UseType { get; set; }

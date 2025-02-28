@@ -1,8 +1,9 @@
-﻿namespace OpenRP.Framework.Database.Models
+﻿using OpenRP.Framework.Database.Entities;
+
+namespace OpenRP.Framework.Database.Models
 {
-    public class CharacterModel
+    public class CharacterModel : BaseModel
     {
-        public ulong Id { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
         public string LastName { get; set; }

@@ -2,9 +2,8 @@
 
 namespace OpenRP.Framework.Database.Models
 {
-    public class InventoryModel : BaseEntity
+    public class InventoryModel : BaseModel
     {
-        public ulong Id { get; set; }
         public string Name { get; set; }
         /// <summary>
         /// Max weight in grams

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenRP.Framework.Database.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Database.Models
 {
-    public class CurrencyUnitModel
+    public class CurrencyUnitModel : BaseModel
     {
-        public ulong Id { get; set; }
         public ulong CurrencyId { get; set; }
         public decimal UnitValue { get; set; }
 

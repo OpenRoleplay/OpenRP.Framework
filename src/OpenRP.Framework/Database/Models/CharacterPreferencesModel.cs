@@ -1,8 +1,9 @@
-﻿namespace OpenRP.Framework.Database.Models
+﻿using OpenRP.Framework.Database.Entities;
+
+namespace OpenRP.Framework.Database.Models
 {
-    public class CharacterPreferencesModel
+    public class CharacterPreferencesModel : BaseModel
     {
-        public ulong Id { get; set; }
         public ulong CharacterId { get; set; }
         public bool HardcoreMode { get; set; }
         public bool AllowCharacterKill { get; set; }

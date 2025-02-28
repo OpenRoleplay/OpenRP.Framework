@@ -1,8 +1,9 @@
-﻿namespace OpenRP.Framework.Database.Models
+﻿using OpenRP.Framework.Database.Entities;
+
+namespace OpenRP.Framework.Database.Models
 {
-    public class VehicleModelSpawnTypeModel
+    public class VehicleModelSpawnTypeModel : BaseModel
     {
-        public ulong Id { get; set; }
         public string Name { get; set; }
     }
 }

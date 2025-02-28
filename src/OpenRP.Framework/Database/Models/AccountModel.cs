@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Database.Models
 {
-    public class AccountModel : BaseEntity
+    public class AccountModel : BaseModel
     {
-        public ulong Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public uint Level { get; set; }

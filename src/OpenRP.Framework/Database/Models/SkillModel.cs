@@ -1,8 +1,9 @@
-﻿namespace OpenRP.Framework.Database.Models
+﻿using OpenRP.Framework.Database.Entities;
+
+namespace OpenRP.Framework.Database.Models
 {
-    public class SkillModel
+    public class SkillModel : BaseModel
     {
-        public ulong Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }

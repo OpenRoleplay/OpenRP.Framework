@@ -1,4 +1,5 @@
-﻿using OpenRP.Framework.Features.Fishing.Enums;
+﻿using OpenRP.Framework.Database.Entities;
+using OpenRP.Framework.Features.Fishing.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Database.Models
 {
-    public class FishLootModel
+    public class FishLootModel : BaseModel
     {
-        public ulong Id { get; set; }
         public string Name { get; set; }
         public FishLootType FishLootType { get; set; }
         public int MinWeightInGrams { get; set; }

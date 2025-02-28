@@ -62,7 +62,7 @@ namespace OpenRP.Framework.Database
         private void UpdateTimestamps()
         {
             // Only update entities that inherit from BaseEntity
-            var entries = ChangeTracker.Entries<BaseEntity>();
+            var entries = ChangeTracker.Entries<BaseModel>();
             foreach (var entry in entries)
             {
                 if (entry.State == EntityState.Added)
@@ -75,6 +75,23 @@ namespace OpenRP.Framework.Database
                     entry.Entity.UpdatedOn = DateTime.UtcNow;
                 }
             }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Configure all entities that inherit from BaseModel
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes()
+                     .Where(t => typeof(BaseModel).IsAssignableFrom(t.ClrType)))
+            {
+                modelBuilder.Entity(entityType.ClrType)
+                    .HasKey(nameof(BaseModel.Id));
+
+                modelBuilder.Entity(entityType.ClrType)
+                    .Property(nameof(BaseModel.Id))
+                    .ValueGeneratedOnAdd();
+            }
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
