@@ -140,15 +140,18 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return sb.ToString();
         }
 
-        public bool HasItem(Item item, uint amount = 0)
+        public bool HasItem(Item? item, uint amount = 0)
         {
-            List<InventoryItem> inventoryItems = GetInventoryItems();
-
-            if(inventoryItems.Any(i => i.GetItem().GetId() == item.GetId()
-                && (amount == 0 || i.GetAmount() >= amount) 
-            ))
+            if (item != null)
             {
-                return true;
+                List<InventoryItem> inventoryItems = GetInventoryItems();
+
+                if (inventoryItems.Any(i => i.GetItem().GetId() == item.GetId()
+                    && (amount == 0 || i.GetAmount() >= amount)
+                ))
+                {
+                    return true;
+                }
             }
             return false;
         }
