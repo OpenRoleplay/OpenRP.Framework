@@ -162,7 +162,7 @@ namespace OpenRP.Framework.Features.Discord.Services
 
             if (lastMessage != null && !lastMessage.Content.EndsWith("is now playing on the server.") && !lastMessage.Content.EndsWith("is no longer playing on the server."))
             {
-                return await IsMessageFromBotAsync(lastMessage);
+                return IsMessageFromBotAsync(lastMessage);
             }
 
             // If no messages are found
@@ -175,7 +175,7 @@ namespace OpenRP.Framework.Features.Discord.Services
         /// </summary>
         /// <param name="message">The Discord message to check.</param>
         /// <returns>True if the message was sent by the bot; otherwise, false.</returns>
-        private async Task<bool> IsMessageFromBotAsync(DiscordMessage message)
+        private bool IsMessageFromBotAsync(DiscordMessage message)
         {
             // Get the bot's user ID
             var botUser = _discordClient.CurrentUser;

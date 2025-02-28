@@ -12,7 +12,7 @@ namespace OpenRP.Framework.Features.Accounts.Services
     public interface IAccountService
     {
         bool DoesAccountExist(string username);
-        List<AccountModel> GetAccountsByCharacterName(string characterName);
+        List<AccountModel>? GetAccountsByCharacterName(string characterName);
         AccountModel? GetAccountByUsername(string username);
         bool CheckPassword(string username, string password);
         Task LoginPlayer(Player player, string username);

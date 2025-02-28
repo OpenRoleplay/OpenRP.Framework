@@ -11,7 +11,6 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
     public class ActorConversationWithPlayerPromptBuilder
     {
         private List<ServerActor> _actorData;
-        private string _messageReplyingTo;
 
         // Prompt
         private DateTime _promptCurrentDate;

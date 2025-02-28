@@ -49,8 +49,8 @@ namespace OpenRP.Framework.Features.MainMenu.Services.Dialogs
             betterListDialog.SetTitle(TitleType.Parents, $"Welcome to {ChatColor.Highlight}Open Roleplay{ChatColor.White}!");
 
             string characterName = player.Name;
-            List<AccountModel> characterAccounts = _accountService.GetAccountsByCharacterName(characterName);
-            AccountModel account = _accountService.GetAccountByUsername(player.Name);
+            List<AccountModel>? characterAccounts = _accountService.GetAccountsByCharacterName(characterName);
+            AccountModel? account = _accountService.GetAccountByUsername(player.Name);
 
             int loginToCurrentAccountIndex = -1;
             if (account != null)

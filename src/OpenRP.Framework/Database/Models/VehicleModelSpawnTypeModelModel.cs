@@ -13,7 +13,7 @@ namespace OpenRP.Framework.Database.Models
         public ulong VehicleModelId { get; set; }
 
         // Navginational Properties
-        public VehicleModelModel VehicleModel { get; set; }
-        public VehicleModelSpawnTypeModel VehicleSpawnType { get; set; }
+        public VehicleModelModel? VehicleModel { get; set; }
+        public VehicleModelSpawnTypeModel? VehicleSpawnType { get; set; }
     }
 }

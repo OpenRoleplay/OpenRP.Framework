@@ -44,7 +44,7 @@ namespace OpenRP.Framework.Features.Accounts.Services
             return _dataContext.Accounts.FirstOrDefault(a => a.Id == accountId);
         }
 
-        public List<AccountModel> GetAccountsByCharacterName(string characterName)
+        public List<AccountModel>? GetAccountsByCharacterName(string characterName)
         {
             if (characterName.Contains("_"))
             {

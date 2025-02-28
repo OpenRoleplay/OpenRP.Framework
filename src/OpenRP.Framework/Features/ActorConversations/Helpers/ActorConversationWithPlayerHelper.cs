@@ -109,7 +109,7 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
             try
             {
                 // Deactivate conversation if no players are attached
-                List<ActorConversationWithPlayerState> currentlyAttachedPlayers = await GetCurrentlyAttachedPlayerStates();
+                List<ActorConversationWithPlayerState> currentlyAttachedPlayers = GetCurrentlyAttachedPlayerStates();
                 int attachedPlayerCount = currentlyAttachedPlayers.Count;
                 if (attachedPlayerCount == 0)
                 {
@@ -122,7 +122,7 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
             }
         }
 
-        private async Task<List<ActorConversationWithPlayerState>> GetCurrentlyAttachedPlayerStates()
+        private List<ActorConversationWithPlayerState> GetCurrentlyAttachedPlayerStates()
         {
             return _entityManager.GetComponents<ActorConversationWithPlayerState>().Where(i => i.ConversationId == _conversationId).ToList();
         }
@@ -145,7 +145,7 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
                     {
                         canGenerateNewExchange = false;
 
-                        List<ActorConversationWithPlayerState> currentlyAttachedPlayers = await GetCurrentlyAttachedPlayerStates();
+                        List<ActorConversationWithPlayerState> currentlyAttachedPlayers = GetCurrentlyAttachedPlayerStates();
                         foreach (var playerState in currentlyAttachedPlayers)
                         {
                             Player player = null;
@@ -168,7 +168,6 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
 
                         if (newExchange != null)
                         {
-                            ActorModel fromActor = null;
                             ActorCommandProcessor actorCommandProcessor = new ActorCommandProcessor(newExchange, _conversationActorsParticipating, _conversationHistory);
                             List<ActorProcessedCommand> processedCommands = actorCommandProcessor.Process();
 
@@ -184,7 +183,7 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
                                 _conversationHistory.Add(historyEntry);
 
                                 // Notify only players who have caught up
-                                List<ActorConversationWithPlayerState> currentlyAttachedPlayers = await GetCurrentlyAttachedPlayerStates();
+                                List<ActorConversationWithPlayerState> currentlyAttachedPlayers = GetCurrentlyAttachedPlayerStates();
                                 foreach (var playerState in currentlyAttachedPlayers)
                                 {
                                     Player player = null;
