@@ -87,7 +87,11 @@ namespace OpenRP.Framework.Database
                 if (entry.Entity.Inventory == null)
                 {
                     // Create a new InventoryModel and associate it.
-                    var newInventory = new InventoryModel();
+                    var newInventory = new InventoryModel()
+                    {
+                        Name = $"{entry.Entity.FirstName} {entry.Entity.LastName}`s Inventory",
+                        MaxWeight = 10000
+                    };
                     entry.Entity.Inventory = newInventory;
                 }
             }
