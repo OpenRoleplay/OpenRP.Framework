@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace OpenRP.Framework.Features.Inventories.Services
 {
-    public class InventoryManager : BaseManager<InventoryModel, Inventory>, IBaseManager
+    public class InventoryManager : BaseManager<InventoryModel, Inventory>, IInventoryManager
     {
         public InventoryManager(BaseDataContext dataContext, IEntityManager entityManager, ILogger<InventoryManager> logger)
             : base(dataContext, entityManager, logger) { }
