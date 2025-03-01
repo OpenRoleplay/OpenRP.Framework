@@ -50,12 +50,14 @@ namespace OpenRP.Framework.Database
         public override int SaveChanges()
         {
             UpdateTimestamps();
+            AttachNewInventories();
             return base.SaveChanges();
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             UpdateTimestamps();
+            AttachNewInventories();
             return base.SaveChangesAsync(cancellationToken);
         }
 
@@ -73,6 +75,20 @@ namespace OpenRP.Framework.Database
                 else if (entry.State == EntityState.Modified)
                 {
                     entry.Entity.UpdatedOn = DateTime.UtcNow;
+                }
+            }
+        }
+
+        private void AttachNewInventories()
+        {
+            // Loop through all newly added CharacterModel entries.
+            foreach (var entry in ChangeTracker.Entries<CharacterModel>().Where(e => e.State == EntityState.Added))
+            {
+                if (entry.Entity.Inventory == null)
+                {
+                    // Create a new InventoryModel and associate it.
+                    var newInventory = new InventoryModel();
+                    entry.Entity.Inventory = newInventory;
                 }
             }
         }

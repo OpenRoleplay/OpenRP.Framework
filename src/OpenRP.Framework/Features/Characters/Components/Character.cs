@@ -17,7 +17,7 @@ namespace OpenRP.Framework.Features.Characters.Components
 {
     public class Character : Component
     {
-        private Player _player;
+        private Player? _player;
         private CharacterModel _characterModel;
 
         public Character(CharacterModel characterModel)
@@ -27,7 +27,7 @@ namespace OpenRP.Framework.Features.Characters.Components
 
         public ulong GetDatabaseId() => GetCharacterModel().Id;
 
-        public Player GetPlayer()
+        public Player? GetPlayer()
         {
             if (_player == null && this.Entity.IsOfType(SampEntities.PlayerType))
             {
