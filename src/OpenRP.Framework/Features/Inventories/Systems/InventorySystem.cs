@@ -1,5 +1,6 @@
 ﻿using OpenRP.Framework.Features.Inventories.Services;
 using OpenRP.Framework.Features.Items.Services;
+using OpenRP.Framework.Shared.BaseManager.Helpers;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace OpenRP.Framework.Features.Inventories.Systems
         [Event]
         public void OnGameModeInit(IInventoryManager inventoryManager, IInventoryItemManager inventoryItemManager)
         {
-            inventoryManager.LoadInventories();
+            inventoryManager.LoadAll();
             inventoryItemManager.LoadInventoryItems();
         }
 

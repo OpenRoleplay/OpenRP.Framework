@@ -3,6 +3,7 @@ using OpenRP.Framework.Database.Services;
 using OpenRP.Framework.Features.Inventories.Entities;
 using OpenRP.Framework.Features.Inventories.Helpers;
 using OpenRP.Framework.Features.Items.Components;
+using OpenRP.Framework.Shared.BaseManager.Entities;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Inventories.Components
 {
-    public class Inventory : Component
+    public class Inventory : Component, IBaseDataComponent, IChangeable, IDeletable
     {
         private InventoryModel _inventoryModel;
         private bool _hasChanges;

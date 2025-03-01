@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Inventories.Services;
 using OpenRP.Framework.Features.Inventories.Services.Dialogs;
+using OpenRP.Framework.Shared.BaseManager.Helpers;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
