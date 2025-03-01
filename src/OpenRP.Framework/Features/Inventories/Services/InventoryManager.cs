@@ -45,6 +45,8 @@ namespace OpenRP.Framework.Features.Inventories.Services
             int inventoriesAdded = LoadNewInventories(changesSince);
             int inventoriesUpdated = UpdateInventories(changesSince);
             int inventoriesSaved = SaveInventories();
+            int inventoriesCreated = CreateInventories();
+            int inventoriesDeleted = DeleteInventories();
         }
 
         public int LoadInventories()
@@ -126,6 +128,67 @@ namespace OpenRP.Framework.Features.Inventories.Services
                     {
                         inventoryModel.MaxWeight = inventory.GetMaxWeight();
                         if (_dataContext.SaveChanges() > 0)
+                        {
+                            inventory.ProcessChanges(false);
+                            amountLoaded++;
+                        }
+                    }
+                }
+            }
+
+            return amountLoaded;
+        }
+
+        private async Task<int> CreateInventories()
+        {
+            int amountCreated = 0;
+            foreach (Inventory inventory in _entityManager.GetComponents<Inventory>())
+            {
+                if (inventory.GetId() == 0)
+                {
+                    InventoryModel inventoryModel = inventory.GetRawInventoryModel();
+
+                    if (inventoryModel != null)
+                    {
+                        InventoryModel createdInventoryModel = _dataContext.Inventories.Update(inventoryModel).Entity;
+
+                        if (await _dataContext.SaveChangesAsync() > 0)
+                        {
+                            inventory.ProcessChanges(false);
+
+                            inventory.Destroy();
+
+                            EntityId inventoryEntityId = InventoryEntities.GetInventoryId((int)createdInventoryModel.Id);
+
+                            _entityManager.Create(inventoryEntityId);
+
+                            Inventory newInventory = _entityManager.AddComponent<Inventory>(inventoryEntityId, createdInventoryModel, inventoryModel);
+
+                            amountCreated++;
+                        }
+                    }
+                }
+            }
+
+            InventoryNewEntities.ResetNewInventoryId();
+
+            return amountCreated;
+        }
+
+        private async Task<int> DeleteInventories()
+        {
+            int amountLoaded = 0;
+            foreach (Inventory inventory in _entityManager.GetComponents<Inventory>())
+            {
+                if (inventory.IsDeleted())
+                {
+                    InventoryModel inventoryModel = inventory.GetRawInventoryModel();
+
+                    if (inventoryModel != null)
+                    {
+                        _dataContext.Inventories.Remove(inventoryModel);
+
+                        if (await _dataContext.SaveChangesAsync() > 0)
                         {
                             inventory.ProcessChanges(false);
                             amountLoaded++;

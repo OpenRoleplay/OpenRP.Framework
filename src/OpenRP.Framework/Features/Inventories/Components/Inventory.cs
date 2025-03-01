@@ -17,6 +17,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
     {
         private InventoryModel _inventoryModel;
         private bool _hasChanges;
+        private bool _isDeleted;
         private EntityId? _parentInventoryEntityId;
         public Inventory(InventoryModel inventoryModel)
         {
@@ -32,6 +33,16 @@ namespace OpenRP.Framework.Features.Inventories.Components
         public void ProcessChanges(bool processChanges = true)
         {
             _hasChanges = processChanges;
+        }
+
+        public bool IsDeleted()
+        {
+            return _isDeleted;
+        }
+
+        public void ProcessDeletion(bool processDeletion = true)
+        {
+            _isDeleted = processDeletion;
         }
 
         public InventoryModel GetRawInventoryModel()
