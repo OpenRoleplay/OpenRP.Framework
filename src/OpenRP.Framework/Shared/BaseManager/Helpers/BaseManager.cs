@@ -48,6 +48,7 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         protected abstract EntityId GetEntityId(TModel model);
         protected abstract TModel GetModelFromComponent(TComponent component);
         protected abstract void ResetNewId();
+        protected virtual EntityId? GetParentEntityId(TModel model) => null;
 
         public int LoadAll()
         {
@@ -74,7 +75,15 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             foreach (var model in models)
             {
                 EntityId entityId = GetEntityId(model);
-                _entityManager.Create(entityId);
+                EntityId? parentId = GetParentEntityId(model);
+                if (parentId.HasValue)
+                {
+                    _entityManager.Create(entityId, parentId.Value);
+                }
+                else
+                {
+                    _entityManager.Create(entityId);
+                }
                 _entityManager.AddComponent<TComponent>(entityId, model);
                 count++;
             }
@@ -90,8 +99,16 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             foreach (var model in models)
             {
                 EntityId entityId = GetEntityId(model);
+                EntityId? parentId = GetParentEntityId(model);
                 _entityManager.Destroy(entityId);
-                _entityManager.Create(entityId);
+                if (parentId.HasValue)
+                {
+                    _entityManager.Create(entityId, parentId.Value);
+                }
+                else
+                {
+                    _entityManager.Create(entityId);
+                }
                 _entityManager.AddComponent<TComponent>(entityId, model);
                 count++;
             }
@@ -103,7 +120,7 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             int count = 0;
             foreach (var component in _entityManager.GetComponents<TComponent>())
             {
-                // Assume each TComponent implements an interface for change tracking.
+                // Assume each TComponent implements IChangeable for change tracking.
                 if (component is IChangeable changeTrackable && changeTrackable.HasChanges())
                 {
                     TModel model = GetModelFromComponent(component);
@@ -136,7 +153,15 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
                         EntityId oldEntityId = GetEntityId(model);
                         _entityManager.Destroy(oldEntityId);
                         EntityId newEntityId = GetEntityId(updatedModel);
-                        _entityManager.Create(newEntityId);
+                        EntityId? parentId = GetParentEntityId(updatedModel);
+                        if (parentId.HasValue)
+                        {
+                            _entityManager.Create(newEntityId, parentId.Value);
+                        }
+                        else
+                        {
+                            _entityManager.Create(newEntityId);
+                        }
                         _entityManager.AddComponent<TComponent>(newEntityId, model);
                         count++;
                     }
@@ -167,5 +192,4 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             return count;
         }
     }
-
 }
