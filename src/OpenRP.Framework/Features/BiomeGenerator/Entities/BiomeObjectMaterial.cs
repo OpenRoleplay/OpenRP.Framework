@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Entities
 {
-    public class GeneratedMaterial
+    public class BiomeObjectMaterial
     {
         public int MaterialIndex { get; set; }
         public int ModelId { get; set; }
@@ -15,7 +15,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Entities
         public string TextureName { get; set; }
         public Color MaterialColor { get; set; }
 
-        public GeneratedMaterial(int materialIndex, int modelId, string txdName, string textureName, Color materialColor = new Color())
+        public BiomeObjectMaterial(int materialIndex, int modelId, string txdName, string textureName, Color materialColor = new Color())
         {
             MaterialIndex = materialIndex;
             ModelId = modelId;
