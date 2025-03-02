@@ -31,5 +31,10 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Components
         {
             return _accountSettingsModel.GlobalChatEnabled;
         }
+
+        public bool GetNewbieChatEnabled()
+        {
+            return _accountSettingsModel.NewbieChatEnabled;
+        }
     }
 }
