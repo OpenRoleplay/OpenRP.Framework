@@ -13,7 +13,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Entities
         public Vector2 VirtualPosition { get; set; }
         public Vector3 GamePosition { get; set; }
         public Vector3 GameRotation { get; set; }
-        public List<BiomeObjectMaterial>? Materials { get; set; } = new List<BiomeObjectMaterial>();
+        public List<BiomeObjectMaterial> Materials { get; set; }
         public Color Color { get; set; }
         public int? StreamDistance { get; set; }
 
