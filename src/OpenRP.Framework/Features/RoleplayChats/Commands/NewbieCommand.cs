@@ -1,4 +1,5 @@
-﻿using OpenRP.Framework.Features.Commands.Attributes;
+﻿using OpenRP.Framework.Features.AccountSettingsFeature.Components;
+using OpenRP.Framework.Features.Commands.Attributes;
 using OpenRP.Framework.Features.Discord.Services;
 using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Shared.Chat.Enums;
@@ -22,6 +23,13 @@ namespace OpenRP.Framework.Features.RoleplayChats.Commands
             CommandGroups = new[] { "Chat" })]
         public void Newbie(Player player, IChatService chatService, IDiscordService discordService, string text)
         { 
+            AccountSettings accountSettings = player.GetComponent<AccountSettings>();
+            if (accountSettings != null && !accountSettings.GetNewbieChatEnabled())
+            {
+                player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You can't chat in newbie chat because you have it disabled in /settings!");
+                return;
+            }
+
             chatService.SendPlayerChatMessage(player, PlayerChatMessageType.NEWBIE, text);
             discordService.SendNewbieChatMessage(player, text);
         }

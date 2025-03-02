@@ -35,6 +35,11 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Models.Configuration
                    .HasDefaultValue(1)
                    .IsRequired();
 
+            // Configure the NewbieChatEnabled property.
+            builder.Property(a => a.NewbieChatEnabled)
+                   .HasDefaultValue(1)
+                   .IsRequired();
+
             // Configure the one-to-one relationship with AccountModel.
             // Adjust the navigation on the AccountModel side if needed.
             builder.HasOne(a => a.AccountModel)

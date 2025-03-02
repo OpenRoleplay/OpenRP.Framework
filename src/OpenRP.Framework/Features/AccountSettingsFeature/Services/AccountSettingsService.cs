@@ -171,6 +171,21 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
             return accountSettings.GetGlobalChatEnabled() ? $"{Color.Green}Enabled" : $"{Color.DarkRed}Disabled";
         }
 
+        public void SwitchNewbieChat(Player player, AccountSettings accountSettings)
+        {
+            ulong databaseId = accountSettings.GetDatabaseId();
+            AccountSettingsModel accountSettingsModel = _dataContext.AccountSettings.Find(databaseId);
+            accountSettingsModel.NewbieChatEnabled = !accountSettingsModel.NewbieChatEnabled;
+            _dataContext.SaveChanges();
+            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"Newbie chat has been {(accountSettingsModel.NewbieChatEnabled ? "enabled" : "disabled")}.");
+            ReloadAccountSettings(player);
+        }
+
+        private string GetCurrentNewbieChatValue(AccountSettings accountSettings)
+        {
+            return accountSettings.GetNewbieChatEnabled() ? $"{Color.Green}Enabled" : $"{Color.DarkRed}Disabled";
+        }
+
         public void OpenAccountSettingsDialog(Player player)
         {
             AccountSettings accountSettings = player.GetComponent<AccountSettings>();
@@ -184,6 +199,7 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
 
             tablistDialog.AddHeaders("Chats");
             int globalChat = tablistDialog.AddRow("OOC Chat", GetCurrentGlobalChatValue(accountSettings));
+            int newbieChat = tablistDialog.AddRow("Newbie Chat", GetCurrentNewbieChatValue(accountSettings));
 
             void DialogHandler(TablistDialogResponse r)
             {
@@ -205,6 +221,13 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
                 if (index == globalChat)
                 {
                     SwitchGlobalChat(player, accountSettings);
+                    OpenAccountSettingsDialog(player);
+                }
+
+                // Newbie Chat Toggle
+                if (index == newbieChat)
+                {
+                    SwitchNewbieChat(player, accountSettings);
                     OpenAccountSettingsDialog(player);
                 }
             }
