@@ -9,6 +9,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Entities
 {
     public interface IBiomeObjectGenerator
     {
+        string ObjectType { get; }
         BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor);
     }
 }

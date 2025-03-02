@@ -6,14 +6,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenRP.Framework.Features.BiomeGenerator.ObjectGenerators
+namespace OpenRP.Framework.Features.BiomeGenerator.Services.ObjectGenerators
 {
     public class DeadBirchTreeGenerator : IBiomeObjectGenerator
     {
+        private DeadTreeGenerator _deadTreeGenerator;
+        public DeadBirchTreeGenerator()
+        {
+            _deadTreeGenerator = new DeadTreeGenerator();
+        }
+
+        public string ObjectType => "DeadBirchTree";
+
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
         {
-            DeadBirchTreeGenerator deadBirchTreeGenerator = new DeadBirchTreeGenerator();
-            BiomeObject deadObject = deadBirchTreeGenerator.Generate(virtualPosition, gamePosition, gameRotation, defaultRotation, outputColor);
+            BiomeObject deadObject = _deadTreeGenerator.Generate(virtualPosition, gamePosition, gameRotation, defaultRotation, outputColor);
 
             BiomeObjectMaterial deadMaterial;
             switch (deadObject.ModelId)

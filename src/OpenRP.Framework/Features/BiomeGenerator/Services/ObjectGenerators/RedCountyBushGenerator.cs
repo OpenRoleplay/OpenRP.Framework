@@ -6,10 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenRP.Framework.Features.BiomeGenerator.ObjectGenerators
+namespace OpenRP.Framework.Features.BiomeGenerator.Services.ObjectGenerators
 {
     public class RedCountyBushGenerator : IBiomeObjectGenerator
     {
+        public string ObjectType => "RedCountyBush";
+
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
         {
             int[] obj_arr_bush = { 826, 19473 };
