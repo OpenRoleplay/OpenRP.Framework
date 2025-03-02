@@ -36,11 +36,31 @@ namespace OpenRP.Framework.Features.Characters.Components
             return _player;
         }
 
-        public Inventory GetInventory()
+        public Inventory? GetInventory()
         {
-            EntityId entityId = InventoryEntities.GetInventoryId((int)_characterModel.InventoryId);
+            if(_characterModel.InventoryId != null)
+            {
+                EntityId entityId = InventoryEntities.GetInventoryId((int)_characterModel.InventoryId);
 
-            return Manager.GetComponent<Inventory>(entityId);
+                return Manager.GetComponent<Inventory>(entityId);
+            }
+            return null;
+        }
+
+        public Inventory? GetWallet()
+        {
+            Inventory? inventoryToCheck = GetInventory();
+            if(inventoryToCheck != null)
+            {
+                foreach(InventoryItem inventoryItem in inventoryToCheck.GetInventoryItems())
+                {
+                    if(inventoryItem.GetItem().IsItemWallet() && inventoryItem.GetAdditionalData().GetBoolean("DEEFAULT_WALLET") == true)
+                    {
+                        return inventoryItem.GetItemInventory();
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -51,7 +71,7 @@ namespace OpenRP.Framework.Features.Characters.Components
             return _characterModel;
         }
 
-        public string GetCharacterName()
+        public string GetName()
         {
             return String.Format("{0} {1}", _characterModel.FirstName, _characterModel.LastName);
         }
@@ -61,9 +81,13 @@ namespace OpenRP.Framework.Features.Characters.Components
             return !String.IsNullOrEmpty(_characterModel.Accent);
         }
 
-        public string GetAccent()
+        public string? GetAccent()
         {
-            return _characterModel.Accent;
+            if (HasAccent())
+            {
+                return _characterModel.Accent;
+            }
+            return null;
         }
     }
 }

@@ -38,12 +38,12 @@ namespace OpenRP.Framework.Features.Admins.Commands
                     targetCharacterPermissions.UpdateCharacterPermissions();
 
                     player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO,
-                        $"Successfully granted the permission group '{permission_group}' to player {targetCharacter.GetCharacterName()}.");
+                        $"Successfully granted the permission group '{permission_group}' to player {targetCharacter.GetName()}.");
                 }
                 else
                 {
                     player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR,
-                        $"Failed to grant the permission group '{permission_group}' to player {targetCharacter.GetCharacterName()}. Please check the permission group name.");
+                        $"Failed to grant the permission group '{permission_group}' to player {targetCharacter.GetName()}. Please check the permission group name.");
                 }
             }
             else

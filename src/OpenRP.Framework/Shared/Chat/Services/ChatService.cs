@@ -107,7 +107,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
 
             if (character != null)
             {
-                string name = character.GetCharacterName();
+                string name = character.GetName();
                 string accent = character.GetAccent();
                 Vector3 position = player.Position;
 
@@ -128,7 +128,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
                 switch (type)
                 {
                     case PlayerChatMessageType.OOC:
-                        string CHAT_ACTION_OOC = String.Format("(( OOC | {0}: {1} ))", character.GetCharacterName(), text);
+                        string CHAT_ACTION_OOC = String.Format("(( OOC | {0}: {1} ))", character.GetName(), text);
 
                         foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
                         {
@@ -141,12 +141,12 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         }
                         break;
                     case PlayerChatMessageType.LOOC:
-                        string CHAT_ACTION_LOOC = String.Format("(( L-OOC | {0}: {1} ))", character.GetCharacterName(),text);
+                        string CHAT_ACTION_LOOC = String.Format("(( L-OOC | {0}: {1} ))", character.GetName(),text);
 
                         SendClientRangedMessage(player, Color.LightGray, 20, CHAT_ACTION_LOOC);
                         break;
                     case PlayerChatMessageType.NEWBIE:
-                        string CHAT_ACTION_NEWBIE = String.Format("(( Newbie | {0}[1]: {2} ))", character.GetCharacterName(), player.Entity.Handle,text);
+                        string CHAT_ACTION_NEWBIE = String.Format("(( Newbie | {0}[1]: {2} ))", character.GetName(), player.Entity.Handle,text);
                         
                         foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
                         {
@@ -154,23 +154,23 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         }
                         break;
                     case PlayerChatMessageType.ME:
-                        string CHAT_ACTION_ME = String.Format("* {0} {1} *", character.GetCharacterName(), text);
+                        string CHAT_ACTION_ME = String.Format("* {0} {1} *", character.GetName(), text);
 
                         SendClientRangedMessage(player, ServerColor.RoleplayActionColor, 20, CHAT_ACTION_ME);
                         break;
                     case PlayerChatMessageType.DO:
-                        string CHAT_ACTION_DO = String.Format("{0} (( {1} ))", text, character.GetCharacterName());
+                        string CHAT_ACTION_DO = String.Format("{0} (( {1} ))", text, character.GetName());
 
                         SendClientRangedMessage(player, ServerColor.RoleplayActionColor, 20, CHAT_ACTION_DO);
                         break;
                     case PlayerChatMessageType.AME:
-                        string CHAT_ACTION_AME = String.Format("* {0} {1} *", character.GetCharacterName(), text);
+                        string CHAT_ACTION_AME = String.Format("* {0} {1} *", character.GetName(), text);
 
                         player.SendClientMessage(ServerColor.RoleplayActionColor, CHAT_ACTION_AME);
                         player.SetChatBubble(CHAT_ACTION_AME, ServerColor.RoleplayActionColor, 20, CHAT_ACTION_AME.Length * 60);
                         break;
                     case PlayerChatMessageType.MY:
-                        string characterName = character.GetCharacterName();
+                        string characterName = character.GetName();
                         string nameSuffix = characterName.EndsWith("s") ? "'" : "'s";
                         string CHAT_ACTION_MY = String.Format("* {0}{1} {2}", characterName, nameSuffix, text);
 
@@ -180,12 +180,12 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         SendTalkMessage(player, text);
                         break;
                     case PlayerChatMessageType.LOW:
-                        string CHAT_ACTION_LOW = String.Format("{0} says quietly: {1}", character.GetCharacterName(), text);
+                        string CHAT_ACTION_LOW = String.Format("{0} says quietly: {1}", character.GetName(), text);
 
                         SendClientRangedMessage(player, Color.LightSlateGray, 3, CHAT_ACTION_LOW);
                         break;
                     case PlayerChatMessageType.SHOUT:
-                        string CHAT_ACTION_SHOUT = String.Format("{0} shouts: {1}", character.GetCharacterName(), text);
+                        string CHAT_ACTION_SHOUT = String.Format("{0} shouts: {1}", character.GetName(), text);
 
                         SendClientRangedMessage(player, Color.Orange, 30, CHAT_ACTION_SHOUT);
                         break;
