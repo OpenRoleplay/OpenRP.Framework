@@ -8,14 +8,10 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Enums
 {
     public enum BiomeType
     {
-        BirchForest,
-        ConiferousWoodland,
+        RedCounty,
+        Panopticon,
         DeadForest,
-        DeadForestWithTrees,
         Farmland,
-        ForestPlains,
-        OakForest,
         Plains,
-        SunflowerFields
     }
 }
