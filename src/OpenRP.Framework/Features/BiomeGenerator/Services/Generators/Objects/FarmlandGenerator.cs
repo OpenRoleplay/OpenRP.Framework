@@ -14,7 +14,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
         {
-            BiomeObject generatedObject = new BiomeObject(855, virtualPosition, gamePosition, gameRotation, outputColor);
+            BiomeObject generatedObject = new BiomeObject(-1005, virtualPosition, gamePosition, gameRotation, outputColor);
 
             return generatedObject;
         }
