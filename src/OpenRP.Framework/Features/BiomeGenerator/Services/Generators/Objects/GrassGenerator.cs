@@ -6,27 +6,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenRP.Framework.Features.BiomeGenerator.Services.ObjectGenerators
+namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 {
-    public class RedCountyBushGenerator : IBiomeObjectGenerator
+    public class GrassGenerator : IBiomeObjectGenerator
     {
-        public string ObjectType => "RedCountyBush";
+        public string ObjectType => "Grass";
 
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
         {
-            int[] obj_arr_bush = { 826, 19473 };
+            int[] obj_arr_grass = { -1003, -1004 };
 
-            int modelId = obj_arr_bush[Random.Shared.Next(obj_arr_bush.Length)];
+            int modelId = obj_arr_grass[Random.Shared.Next(obj_arr_grass.Length)];
 
-            BiomeObject bushObject = new BiomeObject(
-                obj_arr_bush[Random.Shared.Next(obj_arr_bush.Length)],
+            BiomeObject grassObject = new BiomeObject(
+                obj_arr_grass[Random.Shared.Next(obj_arr_grass.Length)],
                 virtualPosition,
                 new Vector3(gamePosition.XY, gamePosition.Z),
                 gameRotation,
                 outputColor
             );
 
-            return bushObject;
+            return grassObject;
         }
     }
 }

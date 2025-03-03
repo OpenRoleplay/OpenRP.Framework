@@ -8,7 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Features.BiomeGenerator.Entities;
 using OpenRP.Framework.Features.BiomeGenerator.Services;
-using OpenRP.Framework.Features.BiomeGenerator.Services.ObjectGenerators;
+using OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects;
+using OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Extensions
 {
@@ -17,13 +18,31 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Extensions
         public static IServiceCollection AddBiomeGenerator(this IServiceCollection self)
         {
             return self
+                .AddSingleton<IBiomeObjectGenerator, BirchTreeGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, ConiferousBushGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, ConiferousDeadTreeGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, DeadBirchTreeGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, DeadTreeGenerator>()
-                .AddSingleton<IBiomeObjectGenerator, GrassGenerator>()
-                .AddSingleton<IBiomeObjectGenerator, RedCountyBushGenerator>()
-                .AddSingleton<IBiomeObjectGenerator, SingleSunflowerGenerator>()
-                .AddSingleton<IBiomeObjectGenerator, BirchTreeGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, DeadTreeStandingGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, DryBushGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, FarmlandGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, FlowerGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, GrassGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, MultipleSunflowerGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, OakTreeGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, PineTreeGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, RedCountyBushGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, RubbleGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, SingleSunflowerGenerator>()
+                .AddSingleton<BirchForestBiome>()
+                .AddSingleton<ConiferousWoodlandBiome>()
+                .AddSingleton<DeadForestBiome>()
+                .AddSingleton<DeadForestBiomeWithTrees>()
+                .AddSingleton<FarmlandBiome>()
+                .AddSingleton<ForestPlainsBiome>()
+                .AddSingleton<OakForestBiome>()
+                .AddSingleton<PlainsBiome>()
+                .AddSingleton<SunflowerBiome>()
                 .AddSingleton<IBiomeObjectFactory, BiomeObjectFactory>();
         }
     }

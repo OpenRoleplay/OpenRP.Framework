@@ -6,16 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenRP.Framework.Features.BiomeGenerator.Services.ObjectGenerators
+namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 {
-    public class SingleSunflowerGenerator : IBiomeObjectGenerator
+    public class MultipleSunflowerGenerator : IBiomeObjectGenerator
     {
-        public string ObjectType => "Sunflower";
+        public string ObjectType => "SunflowerMultiple";
 
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
         {
             BiomeObject sunflowerObject = new BiomeObject(
-                -1002,
+                -1000,
                 virtualPosition,
                 gamePosition,
                 defaultRotation,

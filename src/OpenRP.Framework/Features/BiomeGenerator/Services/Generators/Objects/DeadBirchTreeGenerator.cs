@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenRP.Framework.Features.BiomeGenerator.Services.ObjectGenerators
+namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 {
     public class DeadBirchTreeGenerator : IBiomeObjectGenerator
     {

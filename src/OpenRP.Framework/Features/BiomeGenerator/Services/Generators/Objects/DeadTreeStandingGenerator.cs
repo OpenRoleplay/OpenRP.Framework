@@ -7,29 +7,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenRP.Framework.Features.BiomeGenerator.Services.ObjectGenerators
+namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 {
-    public class DeadTreeGenerator : IBiomeObjectGenerator
+    public class DeadTreeStandingGenerator : IBiomeObjectGenerator
     {
-        public string ObjectType => "DeadTree";
+        public string ObjectType => "DeadTreeStanding";
 
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
         {
-            int[] obj_arr_deadtree = { 848, 833, 831, 847, 837, 832, 841, 842, 836, 840, 834, 839, 843, 838, 844, 835, 846, 845 };
+            int[] obj_arr_deadtree_standing = { 704, 686 };
 
-            int modelId = obj_arr_deadtree[Random.Shared.Next(obj_arr_deadtree.Length)];
+            int modelId = obj_arr_deadtree_standing[Random.Shared.Next(obj_arr_deadtree_standing.Length)];
 
             float adjustedZ = gamePosition.Z + BiomeModelOverride.GetModelZOffset(modelId);
 
-            BiomeObject deadTreeObject = new BiomeObject(
-                obj_arr_deadtree[Random.Shared.Next(obj_arr_deadtree.Length)],
+            BiomeObject deadTreeStandingObject = new BiomeObject(
+                obj_arr_deadtree_standing[Random.Shared.Next(obj_arr_deadtree_standing.Length)],
                 virtualPosition,
                 new Vector3(gamePosition.XY, adjustedZ),
                 gameRotation,
                 outputColor
             );
 
-            return deadTreeObject;
+            return deadTreeStandingObject;
         }
     }
 }
