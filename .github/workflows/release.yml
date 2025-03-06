@@ -3,9 +3,9 @@ name: release
 on:
   push:
     branches:
-      - "main"
+      - "main" 
     tags:
-      - "*"  
+      - "*" 
 
 jobs:
   build:
@@ -13,6 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Set VERSION variable
       run: |
@@ -20,7 +22,10 @@ jobs:
           # For tag pushes, use the tag version directly
           VERSION=${GITHUB_REF/refs\/tags\//}  # Extract version from the tag (e.g., "1.0.0")
         else
-          # For branch pushes, get the latest tag and append the year and week number
+          # For branch pushes, fetch all tags and use the latest one
+          git fetch --tags  # Ensure all tags are fetched
+
+          # Get the latest tag (note: this works now after `git fetch --tags`)
           LATEST_TAG=$(git describe --tags --abbrev=0)  # Get the latest tag
           VERSION="${LATEST_TAG}-$(date +'%Y-W%U')"  # Append year and week (e.g., "1.0.0-2025-W10")
         fi
