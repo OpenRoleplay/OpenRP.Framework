@@ -4,6 +4,16 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageIcon>OpenRoleplay.png</PackageIcon>
+    <Title>OpenRP.Framework</Title>
+    <Description>OpenRP.Framework is the open source library of Open Roleplay, an ambitious SA-MP roleplay gamemode developed for open.mp (Open Multiplayer, a multiplayer mod for GTA San Andreas) using the SampSharp framework.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/OpenRoleplay/OpenRP.Framework</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>SampSharp</PackageTags>
+    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://open-roleplay.com/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +38,17 @@
 
   <ItemGroup>
     <Folder Include="Features\Harvestables\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\OpenRoleplay.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
