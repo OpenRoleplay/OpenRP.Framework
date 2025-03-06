@@ -2,8 +2,11 @@ name: release
 
 on:
   push:
-    branches: [ main ]
-    
+    branches:
+      - "main"
+    tags:
+      - "*"  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,13 +14,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set VERSION variable from tag (or fallback to week-based version)
+    - name: Set VERSION variable
       run: |
         if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-          VERSION=${GITHUB_REF/refs\/tags\//}  # Extract version from the tag
+          # For tag pushes, use the tag version directly
+          VERSION=${GITHUB_REF/refs\/tags\//}  # Extract version from the tag (e.g., "1.0.0")
         else
-          # Use the year and week number in the format "1.0.0-dev-YYYY-Www"
-          VERSION="1.0.0-dev-$(date +'%Y-W%U')"  # Format: "1.0.0-dev-2025-W10"
+          # For branch pushes, get the latest tag and append the year and week number
+          LATEST_TAG=$(git describe --tags --abbrev=0)  # Get the latest tag
+          VERSION="${LATEST_TAG}-$(date +'%Y-W%U')"  # Append year and week (e.g., "1.0.0-2025-W10")
         fi
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
