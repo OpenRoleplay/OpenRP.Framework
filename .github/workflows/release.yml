@@ -3,7 +3,7 @@ name: release
 on:
   push:
     branches: [ main ]
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,8 +11,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set VERSION variable from tag
-      run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+    - name: Set VERSION variable from tag (or fallback to branch name)
+      run: |
+        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          VERSION=${GITHUB_REF/refs\/tags\//} 
+        else
+          VERSION="dev-${GITHUB_SHA}"
+        fi
+        echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
