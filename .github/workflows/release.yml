@@ -29,7 +29,9 @@ jobs:
           LATEST_TAG=$(git describe --tags --abbrev=0)  # Get the latest tag
           
           # Generate the version with the year and week in a valid format
-          VERSION="${LATEST_TAG}-preview.$(date +'%Y.%U')"
+          WEEK=$(date +'%U')
+          WEEK=$((10#$WEEK))
+          VERSION="${LATEST_TAG}-preview.$(date +'%Y').${WEEK}"
         fi
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
