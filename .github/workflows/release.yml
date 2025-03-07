@@ -1,0 +1,53 @@
+name: release
+
+on:
+  push:
+    branches:
+      - "main" 
+    tags:
+      - "*" 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set VERSION variable
+      run: |
+        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          # For tag pushes, use the tag version directly
+          VERSION=${GITHUB_REF/refs\/tags\//}  # Extract version from the tag (e.g., "1.0.0")
+        else
+          # For branch pushes, fetch all tags and use the latest one
+          git fetch --tags  # Ensure all tags are fetched
+
+          # Get the latest tag (note: this works now after `git fetch --tags`)
+          LATEST_TAG=$(git describe --tags --abbrev=0)  # Get the latest tag
+          
+          # Generate the version with the year and week in a valid format
+          WEEK=$(date +'%U')
+          WEEK=$((10#$WEEK))
+          VERSION="${LATEST_TAG}-preview.$(date +'%Y').${WEEK}"
+        fi
+        echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build /p:CiVersion=${VERSION} --configuration Release --no-restore
+
+    - name: Pack
+      run: dotnet pack --configuration Release --no-build --output bin
+
+    - name: Push (allow overwriting)
+      run: dotnet nuget push bin/*.nupkg --source="https://api.nuget.org/v3/index.json" --api-key ${{secrets.NUGET_API_KEY}}
