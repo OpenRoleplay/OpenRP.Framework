@@ -272,5 +272,44 @@ namespace OpenRP.Framework.Features.Discord.Services
                 return false;
             }
         }
+
+        public async Task<bool> UpdateDateTime(DateTime date, TimeSpan time)
+        {
+            // Ensure the client is initialized and connected.
+            await _initializationTask;
+
+            // Build the desired channel names.
+            string serverDateString = $"Server Date: {date:dd/MM/yyyy}";
+            string serverTimeString = $"Server Time: {time.Hours:D2}:{time.Minutes:D2}";
+
+            bool updated = false;
+
+            // Update the date channel name if configured.
+            if (_options.ServerDateChannelId != default(ulong))
+            {
+                var dateChannel = await _discordClient.GetChannelAsync(_options.ServerDateChannelId);
+                if (dateChannel != null && dateChannel.Name != serverDateString)
+                {
+                    // Modify the channel's name.
+                    await dateChannel.ModifyAsync(m => m.Name = serverDateString);
+                    updated = true;
+                }
+            }
+
+            // Update the time channel name if configured.
+            if (_options.ServerTimeChannelId != default(ulong))
+            {
+                var timeChannel = await _discordClient.GetChannelAsync(_options.ServerTimeChannelId);
+                if (timeChannel != null && timeChannel.Name != serverTimeString)
+                {
+                    // Modify the channel's name.
+                    await timeChannel.ModifyAsync(m => m.Name = serverTimeString);
+                    updated = true;
+                }
+            }
+
+            return updated;
+        }
+
     }
 }

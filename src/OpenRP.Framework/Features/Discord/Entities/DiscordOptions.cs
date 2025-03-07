@@ -12,5 +12,7 @@ namespace OpenRP.Framework.Features.Discord.Entities
         public ulong GeneralChatChannelId { get; set; }
         public ulong SupportChannelId { get; set; }
         public ulong PlayerCountChannelId { get; set; }
+        public ulong ServerDateChannelId { get; set; }
+        public ulong ServerTimeChannelId { get; set; }
     }
 }

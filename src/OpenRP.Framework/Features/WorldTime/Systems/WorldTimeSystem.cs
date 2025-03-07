@@ -1,6 +1,7 @@
 ﻿using OpenRP.Framework.Features.CDN.Services;
 using OpenRP.Framework.Features.DebugSettingsFeature.Components;
 using OpenRP.Framework.Features.DebugSettingsFeature.Services;
+using OpenRP.Framework.Features.Discord.Services;
 using OpenRP.Framework.Features.WorldTime.Services;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
@@ -24,14 +25,16 @@ namespace OpenRP.Framework.Features.WorldTime.Systems
         }
 
         [Timer(30000)]
-        public void UpdateWorldTime(IEntityManager entityManager, IWorldTimeService worldTimeService)
+        public void UpdateWorldTime(IEntityManager entityManager, IWorldTimeService worldTimeService, IDiscordService discordService)
         {
+            DateTime ingameDate = worldTimeService.GetCurrentDate();
+            TimeSpan ingameTime = worldTimeService.GetCurrentIngameTime();
+
             foreach (Player player in entityManager.GetComponents<Player>())
             {
                 Vector3 playerPosition = player.Position;
 
                 TimeSpan simulationTime = worldTimeService.GetCurrentSimulationTime(playerPosition.X);
-                TimeSpan ingameTime = worldTimeService.GetCurrentIngameTime();
 
                 int ingameHours = (int)ingameTime.TotalHours % 24;
                 int ingameMinutes = ingameTime.Minutes % 60;
@@ -49,6 +52,8 @@ namespace OpenRP.Framework.Features.WorldTime.Systems
                         $"In-Game Time: {ingameHours:D2}:{ingameMinutes:D2} | Simulation Time: {simulationHours:D2}:{simulationMinutes:D2}");
                 }
             }
+
+            discordService.UpdateDateTime(ingameDate, ingameTime);
         }
     }
 }
