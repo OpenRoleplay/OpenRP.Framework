@@ -17,10 +17,13 @@ namespace OpenRP.Framework.Features.WorldTime.Services
             _options = options.Value;
         }
 
-        public DateTime GetCurrentDate()
+        public DateTime GetCurrentIngameDateTime()
         {
             // Use current UTC date, then subtract 33 years.
-            return DateTime.UtcNow.AddYears(-33);
+            DateTime ingameDate = DateTime.UtcNow.AddYears(-33);
+            TimeSpan ingameTime = GetCurrentIngameTime();
+
+            return new DateTime(ingameDate.Year, ingameDate.Month, ingameDate.Day, ingameTime.Hours, ingameTime.Minutes, ingameTime.Seconds);
         }
 
         public TimeSpan GetCurrentIngameTime()

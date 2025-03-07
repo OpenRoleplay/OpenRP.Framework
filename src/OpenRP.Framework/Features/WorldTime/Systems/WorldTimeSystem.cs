@@ -27,7 +27,7 @@ namespace OpenRP.Framework.Features.WorldTime.Systems
         [Timer(30000)]
         public void UpdateWorldTime(IEntityManager entityManager, IWorldTimeService worldTimeService, IDiscordService discordService)
         {
-            DateTime ingameDate = worldTimeService.GetCurrentDate();
+            DateTime ingameDate = worldTimeService.GetCurrentIngameDateTime();
             TimeSpan ingameTime = worldTimeService.GetCurrentIngameTime();
 
             foreach (Player player in entityManager.GetComponents<Player>())

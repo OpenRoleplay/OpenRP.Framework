@@ -9,10 +9,10 @@ namespace OpenRP.Framework.Features.WorldTime.Services
     public interface IWorldTimeService
     {
         /// <summary>
-        /// Gets the current simulation date.
-        /// This is the current UTC date minus 33 years.
+        /// Gets the current simulation datetime.
+        /// This is the current UTC date minus 33 years with the ingame time.
         /// </summary>
-        DateTime GetCurrentDate();
+        DateTime GetCurrentIngameDateTime();
 
         /// <summary>
         /// Gets the current in-game time.

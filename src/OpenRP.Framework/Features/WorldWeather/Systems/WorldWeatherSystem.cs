@@ -24,7 +24,7 @@ namespace OpenRP.Framework.Features.WorldWeather.Systems
         }
 
         [Timer(5000)]
-        public void UpdateWorldWeather(IEntityManager entityManager, IWorldWeatherService worldWeatherService)
+        public void UpdateWorldWeather(IEntityManager entityManager, IWorldWeatherService worldWeatherService, IWorldWindDirectionService worldWindDirectionService, IWorldTimeService worldTimeService)
         {
             List<Player> players = entityManager.GetComponents<Player>().ToList();
             foreach (Player player in players)
@@ -41,12 +41,14 @@ namespace OpenRP.Framework.Features.WorldWeather.Systems
                     bool isArid = worldWeatherService.IsPositionArid(pos);
                     double windSpeed = worldWeatherService.GetWindSpeedAt(pos);
                     double temp = worldWeatherService.GetTemperatureAt(pos);
+                    DateTime worldDateTime = worldTimeService.GetCurrentIngameDateTime();
+                    string windDirection = worldWindDirectionService.GetWindDirection(worldDateTime);
 
                     player.SendPlayerInfoMessage(PlayerInfoMessageType.DEBUG,
                         $"Weather: {weatherId} | " +
                         $"Humid: {(isHumid ? "Yes" : "No")} | " +
                         $"Arid: {(isArid ? "Yes" : "No")} | " +
-                        $"Wind: {windSpeed:F1} m/s | " +
+                        $"Wind: {windSpeed:F1} m/s {windDirection} | " +
                         $"Temp: {temp:F1} degrees Celsius");
                 }
             }

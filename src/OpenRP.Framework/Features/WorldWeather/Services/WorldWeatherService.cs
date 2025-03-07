@@ -164,7 +164,7 @@ namespace OpenRP.Framework.Features.WorldWeather.Services
 
             // Get current in-game time
             TimeSpan gameTime = _worldTimeService.GetCurrentSimulationTime(position.X);
-            DateTime gameDate = _worldTimeService.GetCurrentDate();
+            DateTime gameDate = _worldTimeService.GetCurrentIngameDateTime();
 
             // Calculate daily variation (-1 to 1) peaking at 3 PM
             double dailyPhase = (gameTime.TotalHours - 9) / 12; // Center at 15:00 (3 PM)

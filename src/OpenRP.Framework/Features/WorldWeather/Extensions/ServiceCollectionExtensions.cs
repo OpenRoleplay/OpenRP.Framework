@@ -15,9 +15,10 @@ namespace OpenRP.Framework.Features.WorldWeather.Extensions
             this IServiceCollection services,
             Action<WorldWeatherOptions> configureOptions)
         {
-            services.Configure(configureOptions);
-            services.AddSingleton<IWorldWeatherService, WorldWeatherService>();
-            return services;
+            return services
+                .Configure(configureOptions)
+                .AddSingleton<IWorldWeatherService, WorldWeatherService>()
+                .AddSingleton<IWorldWindDirectionService, WorldWindDirectionService>();
         }
     }
 }
