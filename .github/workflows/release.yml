@@ -27,25 +27,18 @@ jobs:
           # Get the latest base tag (e.g., "0.1.0")
           LATEST_TAG=$(git describe --tags --abbrev=0)
         
-          # Get the current week (removing any leading zero)
+          # Get the current week and year (removing any leading zero from week)
           WEEK=$(date +'%U')
           WEEK=$((10#$WEEK))
           YEAR=$(date +'%Y')
         
-          # Build a pattern to match versions for the current week, e.g. "0.1.0-preview.2025.9.*"
-          PATTERN="${LATEST_TAG}-preview.${YEAR}.${WEEK}."
+          # Determine the start of the week (Monday). Adjust if your week starts on a different day.
+          MONDAY=$(date -d "monday this week" +%Y-%m-%d)
         
-          # Get the highest build number for this week from existing tags
-          LATEST_WEEK_TAG=$(git tag -l "${PATTERN}*" | sort -V | tail -n 1)
-          if [ -z "$LATEST_WEEK_TAG" ]; then
-            BUILD_NUMBER=1
-          else
-            # Extract the build number (everything after the last dot)
-            BUILD_NUMBER=${LATEST_WEEK_TAG##*.}
-            BUILD_NUMBER=$((BUILD_NUMBER + 1))
-          fi
+          # Count the number of commits made since the start of the week
+          BUILD_NUMBER=$(git rev-list --count HEAD --since="$MONDAY")
         
-          # Construct the version with an incremental build counter
+          # Construct the version string with the commit count as the build number
           VERSION="${LATEST_TAG}-preview.${YEAR}.${WEEK}.${BUILD_NUMBER}"
         fi
         
