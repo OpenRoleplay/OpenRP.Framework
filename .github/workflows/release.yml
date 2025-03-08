@@ -23,21 +23,20 @@ jobs:
           VERSION=${GITHUB_REF/refs\/tags\//}
         else
           git fetch --tags  # Ensure all tags are fetched
-        
+          
           # Get the latest base tag (e.g., "0.1.0")
           LATEST_TAG=$(git describe --tags --abbrev=0)
-        
+          
           # Get the current week and year (removing any leading zero from week)
           WEEK=$(date +'%U')
           WEEK=$((10#$WEEK))
           YEAR=$(date +'%Y')
-        
-          # Determine the start of the week (Monday). Adjust if your week starts on a different day.
-          MONDAY=$(date -d "monday this week" +%Y-%m-%d)
-        
-          # Count the number of commits made since the start of the week
+          
+          MONDAY=$(date -d "today - $(($(date +%u)-1)) days" +%Y-%m-%d)
+          
+          # Count the number of commits made since Monday
           BUILD_NUMBER=$(git rev-list --count HEAD --since="$MONDAY")
-        
+          
           # Construct the version string with the commit count as the build number
           VERSION="${LATEST_TAG}-preview.${YEAR}.${WEEK}.${BUILD_NUMBER}"
         fi
