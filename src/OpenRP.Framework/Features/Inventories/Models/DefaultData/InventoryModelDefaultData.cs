@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Inventories.Models.DefaultData
 {
-    public class InventoryModelDefaultData : IEntityTypeConfiguration<InventoryItemModel>
+    public class InventoryModelDefaultData : IEntityTypeConfiguration<InventoryModel>
     {
-        public void Configure(EntityTypeBuilder<InventoryItemModel> builder)
+        public void Configure(EntityTypeBuilder<InventoryModel> builder)
         {
             builder.HasData(
                 new InventoryModel

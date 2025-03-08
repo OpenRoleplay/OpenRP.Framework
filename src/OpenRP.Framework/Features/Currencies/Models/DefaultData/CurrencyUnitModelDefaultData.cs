@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Currencies.Models.DefaultData
 {
-    public class CurrencyUnitModelDefaultData : IEntityTypeConfiguration<CurrencyModel>
+    public class CurrencyUnitModelDefaultData : IEntityTypeConfiguration<CurrencyUnitModel>
     {
-        public void Configure(EntityTypeBuilder<CurrencyModel> builder)
+        public void Configure(EntityTypeBuilder<CurrencyUnitModel> builder)
         {
             builder.HasData(
                 // San Andreas Dollar
