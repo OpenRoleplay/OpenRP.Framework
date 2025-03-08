@@ -4,6 +4,7 @@ using OpenRP.Framework.Features.AccountSettingsFeature.Models.Configuration;
 using OpenRP.Framework.Features.Actors.Models.Configurations;
 using OpenRP.Framework.Features.Characters.Models.Configuration;
 using OpenRP.Framework.Features.Currencies.Models.Configuration;
+using OpenRP.Framework.Features.Currencies.Models.DefaultData;
 using OpenRP.Framework.Features.DroppedItems.Models.Configurations;
 using OpenRP.Framework.Features.Fishing.Models;
 using OpenRP.Framework.Features.Inventories.Models.Configurations;
@@ -28,7 +29,9 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new CharacterModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new CurrencyModelConfiguration());
+            modelBuilder.ApplyConfiguration(new CurrencyModelDefaultData());
             modelBuilder.ApplyConfiguration(new CurrencyUnitModelConfiguration());
+            modelBuilder.ApplyConfiguration(new CurrencyUnitModelDefaultData());
 
             modelBuilder.ApplyConfiguration(new DroppedInventoryItemModelConfiguration());
 
