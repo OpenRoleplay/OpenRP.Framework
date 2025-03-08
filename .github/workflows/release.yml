@@ -20,19 +20,35 @@ jobs:
       run: |
         if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
           # For tag pushes, use the tag version directly
-          VERSION=${GITHUB_REF/refs\/tags\//}  # Extract version from the tag (e.g., "1.0.0")
+          VERSION=${GITHUB_REF/refs\/tags\//}
         else
-          # For branch pushes, fetch all tags and use the latest one
           git fetch --tags  # Ensure all tags are fetched
-
-          # Get the latest tag (note: this works now after `git fetch --tags`)
-          LATEST_TAG=$(git describe --tags --abbrev=0)  # Get the latest tag
-          
-          # Generate the version with the year and week in a valid format
+        
+          # Get the latest base tag (e.g., "0.1.0")
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+        
+          # Get the current week (removing any leading zero)
           WEEK=$(date +'%U')
           WEEK=$((10#$WEEK))
-          VERSION="${LATEST_TAG}-preview.$(date +'%Y').${WEEK}"
+          YEAR=$(date +'%Y')
+        
+          # Build a pattern to match versions for the current week, e.g. "0.1.0-preview.2025.9.*"
+          PATTERN="${LATEST_TAG}-preview.${YEAR}.${WEEK}."
+        
+          # Get the highest build number for this week from existing tags
+          LATEST_WEEK_TAG=$(git tag -l "${PATTERN}*" | sort -V | tail -n 1)
+          if [ -z "$LATEST_WEEK_TAG" ]; then
+            BUILD_NUMBER=1
+          else
+            # Extract the build number (everything after the last dot)
+            BUILD_NUMBER=${LATEST_WEEK_TAG##*.}
+            BUILD_NUMBER=$((BUILD_NUMBER + 1))
+          fi
+        
+          # Construct the version with an incremental build counter
+          VERSION="${LATEST_TAG}-preview.${YEAR}.${WEEK}.${BUILD_NUMBER}"
         fi
+        
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
     - name: Setup .NET
