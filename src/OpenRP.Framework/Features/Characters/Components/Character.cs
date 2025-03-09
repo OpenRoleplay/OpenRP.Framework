@@ -12,10 +12,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using OpenRP.Framework.Features.Inventories.Components;
 using OpenRP.Framework.Features.Inventories.Entities;
+using OpenRP.Framework.Shared.BaseManager.Entities;
 
 namespace OpenRP.Framework.Features.Characters.Components
 {
-    public class Character : Component
+    public class Character : Component, IBaseDataComponent
     {
         private Player? _player;
         private CharacterModel _characterModel;
@@ -25,7 +26,10 @@ namespace OpenRP.Framework.Features.Characters.Components
             _characterModel = characterModel;
         }
 
-        public ulong GetDatabaseId() => GetCharacterModel().Id;
+        public ulong GetId()
+        {
+            return GetCharacterModel().Id;
+        }
 
         public Player? GetPlayer()
         {

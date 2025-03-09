@@ -44,7 +44,7 @@ namespace OpenRP.Framework.Features.Characters.Services
         {
             try
             {
-                CharacterModel characterToEdit = _dataContext.Characters.FirstOrDefault(i => i.Id == character.GetDatabaseId());
+                CharacterModel characterToEdit = _dataContext.Characters.FirstOrDefault(i => i.Id == character.GetId());
 
                 if (characterToEdit != null)
                 {
@@ -67,7 +67,7 @@ namespace OpenRP.Framework.Features.Characters.Services
                 CharacterModel characterData = _dataContext.Characters
                     .Include(c => c.Inventory)
                     .ThenInclude(c => c.Items)
-                    .FirstOrDefault(c => c.Id == character.GetDatabaseId());
+                    .FirstOrDefault(c => c.Id == character.GetId());
 
                 // Create inventory if it doesn't exist
                 if (characterData.Inventory == null)
