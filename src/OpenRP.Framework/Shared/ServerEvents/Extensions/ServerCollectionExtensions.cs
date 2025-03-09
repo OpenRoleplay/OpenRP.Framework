@@ -19,6 +19,7 @@ namespace OpenRP.Framework.Shared.ServerEvents.Extensions
         {
             return self
                 .AddSingleton<IServerEventAggregator, ServerEventAggregator>()
+                .AddSingleton<IServerEventDispatcher, ServerEventDispatcher>()
                 .AddServerSystemsInAssembly();
         }
 

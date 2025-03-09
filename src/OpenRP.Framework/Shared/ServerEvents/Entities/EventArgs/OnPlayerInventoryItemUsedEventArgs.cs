@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Features.Accounts.Components;
+﻿using OpenRP.Framework.Database.Models;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs
 {
-    public class OnAccountLoggedInEventArgs : ServerEventArgs
+    public class OnPlayerInventoryItemUsedEventArgs : ServerEventArgs
     {
         public Player? Player { get; set; }
-        public Account? Account { get; set; }
+        public InventoryItemModel? InventoryItem { get; set; }
     }
 }

@@ -11,8 +11,8 @@ namespace OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs
 {
     public class OnCharacterSelectedEventArgs : ServerEventArgs
     {
-        public Player Player { get; set; }
-        public Account Account { get; set; }
-        public Character Character { get; set; }
+        public Player? Player { get; set; }
+        public Account? Account { get; set; }
+        public Character? Character { get; set; }
     }
 }

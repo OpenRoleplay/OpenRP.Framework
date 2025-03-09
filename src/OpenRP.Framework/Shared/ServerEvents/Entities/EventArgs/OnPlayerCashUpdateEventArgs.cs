@@ -1,5 +1,4 @@
-﻿using OpenRP.Framework.Features.Accounts.Components;
-using SampSharp.Entities.SAMP;
+﻿using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs
 {
-    public class OnAccountLoggedInEventArgs : ServerEventArgs
+    public class OnPlayerCashUpdateEventArgs : ServerEventArgs
     {
         public Player? Player { get; set; }
-        public Account? Account { get; set; }
+        public ulong CurrencyId { get; set; }
     }
 }
