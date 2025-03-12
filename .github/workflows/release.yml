@@ -27,11 +27,12 @@ jobs:
           # Get the latest base tag (e.g., "0.1.0")
           LATEST_TAG=$(git describe --tags --abbrev=0)
           
-          # Get the current week and year (removing any leading zero from week)
-          WEEK=$(date +'%U')
+          # Get the current week using Monday as the first day
+          WEEK=$(date +'%W')
           WEEK=$((10#$WEEK))
           YEAR=$(date +'%Y')
           
+          # Calculate Monday of the current week (works on GNU date)
           MONDAY=$(date -d "today - $(($(date +%u)-1)) days" +%Y-%m-%d)
           
           # Count the number of commits made since Monday
