@@ -45,10 +45,10 @@ namespace OpenRP.Framework.Features.Actors.Models.Configurations
                   .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
 
             // One ActorData can have many ActorRelationships
-            //builder.HasMany(a => a.ActorRelationships)
-            //      .WithOne(ar => ar.ActorRelationshipWithActor)
-            //      .HasForeignKey(ar => ar.ActorRelationshipWithActorId)
-            //      .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
+            builder.HasMany(a => a.ActorRelationships)
+                  .WithOne(ar => ar.ActorRelationshipWithActor)
+                  .HasForeignKey(ar => ar.ActorRelationshipWithActorId)
+                  .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
         }
     }
 }
