@@ -22,7 +22,6 @@ namespace OpenRP.Framework.Database.Models
         public ulong? ActorLinkedToMainMenuSceneId { get; set; }
 
         // Navigational Properties
-        public List<ActorRelationshipModel> ActorRelationships { get; set; }
         public MainMenuSceneModel? ActorLinkedToMainMenuScene { get; set; }
         public ActorPromptModel? ActorPrompt { get; set; }
         public CharacterModel? ActorCharacter { get; set; }

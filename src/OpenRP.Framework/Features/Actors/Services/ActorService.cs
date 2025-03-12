@@ -38,7 +38,6 @@ namespace OpenRP.Framework.Features.Actors.Services
                 .Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromHours(12), $"Actors")
                 .Include(i => i.ActorCharacter)
                 .Include(i => i.ActorPrompt)
-                .Include(i => i.ActorRelationships)
                 .Include(i => i.ActorLinkedToMainMenuScene)
                 .ToList();
         }

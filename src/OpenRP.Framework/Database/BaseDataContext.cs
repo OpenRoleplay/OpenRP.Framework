@@ -20,7 +20,6 @@ namespace OpenRP.Framework.Database
         public DbSet<ItemModel> Items { get; set; }
         public DbSet<ActorModel> Actors { get; set; }
         public DbSet<ActorPromptModel> ActorPrompts { get; set; }
-        public DbSet<ActorRelationshipModel> ActorRelationships { get; set; }
         public DbSet<CurrencyModel> Currencies { get; set; }
         public DbSet<CurrencyUnitModel> CurrencyUnits { get; set; }
         public DbSet<PermissionModel> Permissions { get; set; }
