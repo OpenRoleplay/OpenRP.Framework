@@ -17,7 +17,7 @@ namespace OpenRP.Framework.Features.Items.Extensions
         {
             return loggerConfiguration.WriteTo.Logger(lc => lc
                 .Filter.ByIncludingOnly(Matching.FromSource<ItemManager>())
-                .WriteTo.File("Logs/ItemManager/log-.txt", rollingInterval: RollingInterval.Day, retainedFileTimeLimit: TimeSpan.FromDays(7)));
+                .WriteTo.Async(a => a.File("Logs/ItemManager/log-.txt", rollingInterval: RollingInterval.Day, retainedFileTimeLimit: TimeSpan.FromDays(7))));
         }
     }
 }

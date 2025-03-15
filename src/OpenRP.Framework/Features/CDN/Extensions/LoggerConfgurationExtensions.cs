@@ -16,7 +16,7 @@ namespace OpenRP.Framework.Features.CDN.Extensions
         {
             return loggerConfiguration.WriteTo.Logger(lc => lc
                 .Filter.ByIncludingOnly(Matching.FromSource<OpenCdnService>())
-                .WriteTo.File("Logs/OpenCDN/log-.txt", rollingInterval: RollingInterval.Day, retainedFileTimeLimit: TimeSpan.FromDays(7)));
+                .WriteTo.Async(a => a.File("Logs/OpenCDN/log-.txt", rollingInterval: RollingInterval.Day, retainedFileTimeLimit: TimeSpan.FromDays(7))));
         }
     }
 }
