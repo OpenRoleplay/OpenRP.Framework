@@ -8,6 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using CacheManager.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace OpenRP.Framework.Shared.ServerEvents.Services
 {
@@ -17,14 +19,18 @@ namespace OpenRP.Framework.Shared.ServerEvents.Services
         private readonly Dictionary<string, List<MethodInfo>> _eventHandlers = new Dictionary<string, List<MethodInfo>>();
         private readonly List<object> _systemInstances = new List<object>();
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<ServerEventDispatcher> _logger;
 
-        public ServerEventDispatcher(IServiceProvider serviceProvider, IServerEventAggregator serverEventAggregator)
+        public ServerEventDispatcher(IServiceProvider serviceProvider, IServerEventAggregator serverEventAggregator, ILogger<ServerEventDispatcher> logger)
         {
             _serviceProvider = serviceProvider;
             _serverEventAggregator = serverEventAggregator;
+            _logger = logger;
 
             RegisterEventHandlers();
             SubscribeToEvents();
+
+            _logger.LogInformation("Loaded ServerEventDispatcher");
         }
 
         private void SubscribeToEvents()
@@ -90,6 +96,8 @@ namespace OpenRP.Framework.Shared.ServerEvents.Services
                         }
 
                         _eventHandlers[eventName].Add(method);
+
+                        _logger.LogDebug($"Registered method {method.Name} to EventHandler \"{eventName}\".");
                     }
                 }
             }

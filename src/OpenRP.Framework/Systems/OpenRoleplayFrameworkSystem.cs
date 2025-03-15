@@ -1,4 +1,5 @@
 ﻿using OpenRP.Framework.Shared;
+using OpenRP.Framework.Shared.ServerEvents.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -11,8 +12,9 @@ namespace OpenRP.Framework.Systems
 {
     public class OpenRoleplayFrameworkSystem : ISystem
     {
+        // IServerEventDispatcher is added here in order to initiate the Singleton, do not remove.
         [Event]
-        public void OnGameModeInit(IServerService serverService)
+        public void OnGameModeInit(IServerService serverService, IServerEventDispatcher serverEventDispatcher)
         {
             Console.WriteLine(@"
             ==================================================
