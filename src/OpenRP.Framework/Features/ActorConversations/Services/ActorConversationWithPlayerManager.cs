@@ -40,8 +40,11 @@ namespace OpenRP.Framework.Features.ActorConversations.Services
             List<ServerActor> loadedActors = _actorService.GetServerActors();
             foreach (ulong actorId in actorIds)
             {
-                ServerActor serverActor = loadedActors.FirstOrDefault(i => i.GetId() == actorId);
-                actorList.Add(serverActor);
+                ServerActor? serverActor = loadedActors.FirstOrDefault(i => i.GetId() == actorId);
+                if (serverActor != null)
+                {
+                    actorList.Add(serverActor);
+                }
             }
 
             return CreateConversation(conversationName, actorList);

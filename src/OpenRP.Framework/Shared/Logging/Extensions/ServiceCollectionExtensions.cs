@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenRP.Framework.Features.CDN.Extensions;
 using OpenRP.Framework.Features.Items.Extensions;
 using OpenRP.Framework.Shared.Chat.Services;
 using Serilog;
@@ -22,6 +23,7 @@ namespace OpenRP.Framework.Shared.Logging.Extensions
                     .WriteTo.Console()
                     .WriteTo.File("Logs/General/log-.txt", rollingInterval: RollingInterval.Day, retainedFileTimeLimit: TimeSpan.FromDays(7))
                     .WriteToItemLog() 
+                    .WriteToOpenCdnLog()
                     .CreateLogger();
 
                 logging.ClearProviders();
