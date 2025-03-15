@@ -21,7 +21,7 @@ namespace OpenRP.Framework.Shared.Logging.Extensions
                 Log.Logger = new LoggerConfiguration()
                     .MinimumLevel.Debug()
                     .WriteTo.Console()
-                    .WriteTo.File("Logs/General/log-.txt", rollingInterval: RollingInterval.Day, retainedFileTimeLimit: TimeSpan.FromDays(7))
+                    .WriteTo.Async(a => a.File("Logs/General/log-.txt", rollingInterval: RollingInterval.Day, retainedFileTimeLimit: TimeSpan.FromDays(7)))
                     .WriteToItemLog() 
                     .WriteToOpenCdnLog()
                     .CreateLogger();
