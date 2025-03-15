@@ -12,6 +12,7 @@ using OpenRP.Framework.Features.Inventories.Models.DefaultData;
 using OpenRP.Framework.Features.Items.Models.Configurations;
 using OpenRP.Framework.Features.Items.Models.DefaultData;
 using OpenRP.Framework.Features.Permissions.Models.Configurations;
+using OpenRP.Framework.Features.Permissions.Models.DefaultData;
 using OpenRP.Framework.Features.Vehicles.Models.Configurations;
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,8 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new CharacterPermissionGroupModelConfiguration());
             modelBuilder.ApplyConfiguration(new PermissionGroupModelConfiguration());
             modelBuilder.ApplyConfiguration(new PermissionGroupPermissionModelConfiguration());
+
+            modelBuilder.ApplyConfiguration(new PermissionGroupModelDefaultData());
 
             modelBuilder.ApplyConfiguration(new VehicleModelConfiguration());
             modelBuilder.ApplyConfiguration(new VehicleModelDefaultColorConfiguration());
