@@ -20,7 +20,7 @@ namespace OpenRP.Framework.Features.Discord.Services
         private DiscordClient _discordClient;
         private readonly IEntityManager _entityManager;
         private readonly DiscordOptions _options;
-        private readonly Task _initializationTask;
+        private readonly Task? _initializationTask;
         private readonly IServerService _serverService;
 
         // Private constructor to enforce the use of the factory method
@@ -29,17 +29,10 @@ namespace OpenRP.Framework.Features.Discord.Services
             _entityManager = entityManager;
             _serverService = serverService;
             _options = options.Value;
-            ValidateOptions();
-            _initializationTask = InitializeAsync();
-        }
-        private void ValidateOptions()
-        {
-            if (string.IsNullOrEmpty(_options.DiscordBotToken))
-                throw new ArgumentNullException(nameof(DiscordOptions.DiscordBotToken));
-            if (_options.GeneralChatChannelId == default)
-                throw new ArgumentException(nameof(DiscordOptions.GeneralChatChannelId));
-            if (_options.SupportChannelId == default)
-                throw new ArgumentException(nameof(DiscordOptions.SupportChannelId));
+            if (!String.IsNullOrEmpty(_options.DiscordBotToken))
+            {
+                _initializationTask = InitializeAsync();
+            }
         }
 
         // Asynchronous initialization method
@@ -63,110 +56,125 @@ namespace OpenRP.Framework.Features.Discord.Services
         // Method to send a general chat message
         public async Task SendGeneralChatMessage(string text)
         {
-            // Ensure the client is initialized and connected
-            await _initializationTask;
-
-            if (_discordClient == null)
+            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
             {
-                throw new InvalidOperationException("Discord client is not initialized.");
-            }
+                // Ensure the client is initialized and connected
+                await _initializationTask;
 
-            // Attempt to get the channel
-            var channel = await _discordClient.GetChannelAsync(_options.GeneralChatChannelId);
-            if (channel is null)
-            {
-                throw new InvalidOperationException($"Channel with ID {_options.GeneralChatChannelId} not found.");
-            }
+                if (_discordClient == null)
+                {
+                    throw new InvalidOperationException("Discord client is not initialized.");
+                }
 
-            // Send the message
-            await _discordClient.SendMessageAsync(channel, text.Replace("@", "@​"));
+                // Attempt to get the channel
+                var channel = await _discordClient.GetChannelAsync(_options.GeneralChatChannelId);
+                if (channel is null)
+                {
+                    throw new InvalidOperationException($"Channel with ID {_options.GeneralChatChannelId} not found.");
+                }
+
+                // Send the message
+                await _discordClient.SendMessageAsync(channel, text.Replace("@", "@​"));
+            }
         }
 
         // Method to send a newbie chat message
         public async Task SendSupportChatMessage(string text)
         {
-            // Ensure the client is initialized and connected
-            await _initializationTask;
-
-            if (_discordClient == null)
+            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
             {
-                throw new InvalidOperationException("Discord client is not initialized.");
-            }
+                // Ensure the client is initialized and connected
+                await _initializationTask;
 
-            // Attempt to get the channel
-            var channel = await _discordClient.GetChannelAsync(_options.SupportChannelId);
-            if (channel is null)
-            {
-                throw new InvalidOperationException($"Channel with ID {_options.SupportChannelId} not found.");
-            }
+                if (_discordClient == null)
+                {
+                    throw new InvalidOperationException("Discord client is not initialized.");
+                }
 
-            // Send the message
-            await _discordClient.SendMessageAsync(channel, text.Replace("@", "@​"));
+                // Attempt to get the channel
+                var channel = await _discordClient.GetChannelAsync(_options.SupportChannelId);
+                if (channel is null)
+                {
+                    throw new InvalidOperationException($"Channel with ID {_options.SupportChannelId} not found.");
+                }
+
+                // Send the message
+                await _discordClient.SendMessageAsync(channel, text.Replace("@", "@​"));
+            }
         }
 
         public async Task SendGlobalOocChatMessage(Player player, string text)
         {
-            // Ensure the client is initialized and connected
-            await _initializationTask;
-
-            if (_discordClient == null)
+            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
             {
-                throw new InvalidOperationException("Discord client is not initialized.");
+                // Ensure the client is initialized and connected
+                await _initializationTask;
+
+                if (_discordClient == null)
+                {
+                    throw new InvalidOperationException("Discord client is not initialized.");
+                }
+
+                StringBuilder stringBuilder = new StringBuilder();
+                if (!await IsLastMessageFromBotAsync(_options.GeneralChatChannelId))
+                {
+                    stringBuilder.AppendLine("## [In-Game OOC]");
+                }
+
+                stringBuilder.AppendLine($"**{player.Name.Replace("_", " ")}:** {text}");
+
+                await SendGeneralChatMessage(stringBuilder.ToString());
             }
-
-            StringBuilder stringBuilder = new StringBuilder();
-            if (!await IsLastMessageFromBotAsync(_options.GeneralChatChannelId))
-            {
-                stringBuilder.AppendLine("## [In-Game OOC]");
-            }
-
-            stringBuilder.AppendLine($"**{player.Name.Replace("_", " ")}:** {text}");
-
-            await SendGeneralChatMessage(stringBuilder.ToString());
         }
 
         public async Task SendNewbieChatMessage(Player player, string text)
         {
-            // Ensure the client is initialized and connected
-            await _initializationTask;
-
-            if (_discordClient == null)
+            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
             {
-                throw new InvalidOperationException("Discord client is not initialized.");
+                // Ensure the client is initialized and connected
+                await _initializationTask;
+
+                if (_discordClient == null)
+                {
+                    throw new InvalidOperationException("Discord client is not initialized.");
+                }
+
+                StringBuilder stringBuilder = new StringBuilder();
+                if (!await IsLastMessageFromBotAsync(_options.SupportChannelId))
+                {
+                    stringBuilder.AppendLine("## [In-Game Newbie Chat]");
+                }
+
+                stringBuilder.AppendLine($"**{player.Name.Replace("_", " ")}:** {text}");
+
+                await SendSupportChatMessage(stringBuilder.ToString());
             }
-
-            StringBuilder stringBuilder = new StringBuilder();
-            if (!await IsLastMessageFromBotAsync(_options.SupportChannelId))
-            {
-                stringBuilder.AppendLine("## [In-Game Newbie Chat]");
-            }
-
-            stringBuilder.AppendLine($"**{player.Name.Replace("_", " ")}:** {text}");
-
-            await SendSupportChatMessage(stringBuilder.ToString());
         }
 
         public async Task<bool> IsLastMessageFromBotAsync(ulong channelId)
         {
-            // Retrieve the channel
-            var channel = await _discordClient.GetChannelAsync(channelId);
-            if (channel == null)
+            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
             {
-                Console.WriteLine($"Channel with ID {channelId} not found.");
-                return false;
+                // Retrieve the channel
+                var channel = await _discordClient.GetChannelAsync(channelId);
+                if (channel == null)
+                {
+                    Console.WriteLine($"Channel with ID {channelId} not found.");
+                    return false;
+                }
+
+                // Fetch the last message in the channel
+                var messages = await channel.GetMessagesAsync(1); // Fetch the most recent message
+                DiscordMessage lastMessage = messages.FirstOrDefault();
+
+                if (lastMessage != null && !lastMessage.Content.EndsWith("is now playing on the server.") && !lastMessage.Content.EndsWith("is no longer playing on the server."))
+                {
+                    return IsMessageFromBotAsync(lastMessage);
+                }
+
+                // If no messages are found
+                Console.WriteLine("No messages found in the channel.");
             }
-
-            // Fetch the last message in the channel
-            var messages = await channel.GetMessagesAsync(1); // Fetch the most recent message
-            DiscordMessage lastMessage = messages.FirstOrDefault();
-
-            if (lastMessage != null && !lastMessage.Content.EndsWith("is now playing on the server.") && !lastMessage.Content.EndsWith("is no longer playing on the server."))
-            {
-                return IsMessageFromBotAsync(lastMessage);
-            }
-
-            // If no messages are found
-            Console.WriteLine("No messages found in the channel.");
             return false;
         }
 
@@ -177,16 +185,21 @@ namespace OpenRP.Framework.Features.Discord.Services
         /// <returns>True if the message was sent by the bot; otherwise, false.</returns>
         private bool IsMessageFromBotAsync(DiscordMessage message)
         {
-            // Get the bot's user ID
-            var botUser = _discordClient.CurrentUser;
-            if (botUser == null)
-            {
-                Console.WriteLine("Bot user information is not available.");
-                return false;
-            }
 
-            // Compare the message author ID with the bot's user ID
-            return message.Author.Id == botUser.Id;
+            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
+            {
+                // Get the bot's user ID
+                var botUser = _discordClient.CurrentUser;
+                if (botUser == null)
+                {
+                    Console.WriteLine("Bot user information is not available.");
+                    return false;
+                }
+
+                // Compare the message author ID with the bot's user ID
+                return message.Author.Id == botUser.Id;
+            }
+            return false;
         }
 
         private Task DiscordClient_MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
@@ -236,79 +249,88 @@ namespace OpenRP.Framework.Features.Discord.Services
 
         public async Task<bool> UpdatePlayerCount(bool decrease = false)
         {
-            // Ensure the client is initialized and connected
-            await _initializationTask;
-
-            // Get player count
-            int playerCount = _entityManager.GetComponents<Player>().Count();
-            if(decrease)
+            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
             {
-                playerCount--;
-            }
+                // Ensure the client is initialized and connected
+                await _initializationTask;
 
-            string playerCountString = $"Players Online: {playerCount}/{_serverService.MaxPlayers}";
-
-
-            try
-            {
-                // Get the channel by its ID
-                // Retrieve the channel
-                var channel = await _discordClient.GetChannelAsync(_options.PlayerCountChannelId);
-                if (channel == null)
+                // Get player count
+                int playerCount = _entityManager.GetComponents<Player>().Count();
+                if (decrease)
                 {
-                    Console.WriteLine($"Channel with ID {_options.PlayerCountChannelId} not found.");
-                    return false;
+                    playerCount--;
                 }
 
-                // Change its name to "new-channel-name"
-                await channel.ModifyAsync(x => x.Name = playerCountString);
+                string playerCountString = $"Players Online: {playerCount}/{_serverService.MaxPlayers}";
 
 
-                return true;
+                try
+                {
+                    // Get the channel by its ID
+                    // Retrieve the channel
+                    var channel = await _discordClient.GetChannelAsync(_options.PlayerCountChannelId);
+                    if (channel == null)
+                    {
+                        Console.WriteLine($"Channel with ID {_options.PlayerCountChannelId} not found.");
+                        return false;
+                    }
+
+                    // Change its name to "new-channel-name"
+                    await channel.ModifyAsync(x => x.Name = playerCountString);
+
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating channel: {ex}");
+                    return false;
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error updating channel: {ex}");
-                return false;
-            }
+            return false;
         }
 
         public async Task<bool> UpdateDateTime(DateTime date, TimeSpan time)
         {
-            // Ensure the client is initialized and connected.
-            await _initializationTask;
 
-            // Build the desired channel names.
-            string serverDateString = $"Server Date: {date:dd/MM/yyyy}";
-            string serverTimeString = $"Server Time: {time.Hours:D2}:{time.Minutes:D2}";
-
-            bool updated = false;
-
-            // Update the date channel name if configured.
-            if (_options.ServerDateChannelId != default(ulong))
+            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
             {
-                var dateChannel = await _discordClient.GetChannelAsync(_options.ServerDateChannelId);
-                if (dateChannel != null && dateChannel.Name != serverDateString)
-                {
-                    // Modify the channel's name.
-                    await dateChannel.ModifyAsync(m => m.Name = serverDateString);
-                    updated = true;
-                }
-            }
+                // Ensure the client is initialized and connected.
+                await _initializationTask;
 
-            // Update the time channel name if configured.
-            if (_options.ServerTimeChannelId != default(ulong))
-            {
-                var timeChannel = await _discordClient.GetChannelAsync(_options.ServerTimeChannelId);
-                if (timeChannel != null && timeChannel.Name != serverTimeString)
-                {
-                    // Modify the channel's name.
-                    await timeChannel.ModifyAsync(m => m.Name = serverTimeString);
-                    updated = true;
-                }
-            }
+                // Build the desired channel names.
+                string serverDateString = $"Server Date: {date:dd/MM/yyyy}";
+                string serverTimeString = $"Server Time: {time.Hours:D2}:{time.Minutes:D2}";
 
-            return updated;
+                bool updated = false;
+
+                // Update the date channel name if configured.
+                if (_options.ServerDateChannelId != default(ulong))
+                {
+                    var dateChannel = await _discordClient.GetChannelAsync(_options.ServerDateChannelId);
+                    if (dateChannel != null && dateChannel.Name != serverDateString)
+                    {
+                        // Modify the channel's name.
+                        await dateChannel.ModifyAsync(m => m.Name = serverDateString);
+                        updated = true;
+                    }
+                }
+
+                // Update the time channel name if configured.
+                if (_options.ServerTimeChannelId != default(ulong))
+                {
+                    var timeChannel = await _discordClient.GetChannelAsync(_options.ServerTimeChannelId);
+                    if (timeChannel != null && timeChannel.Name != serverTimeString)
+                    {
+                        // Modify the channel's name.
+                        await timeChannel.ModifyAsync(m => m.Name = serverTimeString);
+                        updated = true;
+                    }
+                }
+
+                return updated;
+            }
+            return false;
         }
 
     }

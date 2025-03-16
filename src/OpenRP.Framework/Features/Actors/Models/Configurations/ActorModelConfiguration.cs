@@ -37,18 +37,6 @@ namespace OpenRP.Framework.Features.Actors.Models.Configurations
                   .WithMany()
                   .HasForeignKey(a => a.ActorLinkedToMainMenuSceneId)
                   .OnDelete(DeleteBehavior.Cascade);
-
-            // One ActorData can initiate many ActorRelationships
-            builder.HasMany(a => a.ActorRelationships)
-                  .WithOne(ar => ar.Actor)
-                  .HasForeignKey(ar => ar.ActorId)
-                  .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
-
-            // One ActorData can have many ActorRelationships
-            //builder.HasMany(a => a.ActorRelationships)
-            //      .WithOne(ar => ar.ActorRelationshipWithActor)
-            //      .HasForeignKey(ar => ar.ActorRelationshipWithActorId)
-            //      .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
         }
     }
 }

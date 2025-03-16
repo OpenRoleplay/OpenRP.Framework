@@ -23,29 +23,22 @@ jobs:
           VERSION=${GITHUB_REF/refs\/tags\//}
         else
           git fetch --tags  # Ensure all tags are fetched
-        
+          
           # Get the latest base tag (e.g., "0.1.0")
           LATEST_TAG=$(git describe --tags --abbrev=0)
-        
-          # Get the current week (removing any leading zero)
-          WEEK=$(date +'%U')
+          
+          # Get the current week using Monday as the first day
+          WEEK=$(date +'%W')
           WEEK=$((10#$WEEK))
           YEAR=$(date +'%Y')
-        
-          # Build a pattern to match versions for the current week, e.g. "0.1.0-preview.2025.9.*"
-          PATTERN="${LATEST_TAG}-preview.${YEAR}.${WEEK}."
-        
-          # Get the highest build number for this week from existing tags
-          LATEST_WEEK_TAG=$(git tag -l "${PATTERN}*" | sort -V | tail -n 1)
-          if [ -z "$LATEST_WEEK_TAG" ]; then
-            BUILD_NUMBER=1
-          else
-            # Extract the build number (everything after the last dot)
-            BUILD_NUMBER=${LATEST_WEEK_TAG##*.}
-            BUILD_NUMBER=$((BUILD_NUMBER + 1))
-          fi
-        
-          # Construct the version with an incremental build counter
+          
+          # Calculate Monday of the current week (works on GNU date)
+          MONDAY=$(date -d "today - $(($(date +%u)-1)) days" +%Y-%m-%d)
+          
+          # Count the number of commits made since Monday
+          BUILD_NUMBER=$(git rev-list --count HEAD --since="$MONDAY")
+          
+          # Construct the version string with the commit count as the build number
           VERSION="${LATEST_TAG}-preview.${YEAR}.${WEEK}.${BUILD_NUMBER}"
         fi
         

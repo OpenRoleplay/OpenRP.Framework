@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OpenRP.Framework.Features.CDN.Entities;
+using OpenRP.Framework.Features.Inventories.Services;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Buffers.Text;
@@ -14,39 +16,75 @@ namespace OpenRP.Framework.Features.CDN.Services
     public class OpenCdnService : IOpenCdnService
     {
         private readonly OpenCdnOptions _options;
+        private readonly ILogger<OpenCdnService> _logger;
 
-        public OpenCdnService(IOptions<OpenCdnOptions> options)
+        public OpenCdnService(IOptions<OpenCdnOptions> options, ILogger<OpenCdnService> logger)
         {
             _options = options.Value;
-            ValidateOptions();
+            _logger = logger;
+
+            if (!IsProperlyConfigured())
+            {
+                _logger.LogError("OpenCDN is not properly configured and therefore will not do anything.");
+            }
         }
 
-        public string GetLink(string subDir, string filePath)
+        public bool IsProperlyConfigured()
         {
-            string dateHour = DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
-            string plainString = dateHour + _options.Password;
-            string hash = ComputeSHA256Hash(plainString);
-            string encodedFilePath = Uri.EscapeDataString(filePath);
-            return $"{_options.BaseUrl}/{hash}/{subDir}/{encodedFilePath}";
+            if (!String.IsNullOrEmpty(_options.Password))
+            {
+                return true;
+            }
+
+            if (!String.IsNullOrEmpty(_options.BaseUrl))
+            {
+                return true;
+            }
+
+            return false;
         }
 
-        public string GetBase64Link(string subDir, string base64FilePath)
+        public string? GetLink(string subDir, string filePath)
         {
-            if (string.IsNullOrWhiteSpace(base64FilePath))
-                throw new ArgumentException("File path cannot be null or empty.", nameof(base64FilePath));
-
-            string decodedFilePath;
-            try
+            if (IsProperlyConfigured())
             {
-                byte[] bytes = Convert.FromBase64String(base64FilePath);
-                decodedFilePath = Encoding.UTF8.GetString(bytes);
-            }
-            catch (FormatException ex)
+                string dateHour = DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
+                string plainString = dateHour + _options.Password;
+                string hash = ComputeSHA256Hash(plainString);
+                string encodedFilePath = Uri.EscapeDataString(filePath);
+                return $"{_options.BaseUrl}/{hash}/{subDir}/{encodedFilePath}";
+            } else
             {
-                throw new ArgumentException("The provided file path is not a valid base64 string.", nameof(base64FilePath), ex);
+                _logger.LogError("OpenCDN is not properly configured and therefore GetLink was not executed.");
             }
+            return null;
+        }
 
-            return GetLink(subDir, decodedFilePath);
+        public string? GetBase64Link(string subDir, string base64FilePath)
+        {
+            if (IsProperlyConfigured())
+            {
+                if (string.IsNullOrWhiteSpace(base64FilePath))
+                    throw new ArgumentException("File path cannot be null or empty.", nameof(base64FilePath));
+
+                string decodedFilePath;
+                try
+                {
+                    byte[] bytes = Convert.FromBase64String(base64FilePath);
+                    decodedFilePath = Encoding.UTF8.GetString(bytes);
+                }
+                catch (FormatException ex)
+                {
+                    throw new ArgumentException("The provided file path is not a valid base64 string.", nameof(base64FilePath), ex);
+                }
+
+                return GetLink(subDir, decodedFilePath);
+            }
+            else
+            {
+                _logger.LogError("OpenCDN is not properly configured and therefore GetBase64Link was not executed.");
+            }
+            return null;
         }
 
         private static string ComputeSHA256Hash(string rawData)
@@ -61,36 +99,56 @@ namespace OpenRP.Framework.Features.CDN.Services
             }
         }
 
-        private void ValidateOptions()
-        {
-            if (string.IsNullOrEmpty(_options.Password))
-                throw new ArgumentNullException(nameof(OpenCdnOptions.Password));
-            if (string.IsNullOrEmpty(_options.BaseUrl))
-                throw new ArgumentNullException(nameof(OpenCdnOptions.BaseUrl));
-        }
-
         public void Play(Player player, string subDir, string path)
         {
-            string link = GetLink(subDir, path);
-            player.PlayAudioStream(link);
+            if (IsProperlyConfigured())
+            {
+                string link = GetLink(subDir, path);
+                player.PlayAudioStream(link);
+            }
+            else
+            {
+                _logger.LogError("OpenCDN is not properly configured and therefore Play was not executed.");
+            }
         }
 
         public void Play(Player player, string subDir, string path, Vector3 position, float range)
         {
-            string link = GetLink(subDir, path);
-            player.PlayAudioStream(link, position, range);
+            if (IsProperlyConfigured())
+            {
+                string link = GetLink(subDir, path);
+                player.PlayAudioStream(link, position, range);
+            }
+            else
+            {
+                _logger.LogError("OpenCDN is not properly configured and therefore Play was not executed.");
+            }
         }
 
         public void PlayBase64(Player player, string subDir, string path)
         {
-            string link = GetBase64Link(subDir, path);
-            player.PlayAudioStream(link);
+            if (IsProperlyConfigured())
+            {
+                string link = GetBase64Link(subDir, path);
+                player.PlayAudioStream(link);
+            }
+            else
+            {
+                _logger.LogError("OpenCDN is not properly configured and therefore Play was not executed.");
+            }
         }
 
         public void PlayBase64(Player player, string subDir, string path, Vector3 position, float range)
         {
-            string link = GetBase64Link(subDir, path);
-            player.PlayAudioStream(link, position, range);
+            if (IsProperlyConfigured())
+            {
+                string link = GetBase64Link(subDir, path);
+                player.PlayAudioStream(link, position, range);
+            }
+            else
+            {
+                _logger.LogError("OpenCDN is not properly configured and therefore Play was not executed.");
+            }
         }
     }
 }
