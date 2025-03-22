@@ -29,13 +29,15 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
         private readonly IServerEventAggregator _serverEventAggregator;
         private readonly ITempCharacterService _tempCharacterService;
         private readonly IActorConversationWithPlayerManager _actorConversationWithPlayerManager;
-        public CharacterDialogService(IAccountService accountService, IDialogService dialogService, IServerEventAggregator serverEventAggregator, ITempCharacterService tempCharacterService, IActorConversationWithPlayerManager actorConversationWithPlayerManager)
+        private readonly IDiscordService _discordService;
+        public CharacterDialogService(IAccountService accountService, IDialogService dialogService, IServerEventAggregator serverEventAggregator, ITempCharacterService tempCharacterService, IActorConversationWithPlayerManager actorConversationWithPlayerManager, IDiscordService discordService)
         {
             _accountService = accountService;
             _dialogService = dialogService;
             _serverEventAggregator = serverEventAggregator;
             _tempCharacterService = tempCharacterService;
             _actorConversationWithPlayerManager = actorConversationWithPlayerManager;
+            _discordService = discordService;
         }
 
         public void OpenCharacterSelection(Player player, Action onGoBack)
@@ -72,9 +74,9 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                         player.Spawn();
                         player.Skin = selectedCharacter.Skin;
 
-#if (!DEBUG)
-                            discordService.SendGeneralChatMessage($"## {player.Name.Replace("_", " ")} is now playing on the server.");
-#endif
+                        #if (!DEBUG)
+                            _discordService.SendGeneralChatMessage($"## {player.Name.Replace("_", " ")} is now playing on the server.");
+                        #endif
 
                         var eventArgs = new OnCharacterSelectedEventArgs
                         {
