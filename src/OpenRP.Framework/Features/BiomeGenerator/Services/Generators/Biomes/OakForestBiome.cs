@@ -35,14 +35,14 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
             _biomeOutputColor = GetBiomeOutputColor();
         }
 
-        public ConcurrentBag<BiomeObject> Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation)
+        public ConcurrentBag<BiomeObject> Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation)
         {
             string selectedType = _weightedRandom.GetRandomItem();
             var assets = new ConcurrentBag<BiomeObject>();
 
             if (selectedType != "Nothing")
             {
-                BiomeObject element = _factory.Generate(selectedType, virtualPosition, gamePosition, gameRotation, defaultRotation, _biomeOutputColor);
+                BiomeObject element = _factory.Generate(selectedType, virtualPosition, gamePosition, gameRotation, defaultRotation, maxAngleRotation, _biomeOutputColor);
                 assets.Add(element);
             }
 

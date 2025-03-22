@@ -10,7 +10,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Entities
 {
     public interface IBiome
     {
-        ConcurrentBag<BiomeObject> Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation);
+        ConcurrentBag<BiomeObject> Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation);
         Color GetBiomeOutputColor();
     }
 }
