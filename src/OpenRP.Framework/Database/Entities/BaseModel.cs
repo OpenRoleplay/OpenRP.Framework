@@ -11,5 +11,11 @@ namespace OpenRP.Framework.Database.Entities
         public ulong Id { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
+
+        public BaseModel()
+        {
+            CreatedOn = DateTime.UtcNow;
+            UpdatedOn = DateTime.UtcNow;
+        }
     }
 }

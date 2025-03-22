@@ -13,5 +13,6 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Enums
         DeadForest,
         Farmland,
         Plains,
+        FlintWhetstoneCountyMain,
     }
 }
