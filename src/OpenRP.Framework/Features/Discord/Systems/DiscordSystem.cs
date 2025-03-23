@@ -21,7 +21,14 @@ namespace OpenRP.Framework.Features.Discord.Systems
         [Event]
         public void OnPlayerConnect(Player player, IDiscordService discordService)
         {
-            discordService.UpdatePlayerCount();
+            try
+            {
+                discordService.UpdatePlayerCount();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         [Event]
