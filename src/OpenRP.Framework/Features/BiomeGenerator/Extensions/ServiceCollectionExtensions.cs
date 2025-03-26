@@ -29,6 +29,9 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Extensions
                 .AddSingleton<IBiomeObjectGenerator, FarmlandGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, FlowerGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, GrassGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, LosSantosPlantGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, LosSantosRockGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, LosSantosTreeGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, MultipleSunflowerGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, OakTreeGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, PineTreeGenerator>()
@@ -43,6 +46,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Extensions
                 .AddSingleton<FarmlandBiome>()
                 .AddSingleton<ForestPlainsBiome>()
                 .AddSingleton<OakForestBiome>()
+                .AddSingleton<PalmBeachBiome>()
                 .AddSingleton<PlainsBiome>()
                 .AddSingleton<SunflowerBiome>()
                 .AddSingleton<IBiomeObjectFactory, BiomeObjectFactory>();
