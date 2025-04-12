@@ -22,7 +22,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
                 obj_arr_trees[Random.Shared.Next(obj_arr_trees.Length)],
                 virtualPosition,
                 gamePosition,
-                gameRotation,
+                maxAngleRotation,
                 outputColor
             );
 
