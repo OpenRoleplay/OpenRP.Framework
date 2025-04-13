@@ -1,4 +1,5 @@
-﻿using OpenRP.Framework.Features.CDN.Services;
+﻿using OpenRP.Framework.Features.Admins.Components;
+using OpenRP.Framework.Features.CDN.Services;
 using OpenRP.Framework.Features.DebugSettingsFeature.Components;
 using OpenRP.Framework.Features.DebugSettingsFeature.Services;
 using OpenRP.Framework.Features.Discord.Services;
@@ -32,6 +33,12 @@ namespace OpenRP.Framework.Features.WorldTime.Systems
 
             foreach (Player player in entityManager.GetComponents<Player>())
             {
+                if (player.GetComponent<WeatherTimeOverride>() != null)
+                {
+                    // Skip if the player has a WeatherTimeOverride.
+                    continue;
+                }
+
                 Vector3 playerPosition = player.Position;
 
                 TimeSpan simulationTime = worldTimeService.GetCurrentSimulationTime(playerPosition.X);

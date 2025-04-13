@@ -1,4 +1,5 @@
-﻿using OpenRP.Framework.Features.DebugSettingsFeature.Components;
+﻿using OpenRP.Framework.Features.Admins.Components;
+using OpenRP.Framework.Features.DebugSettingsFeature.Components;
 using OpenRP.Framework.Features.DebugSettingsFeature.Services;
 using OpenRP.Framework.Features.WorldTime.Services;
 using OpenRP.Framework.Features.WorldWeather.Services;
@@ -29,6 +30,12 @@ namespace OpenRP.Framework.Features.WorldWeather.Systems
             List<Player> players = entityManager.GetComponents<Player>().ToList();
             foreach (Player player in players)
             {
+                if (player.GetComponent<WeatherTimeOverride>() != null)
+                {
+                    // Skip if the player has a WeatherTimeOverride.
+                    continue;
+                }
+
                 Vector3 pos = player.Position;
                 int weatherId = worldWeatherService.GetWeatherAt(pos);
                 player.SetWeather(weatherId);
