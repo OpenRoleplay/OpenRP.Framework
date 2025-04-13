@@ -15,5 +15,6 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Enums
         Plains,
         FlintWhetstoneCountyMain,
         LosSantosMain,
+        LosSantosPlains,
     }
 }
