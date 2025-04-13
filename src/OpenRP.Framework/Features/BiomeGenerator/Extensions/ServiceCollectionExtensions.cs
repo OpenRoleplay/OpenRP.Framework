@@ -47,6 +47,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Extensions
                 .AddSingleton<ForestPlainsBiome>()
                 .AddSingleton<OakForestBiome>()
                 .AddSingleton<PalmBeachBiome>()
+                .AddSingleton<PalmPlainsBiome>()
                 .AddSingleton<PlainsBiome>()
                 .AddSingleton<SunflowerBiome>()
                 .AddSingleton<IBiomeObjectFactory, BiomeObjectFactory>();
