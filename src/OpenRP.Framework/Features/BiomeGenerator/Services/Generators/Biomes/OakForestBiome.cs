@@ -49,6 +49,6 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
             return assets;
         }
 
-        public Color GetBiomeOutputColor() => new Color(0, 128, 0);
+        public virtual Color GetBiomeOutputColor() => new Color(0, 128, 0);
     }
 }

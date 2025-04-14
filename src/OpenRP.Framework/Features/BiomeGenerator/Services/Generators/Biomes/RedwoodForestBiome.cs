@@ -12,25 +12,23 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
 {
-    [Biome(30, "Birch Forest", BiomeType.RedCounty)]
-    public class BirchForestBiome : IBiome
+    [Biome(100, "Redwood Forest", BiomeType.SanFierroMain)]
+    public class RedwoodForestBiome : IBiome
     {
         private readonly IBiomeObjectFactory _factory;
         private readonly WeightedRandom<string> _weightedRandom;
         private readonly Color _biomeOutputColor;
 
-        public BirchForestBiome(IBiomeObjectFactory factory)
+        public RedwoodForestBiome(IBiomeObjectFactory factory)
         {
             _factory = factory;
             _weightedRandom = new WeightedRandom<string>(new Dictionary<string, int>
             {
                 { "Grass", 100 },
                 { "RedCountyBush", 15 },
-                { "BirchTree", 15 },
+                { "RedwoodTree", 15 },
                 { "Flower", 48 },
-                { "DeadBirchTree", 5 },
-                { "Sunflower", 2 },
-                { "Nothing", 810 }
+                { "Nothing", 817 }
             });
             _biomeOutputColor = GetBiomeOutputColor();
         }
@@ -49,6 +47,6 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
             return assets;
         }
 
-        public virtual Color GetBiomeOutputColor() => new Color(255, 248, 220);
+        public Color GetBiomeOutputColor() => new Color(128, 0, 0);
     }
 }
