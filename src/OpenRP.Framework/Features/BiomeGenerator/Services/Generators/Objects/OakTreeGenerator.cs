@@ -17,6 +17,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
             int[] obj_arr_trees = {
                 708, 708, 708, 708, 708, 708, 708, 708, 708, 708 // 10x Regular Oak
                 , 713 // 1x Birch
+                , 671 // Bushy Oak Tree
             };
 
             int modelId = obj_arr_trees[Random.Shared.Next(obj_arr_trees.Length)];
