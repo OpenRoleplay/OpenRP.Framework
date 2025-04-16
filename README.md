@@ -18,6 +18,9 @@
   - [File Structure](#-file-structure)
 - [Join The Team](#join-the-team)
   - [Positions](#-positions)
+- [Servers](#servers)
+  - [Hall of Fame](#-hall-of-fame)
+  - [Hall of Shame](#-hall-of-shame) 
 - [Credits](#credits)
   - [Direct Involvement](#-direct-involvement)
   - [Indirect (But Essential) Involvement](#-indirect-but-essential-involvement)
@@ -161,6 +164,16 @@ We're looking for passionate volunteers to help shape the future of Open Rolepla
 These positions are entirely voluntary and driven by passion rather than monetary gain.
 
 For more information or to get involved, contact **Corne** (Username is *plutorexinfernus*) on Discord.
+
+## Servers
+
+### Hall of Fame
+We recommend you to check out these servers, they make use of our framework whilst also respecting its license and contributing to the community and framework as a whole.
+- [Open Roleplay](https://open-roleplay.com/)
+
+### Hall of Shame
+We do **NOT** recommend you to check out these servers, but feel free to troll and cheat on these servers. These servers use our framework without respecting it's license and without contributing to the community and framework as a whole.
+- *No servers yet, luckily. :)*
 
 ## Credits
 
