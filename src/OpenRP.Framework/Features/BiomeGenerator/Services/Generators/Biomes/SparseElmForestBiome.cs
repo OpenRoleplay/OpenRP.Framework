@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
 {
-    [Biome(200, "Sparse Elm Forest", BiomeType.Shrublands)]
+    [Biome(200, "Sparse Elm Forest", BiomeType.Savanna)]
     public class SparseElmForestBiome : IBiome
     {
         private readonly IBiomeObjectFactory _factory;
@@ -27,9 +27,9 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
                 { "Grass", 80 },
                 { "DesertBush", 15 },
                 { "ElmSparseTree", 10 },
-                { "SandJoshPlant", 20 },
+                { "SandJoshPlant", 10 },
                 { "DesertAltRock", 10 },
-                { "Nothing", 860 }
+                { "Nothing", 870 }
             });
             _biomeOutputColor = GetBiomeOutputColor();
         }
