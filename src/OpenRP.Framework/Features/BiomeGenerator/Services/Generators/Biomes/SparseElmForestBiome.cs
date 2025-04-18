@@ -12,21 +12,21 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
 {
-    [Biome(55, "Sparse Redwood Forest", BiomeType.Shrublands)]
-    public class SparseRedwoodForestBiome : IBiome
+    [Biome(200, "Sparse Elm Forest", BiomeType.Shrublands)]
+    public class SparseElmForestBiome : IBiome
     {
         private readonly IBiomeObjectFactory _factory;
         private readonly WeightedRandom<string> _weightedRandom;
         private readonly Color _biomeOutputColor;
 
-        public SparseRedwoodForestBiome(IBiomeObjectFactory factory)
+        public SparseElmForestBiome(IBiomeObjectFactory factory)
         {
             _factory = factory;
             _weightedRandom = new WeightedRandom<string>(new Dictionary<string, int>
             {
                 { "Grass", 80 },
                 { "DesertBush", 15 },
-                { "SparseRedwoodTree", 10 },
+                { "ElmSparseTree", 10 },
                 { "SandJoshPlant", 20 },
                 { "DesertAltRock", 10 },
                 { "Nothing", 860 }
