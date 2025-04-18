@@ -8,25 +8,25 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 {
-    internal class RubbleGenerator : IBiomeObjectGenerator
+    public class PricklyPlantGenerator : IBiomeObjectGenerator
     {
-        public string ObjectType => "Rubble";
+        public string ObjectType => "PricklyPlant";
 
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
-            int[] obj_arr_rubble = { 807, 906, 880, 879, 816, 828, 867, 868, 905 };
+            int[] obj_arr_plants = { 755, 756, 757 };
 
-            int modelId = obj_arr_rubble[Random.Shared.Next(obj_arr_rubble.Length)];
+            int modelId = obj_arr_plants[Random.Shared.Next(obj_arr_plants.Length)];
 
-            BiomeObject rubbleObject = new BiomeObject(
-                obj_arr_rubble[Random.Shared.Next(obj_arr_rubble.Length)],
+            BiomeObject plantObject = new BiomeObject(
+                obj_arr_plants[Random.Shared.Next(obj_arr_plants.Length)],
                 virtualPosition,
                 gamePosition,
                 gameRotation,
                 outputColor
             );
 
-            return rubbleObject;
+            return plantObject;
         }
     }
 }
