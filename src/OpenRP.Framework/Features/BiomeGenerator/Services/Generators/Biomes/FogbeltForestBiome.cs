@@ -27,7 +27,8 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
                 { "Grass", 100 },
                 { "RegularBush", 10 },
                 { "FogbeltBush", 10 },
-                { "RedwoodTree", 20 },
+                { "RedwoodTree", 15 },
+                { "SparseRedwoodTree", 5 },
                 { "Flower", 48 },
                 { "Nothing", 807 }
             });
