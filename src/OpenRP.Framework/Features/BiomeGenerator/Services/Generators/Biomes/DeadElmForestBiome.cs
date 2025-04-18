@@ -29,7 +29,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
                 { "DesertDryBush", 5 },
                 { "ElmDeadTree", 10 },
                 { "SandJoshPlant", 10 },
-                { "DeserRock", 10 },
+                { "DesertRock", 10 },
                 { "Nothing", 870 }
             });
             _biomeOutputColor = GetBiomeOutputColor();
