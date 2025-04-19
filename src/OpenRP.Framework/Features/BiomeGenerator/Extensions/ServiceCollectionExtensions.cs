@@ -61,6 +61,8 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Extensions
                 .AddSingleton<DeadForestBiomeWithTrees>()
                 .AddSingleton<DenseFirForestBiome>()
                 .AddSingleton<DesertBiome>()
+                .AddSingleton<DesertLocustForestBiome>()
+                .AddSingleton<DesertPalmsBiome>()
                 .AddSingleton<ElmForestBiome>()
                 .AddSingleton<FarmlandBiome>()
                 .AddSingleton<FogbeltElmForestBiome>()

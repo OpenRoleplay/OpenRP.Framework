@@ -8,25 +8,27 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 {
-    public class CactusGenerator : IBiomeObjectGenerator
+    public class DesertPalmTreeGenerator : IBiomeObjectGenerator
     {
-        public string ObjectType => "Cactus";
+        public string ObjectType => "DesertPalmTree";
 
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
-            int[] obj_arr_plants = { 650, 651, 653 };
+            int[] obj_arr_trees = {
+                652
+            };
 
-            int modelId = obj_arr_plants[Random.Shared.Next(obj_arr_plants.Length)];
+            int modelId = obj_arr_trees[Random.Shared.Next(obj_arr_trees.Length)];
 
-            BiomeObject plantObject = new BiomeObject(
-                obj_arr_plants[Random.Shared.Next(obj_arr_plants.Length)],
+            BiomeObject treeObject = new BiomeObject(
+                obj_arr_trees[Random.Shared.Next(obj_arr_trees.Length)],
                 virtualPosition,
                 gamePosition,
                 gameRotation,
                 outputColor
             );
 
-            return plantObject;
+            return treeObject;
         }
     }
 }
