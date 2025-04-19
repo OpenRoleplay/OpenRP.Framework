@@ -29,6 +29,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Extensions
                 .AddSingleton<IBiomeObjectGenerator, DenseFirTreeGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, DesertBushGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, DesertDryBushGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, DesertPalmTreeGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, DesertAltRockGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, DesertRockGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, DryBushGenerator>()
