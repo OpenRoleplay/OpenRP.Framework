@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
 {
-    [Biome(255, "Fogbelt Forest", BiomeType.Fogbelt)]
-    public class FogbeltForestBiome : IBiome
+    [Biome(155, "Fogbelt Redwood Forest", BiomeType.Fogbelt)]
+    public class FogbeltRedwoodForestBiome : IBiome
     {
         private readonly IBiomeObjectFactory _factory;
         private readonly WeightedRandom<string> _weightedRandom;
         private readonly Color _biomeOutputColor;
 
-        public FogbeltForestBiome(IBiomeObjectFactory factory)
+        public FogbeltRedwoodForestBiome(IBiomeObjectFactory factory)
         {
             _factory = factory;
             _weightedRandom = new WeightedRandom<string>(new Dictionary<string, int>
