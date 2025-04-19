@@ -19,7 +19,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
         private readonly WeightedRandom<string> _weightedRandom;
         private readonly Color _biomeOutputColor;
 
-        public DesertPalmsBiome(IBiomeObjectFactory factory)
+        public DesertPalmsBiome(IBiomeObjectFactory factory) 
         {
             _factory = factory;
             _weightedRandom = new WeightedRandom<string>(new Dictionary<string, int>
