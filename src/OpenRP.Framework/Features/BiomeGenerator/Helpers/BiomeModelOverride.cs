@@ -41,12 +41,12 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Helpers
 
                 // ElmDeadTreeGenerator
                 case 773:
-                    return 150;
+                    return 175;
 
                 // ElmSparseTreeGenerator
                 case 774:
                 case 780:
-                    return 150;
+                    return 175;
 
             }
             return currentStreamDistance;
