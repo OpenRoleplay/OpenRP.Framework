@@ -38,6 +38,18 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Helpers
                 case -1003: // Grass
                 case -1004: // Grass
                     return 75;
+
+                // ElmDeadTreeGenerator
+                case 773:
+                case 891:
+                    return 100;
+
+                // ElmSparseTreeGenerator
+                case 774:
+                case 780:
+                case 894:
+                    return 100;
+
             }
             return currentStreamDistance;
         }
