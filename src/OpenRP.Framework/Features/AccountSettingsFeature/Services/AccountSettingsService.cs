@@ -106,6 +106,11 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
                     _streamerService.SetRadiusMultiplier(StreamerType.Object, 1.5f, player);
                     _streamerService.Update(player, StreamerType.Object);
                     break;
+                case AccountGraphicPreset.Ultra:
+                    _streamerService.SetVisibleItems(StreamerType.Object, 2000, player);
+                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 2.0f, player);
+                    _streamerService.Update(player, StreamerType.Object);
+                    break;
             }
         }
         public void SwitchGraphicPreset(Player player, AccountSettings accountSettings)
@@ -126,6 +131,9 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
                     accountSettingsModel.AccountGraphicPreset = AccountGraphicPreset.VeryHigh;
                     break;
                 case AccountGraphicPreset.VeryHigh:
+                    accountSettingsModel.AccountGraphicPreset = AccountGraphicPreset.Ultra;
+                    break;
+                case AccountGraphicPreset.Ultra:
                     accountSettingsModel.AccountGraphicPreset = AccountGraphicPreset.Low;
                     player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You must relog in order to see the decrease in draw distance!");
                     break;
@@ -152,6 +160,9 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
 
                 case AccountGraphicPreset.VeryHigh:
                     return $"{Color.DarkGreen}Very High";
+
+                case AccountGraphicPreset.Ultra:
+                    return $"{Color.DarkGreen}Ultra";
             }
             return "N/A";
         }
