@@ -7,7 +7,7 @@ using OpenRP.Framework.Features.Actors.Entities;
 using OpenRP.Framework.Features.VirtualWorlds.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
-using SampSharp.Streamer.Entities;
+using OpenRP.Streamer;
 
 namespace OpenRP.Framework.Features.Actors.Services
 {

@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Database;
-using SampSharp.Streamer.Entities;
+using OpenRP.Streamer;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
 
@@ -87,23 +87,23 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
             switch (accountGraphicPreset) // SetVisibleItems and SetRadiusMultiplier are commented out until they get added to SampSharp-streamer
             {
                 case AccountGraphicPreset.Low:
-                    //_streamerService.SetVisibleItems(StreamerType.Object, 500, player);
-                    //_streamerService.SetRadiusMultiplier(StreamerType.Object, 1.0f, player);
+                    _streamerService.SetVisibleItems(StreamerType.Object, 500, player);
+                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 1.0f, player);
                     _streamerService.Update(player, StreamerType.Object);
                     break;
                 case AccountGraphicPreset.Medium:
-                    //_streamerService.SetVisibleItems(StreamerType.Object, 1000, player);
-                    //_streamerService.SetRadiusMultiplier(StreamerType.Object, 1.0f, player);
+                    _streamerService.SetVisibleItems(StreamerType.Object, 1000, player);
+                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 1.0f, player);
                     _streamerService.Update(player, StreamerType.Object);
                     break;
                 case AccountGraphicPreset.High:
-                    //_streamerService.SetVisibleItems(StreamerType.Object, 2000, player);
-                    //_streamerService.SetRadiusMultiplier(StreamerType.Object, 1.0f, player);
+                    _streamerService.SetVisibleItems(StreamerType.Object, 2000, player);
+                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 1.0f, player);
                     _streamerService.Update(player, StreamerType.Object);
                     break;
                 case AccountGraphicPreset.VeryHigh:
-                    //_streamerService.SetVisibleItems(StreamerType.Object, 2000, player);
-                    //_streamerService.SetRadiusMultiplier(StreamerType.Object, 1.5f, player);
+                    _streamerService.SetVisibleItems(StreamerType.Object, 2000, player);
+                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 1.5f, player);
                     _streamerService.Update(player, StreamerType.Object);
                     break;
             }

@@ -5,7 +5,7 @@ using OpenRP.Framework.Features.MainMenu.Services.Dialogs;
 using OpenRP.Framework.Features.VirtualWorlds.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
-using SampSharp.Streamer.Entities;
+using OpenRP.Streamer;
 using System;
 using System.Collections.Generic;
 using System.Linq;

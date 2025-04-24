@@ -36,12 +36,12 @@ namespace OpenRP.Framework.Features.Discord.Systems
         {
             try
             {
-                #if (!DEBUG)
+                /*#if (!DEBUG)
                     if (player.IsPlayerPlayingAsCharacter())
                     {
-                        discordService.SendGeneralChatMessage($"## {player.Name.Replace("_", " ")} is no longer playing on the server.");
+                        //discordService.SendGeneralChatMessage($"## {player.Name.Replace("_", " ")} is no longer playing on the server.");
                     }
-                #endif
+                #endif*/
                 discordService.UpdatePlayerCount(true);
             }
             catch (Exception ex)
