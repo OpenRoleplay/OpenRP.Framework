@@ -21,5 +21,6 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Enums
         Shrublands,
         Savanna,
         Fogbelt,
+        LasVenturasGravel,
     }
 }
