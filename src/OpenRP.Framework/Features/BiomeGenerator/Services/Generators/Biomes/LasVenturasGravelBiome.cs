@@ -24,8 +24,8 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
             _factory = factory;
             _weightedRandom = new WeightedRandom<string>(new Dictionary<string, int>
             {
-                { "Gravel", 50 },
-                { "Nothing", 950 }
+                { "Gravel", 100 },
+                { "Nothing", 900 }
             });
             _biomeOutputColor = GetBiomeOutputColor();
         }
