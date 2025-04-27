@@ -14,7 +14,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
-            int[] obj_arr_trees = { 620, 621, 712, 645, 710 };
+            int[] obj_arr_trees = { 3505, 3506, 3507, 3508, 3509, 3510, 3511, 3512 };
 
             int modelId = obj_arr_trees[Random.Shared.Next(obj_arr_trees.Length)];
 
