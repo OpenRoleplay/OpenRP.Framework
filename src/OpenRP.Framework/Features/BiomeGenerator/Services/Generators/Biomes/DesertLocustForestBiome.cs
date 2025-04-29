@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Biomes
 {
-    [Biome(50, "Desert Locust Forest", BiomeType.Desert)]
+    [Biome(40, "Desert Locust Forest", BiomeType.Desert)]
     public class DesertLocustForestBiome : IBiome
     {
         private readonly IBiomeObjectFactory _factory;
