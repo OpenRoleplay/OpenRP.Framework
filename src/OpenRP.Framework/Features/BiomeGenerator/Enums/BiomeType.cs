@@ -18,6 +18,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Enums
         LosSantosPlains,
         SanFierroMain,
         Desert,
+        DesertRestrictedZone,
         Shrublands,
         Savanna,
         Fogbelt,
