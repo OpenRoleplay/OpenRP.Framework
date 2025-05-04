@@ -24,5 +24,6 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Enums
         Fogbelt,
         LasVenturasGravel,
         LasVenturasStrip,
+        FortCarsonMain
     }
 }

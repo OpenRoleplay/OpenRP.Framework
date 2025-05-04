@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 {
-    internal class GravelGenerator : IBiomeObjectGenerator
+    internal class SmallRockGenerator : IBiomeObjectGenerator
     {
-        public string ObjectType => "Gravel";
+        public string ObjectType => "SmallRock";
 
         public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
