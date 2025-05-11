@@ -58,6 +58,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Extensions
                 .AddSingleton<IBiomeObjectGenerator, SandJoshPlantGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, SingleSunflowerGenerator>()
                 .AddSingleton<IBiomeObjectGenerator, SparseRedwoodTreeGenerator>()
+                .AddSingleton<IBiomeObjectGenerator, YoungFirTreeGenerator>()
                 .AddSingleton<BirchForestBiome>()
                 .AddSingleton<ConiferousWoodlandBiome>()
                 .AddSingleton<DeadElmForestBiome>()
@@ -91,6 +92,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Extensions
                 .AddSingleton<SparseElmForestBiome>()
                 .AddSingleton<SparseRedwoodForestBiome>()
                 .AddSingleton<SunflowerBiome>()
+                .AddSingleton<YoungFirForestBiome>()
                 .AddSingleton<IBiomeObjectFactory, BiomeObjectFactory>();
         }
     }

@@ -14,6 +14,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Enums
         Farmland,
         Plains,
         FlintWhetstoneCountyMain,
+        AngelPineMain,
         LosSantosMain,
         LosSantosPlains,
         SanFierroMain,
