@@ -13,7 +13,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
     {
         public string ObjectType => "DeadTree";
 
-        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
+        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
             int[] obj_arr_deadtree = { 848, 833, 831, 847, 837, 832, 841, 842, 836, 840, 834, 839, 843, 838, 844, 835, 846, 845 };
 

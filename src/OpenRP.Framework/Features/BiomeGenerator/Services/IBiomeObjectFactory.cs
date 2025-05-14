@@ -10,6 +10,6 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services
 {
     public interface IBiomeObjectFactory
     {
-        BiomeObject Generate(string assetType, Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor);
+        BiomeObject Generate(string assetType, Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor);
     }
 }

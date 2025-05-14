@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SampSharp.Streamer.Entities;
+using OpenRP.Streamer;
 
 namespace OpenRP.Framework.Features.Fishing.Systems
 {

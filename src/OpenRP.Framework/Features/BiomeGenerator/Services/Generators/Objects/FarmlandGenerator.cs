@@ -12,9 +12,9 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
     {
         public string ObjectType => "Farmland";
 
-        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
+        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
-            BiomeObject generatedObject = new BiomeObject(-1005, virtualPosition, gamePosition, gameRotation, outputColor);
+            BiomeObject generatedObject = new BiomeObject(-1010, virtualPosition, gamePosition, gameRotation, outputColor);
 
             return generatedObject;
         }

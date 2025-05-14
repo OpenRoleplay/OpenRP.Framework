@@ -18,9 +18,9 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
 
         public string ObjectType => "DeadBirchTree";
 
-        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
+        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
-            BiomeObject deadObject = _deadTreeGenerator.Generate(virtualPosition, gamePosition, gameRotation, defaultRotation, outputColor);
+            BiomeObject deadObject = _deadTreeGenerator.Generate(virtualPosition, gamePosition, gameRotation, defaultRotation, maxAngleRotation, outputColor);
 
             BiomeObjectMaterial deadMaterial;
             switch (deadObject.ModelId)

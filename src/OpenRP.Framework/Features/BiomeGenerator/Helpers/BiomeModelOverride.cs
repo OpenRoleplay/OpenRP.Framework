@@ -35,7 +35,19 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Helpers
             switch (modelId)
             {
                 case -1002: // Sunflower
+                case -1003: // Grass
+                case -1004: // Grass
                     return 75;
+
+                // ElmDeadTreeGenerator
+                case 773:
+                    return 175;
+
+                // ElmSparseTreeGenerator
+                case 774:
+                case 780:
+                    return 175;
+
             }
             return currentStreamDistance;
         }

@@ -17,11 +17,11 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services
             _generators = generators.ToDictionary(g => g.ObjectType, g => g);
         }
 
-        public BiomeObject Generate(string assetType, Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
+        public BiomeObject Generate(string assetType, Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
             if (_generators.TryGetValue(assetType, out var generator))
             {
-                return generator.Generate(virtualPosition, gamePosition, gameRotation, defaultRotation, outputColor);
+                return generator.Generate(virtualPosition, gamePosition, gameRotation, defaultRotation, maxAngleRotation, outputColor);
             }
             throw new InvalidOperationException($"No generator registered for asset type: {assetType}");
         }

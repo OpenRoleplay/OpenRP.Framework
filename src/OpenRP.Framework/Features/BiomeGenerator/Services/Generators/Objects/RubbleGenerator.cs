@@ -12,9 +12,9 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
     {
         public string ObjectType => "Rubble";
 
-        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
+        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
-            int[] obj_arr_rubble = { 807, 906, 880, 879, 816, 828, 867, 868 };
+            int[] obj_arr_rubble = { 807, 906, 880, 879, 816, 828, 867, 868, 905 };
 
             int modelId = obj_arr_rubble[Random.Shared.Next(obj_arr_rubble.Length)];
 

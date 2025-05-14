@@ -13,5 +13,19 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Enums
         DeadForest,
         Farmland,
         Plains,
+        FlintWhetstoneCountyMain,
+        AngelPineMain,
+        LosSantosMain,
+        LosSantosPlains,
+        SanFierroMain,
+        Desert,
+        DesertWastelands,
+        DesertRestrictedZone,
+        Shrublands,
+        Savanna,
+        Fogbelt,
+        LasVenturasGravel,
+        LasVenturasStrip,
+        FortCarsonMain
     }
 }

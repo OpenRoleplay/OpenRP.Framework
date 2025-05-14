@@ -12,7 +12,7 @@ namespace OpenRP.Framework.Features.BiomeGenerator.Services.Generators.Objects
     {
         public string ObjectType => "DryBush";
 
-        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Color outputColor)
+        public BiomeObject Generate(Vector2 virtualPosition, Vector3 gamePosition, Vector3 gameRotation, Vector3 defaultRotation, Vector3 maxAngleRotation, Color outputColor)
         {
             int[] obj_arr_dry_bushes = { 761, 692 };
 
