@@ -238,7 +238,9 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
 
                     if (string.IsNullOrEmpty(r.InputText))
                     {
-                        MessageDialog firstNameRequired = new MessageDialog(DialogHelper.GetTitle("Character Creation", "Last name"), ChatColor.White + "The last name for your character is required!", DialogHelper.Retry);
+                        BetterMessageDialog firstNameRequired = new BetterMessageDialog("Retry");
+                        firstNameRequired.SetTitle(TitleType.Children, "Character Creation", "Last name");
+                        firstNameRequired.SetContent("The last name for your character is required!");
 
                         void LastNameRequiredDialogHandler(MessageDialogResponse r)
                         {
@@ -249,7 +251,9 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                     }
                     else if (r.InputText.Length > 35)
                     {
-                        MessageDialog lastNameTooLongDialog = new MessageDialog(DialogHelper.GetTitle("Character Creation", "Last name"), ChatColor.White + "The last name for your character may not be longer than 35 characters.", DialogHelper.Retry);
+                        BetterMessageDialog lastNameTooLongDialog = new BetterMessageDialog("Retry");
+                        lastNameTooLongDialog.SetTitle(TitleType.Children, "Character Creation", "Last name");
+                        lastNameTooLongDialog.SetContent("The last name for your character may not be longer than 35 characters.");
 
                         void LastNameTooLongDialogHandler(MessageDialogResponse r)
                         {
