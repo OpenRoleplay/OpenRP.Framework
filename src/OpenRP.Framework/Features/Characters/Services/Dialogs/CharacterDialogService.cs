@@ -217,14 +217,64 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 }
                 else
                 {
-                    penCreateCharacterLastName(player, onGoBack);
+                    onGoBack?.Invoke();
                 }
-            };
+            ;
 
             _dialogService.Show(player.Entity, middleNameYesOrNoDialog, MiddleNameYesOrNoDialogHandler);
         }
 
         private void OpenCreateCharacterLastName(Player player, Action onGoBack)
+        {
+            BetterInputDialog characterDialog = new BetterInputDialog("Next", "Previous");
+            characterDialog.SetTitle(TitleType.Children, "Character Creation", "Last name");
+            characterDialog.SetContent("Pick a last name for your character. The first name of your character can be up to 35 characters long.");
+
+            void CreateCharacterLastNameDialogHandler(InputDialogResponse r)
+            {
+                if (r.Response == DialogResponse.LeftButton)
+                {
+                    CharacterCreation charCreationComponent = player.GetComponent<CharacterCreation>();
+
+                    if (string.IsNullOrEmpty(r.InputText))
+                    {
+                        MessageDialog firstNameRequired = new MessageDialog(DialogHelper.GetTitle("Character Creation", "Last name"), ChatColor.White + "The last name for your character is required!", DialogHelper.Retry);
+
+                        void LastNameRequiredDialogHandler(MessageDialogResponse r)
+                        {
+                            OpenCreateCharacterLastName(player, onGoBack);
+                        }
+
+                        _dialogService.Show(player.Entity, firstNameRequired, LastNameRequiredDialogHandler);
+                    }
+                    else if (r.InputText.Length > 35)
+                    {
+                        MessageDialog lastNameTooLongDialog = new MessageDialog(DialogHelper.GetTitle("Character Creation", "Last name"), ChatColor.White + "The last name for your character may not be longer than 35 characters.", DialogHelper.Retry);
+
+                        void LastNameTooLongDialogHandler(MessageDialogResponse r)
+                        {
+                            OpenCreateCharacterLastName(player, onGoBack);
+                        }
+
+                        _dialogService.Show(player.Entity, lastNameTooLongDialog, LastNameTooLongDialogHandler);
+                    }
+                    else
+                    {
+                        charCreationComponent.CreatingCharacter.LastName = r.InputText.Trim();
+
+                        OpenCreateCharacterDateOfBirth(player, onGoBack);
+                    }
+                }
+                else
+                {
+                    onGoBack?.Invoke();
+                }
+            }
+
+            _dialogService.Show(player.Entity, characterDialog, CreateCharacterLastNameDialogHandler);
+        }
+
+        private void OpenCreateCharacterDateOfBirth(Player player, Action onGoBack)
         {
             throw new NotImplementedException();
         }
