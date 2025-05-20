@@ -171,12 +171,9 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
             {
                 if (r.Response == DialogResponse.LeftButton)
                 {
-                    InputDialog characterDialog = new InputDialog();
-
-                    characterDialog.Caption = DialogHelper.GetTitle("Character Creation", "Middle name");
-                    characterDialog.Content = ChatColor.White + "Pick a middle name for your character. The middle name of your character can be up to 30 characters long. You can also skip this step by not filling a middle name in.";
-                    characterDialog.Button1 = DialogHelper.Next;
-                    characterDialog.Button2 = DialogHelper.Previous;
+                    BetterInputDialog characterDialog = new BetterInputDialog("Next", "Previous");
+                    characterDialog.SetTitle(TitleType.Children, "Character Creation", "Middle name");
+                    characterDialog.SetContent("Pick a middle name for your character. The middle name of your character can be up to 30 characters long. You can also skip this step by not filling a middle name in.");
 
                     void CreateCharacterMiddleNameDialogHandler(InputDialogResponse r)
                     {
@@ -188,41 +185,48 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                             {
                                 charCreationComponent.CreatingCharacter.MiddleName = null;
 
-                                CreateCharacterLastNameDialog.Open(player, dialogService, actorConversationWithPlayerManager, mainMenuDialogService, discordService, serverEventAggregator, tempCharacterService, accountService);
+                                OpenCreateCharacterLastName(player, onGoBack);
                             }
                             else if (r.InputText.Length > 30)
                             {
-                                MessageDialog middleNameTooLongDialog = new MessageDialog(DialogHelper.GetTitle("Character Creation", "Middle name"), ChatColor.White + "The middle name for your character may not be longer than 30 characters.", DialogHelper.Retry);
+                                BetterMessageDialog middleNameTooLongDialog = new BetterMessageDialog("Retry");
+                                middleNameTooLongDialog.SetTitle("Character Creation", "Middle name");
+                                middleNameTooLongDialog.SetContent("The middle name for your character may not be longer than 30 characters.");
 
                                 void MiddleNameTooLongDialogHandler(MessageDialogResponse r)
                                 {
-                                    Open(player, dialogService, actorConversationWithPlayerManager, mainMenuDialogService, discordService, serverEventAggregator, tempCharacterService, accountService);
+                                    OpenCreateCharacterMiddleName(player, onGoBack);
                                 };
 
-                                dialogService.Show(player.Entity, middleNameTooLongDialog, MiddleNameTooLongDialogHandler);
+                                _dialogService.Show(player.Entity, middleNameTooLongDialog, MiddleNameTooLongDialogHandler);
                             }
                             else
                             {
                                 charCreationComponent.CreatingCharacter.MiddleName = r.InputText.Trim();
 
-                                CreateCharacterLastNameDialog.Open(player, dialogService, actorConversationWithPlayerManager, mainMenuDialogService, discordService, serverEventAggregator, tempCharacterService, accountService);
+                                OpenCreateCharacterLastName(player, onGoBack);
                             }
                         }
                         else
                         {
-                            CreateCharacterFirstNameDialog.Open(player, dialogService, actorConversationWithPlayerManager, mainMenuDialogService, discordService, serverEventAggregator, tempCharacterService, accountService);
+                            OpenCreateCharacterFirstName(player, onGoBack);
                         }
                     }
 
-                    dialogService.Show(player.Entity, characterDialog, CreateCharacterMiddleNameDialogHandler);
+                    _dialogService.Show(player.Entity, characterDialog, CreateCharacterMiddleNameDialogHandler);
                 }
                 else
                 {
-                    CreateCharacterLastNameDialog.Open(player, dialogService, actorConversationWithPlayerManager, mainMenuDialogService, discordService, serverEventAggregator, tempCharacterService, accountService);
+                    penCreateCharacterLastName(player, onGoBack);
                 }
             };
 
-            dialogService.Show(player.Entity, middleNameYesOrNoDialog, MiddleNameYesOrNoDialogHandler);
+            _dialogService.Show(player.Entity, middleNameYesOrNoDialog, MiddleNameYesOrNoDialogHandler);
+        }
+
+        private void OpenCreateCharacterLastName(Player player, Action onGoBack)
+        {
+            throw new NotImplementedException();
         }
     }
 }
