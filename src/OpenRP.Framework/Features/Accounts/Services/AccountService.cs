@@ -141,5 +141,34 @@ namespace OpenRP.Framework.Features.Accounts.Services
             }
             return false;
         }
+
+        public bool CreateCharacter(Player player, CharacterModel newCharacter)
+        {
+            try
+            {
+                CharacterCreation charCreationComponent = player.GetComponent<CharacterCreation>();
+                Account accountComponent = player.GetComponent<Account>();
+
+                if (charCreationComponent != null && charCreationComponent.CreatingCharacter != null)
+                {
+                    newCharacter.AccountId = accountComponent.GetAccountId();
+                    _dataContext.Characters.Add(newCharacter);
+                    _dataContext.SaveChanges();
+
+                    ReloadAccount(player, newCharacter.AccountId.Value);
+
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("There is no character to create!");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            return false;
+        }
     }
 }

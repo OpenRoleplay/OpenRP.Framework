@@ -27,15 +27,13 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
         private readonly IAccountService _accountService;
         private readonly IDialogService _dialogService;
         private readonly IServerEventAggregator _serverEventAggregator;
-        private readonly ITempCharacterService _tempCharacterService;
         private readonly IActorConversationWithPlayerManager _actorConversationWithPlayerManager;
         private readonly IDiscordService _discordService;
-        public CharacterDialogService(IAccountService accountService, IDialogService dialogService, IServerEventAggregator serverEventAggregator, ITempCharacterService tempCharacterService, IActorConversationWithPlayerManager actorConversationWithPlayerManager, IDiscordService discordService)
+        public CharacterDialogService(IAccountService accountService, IDialogService dialogService, IServerEventAggregator serverEventAggregator, IActorConversationWithPlayerManager actorConversationWithPlayerManager, IDiscordService discordService)
         {
             _accountService = accountService;
             _dialogService = dialogService;
             _serverEventAggregator = serverEventAggregator;
-            _tempCharacterService = tempCharacterService;
             _actorConversationWithPlayerManager = actorConversationWithPlayerManager;
             _discordService = discordService;
         }
@@ -280,7 +278,64 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
 
         private void OpenCreateCharacterDateOfBirth(Player player, Action onGoBack)
         {
-            throw new NotImplementedException();
+            BetterInputDialog characterDialog = new BetterInputDialog("Next", "Previous");
+            characterDialog.SetTitle(TitleType.Children, "Character Creation", "Date of Birth");
+            characterDialog.SetContent("Pick a date of birth for your character. The appropriate format to use is DD/MM/YYYY.");
+
+            void CreateCharacterDateOfBirthDialogHandler(InputDialogResponse r)
+            {
+                if (r.Response == DialogResponse.LeftButton)
+                {
+                    CharacterCreation charCreationComponent = player.GetComponent<CharacterCreation>();
+
+                    DateTime characterDoB;
+                    if (DateTime.TryParse(r.InputText, out characterDoB))
+                    {
+                        BetterMessageDialog confirmDateOfBirth = new BetterMessageDialog("Yes", "No");
+                        confirmDateOfBirth.SetTitle(TitleType.Children, "Character Creation", "Date of Birth");
+                        confirmDateOfBirth.SetContent(String.Format("Your chosen Date of Birth is {0}, meaning that your character would be {1} years old. Is that correct?", characterDoB.ToString("dd/MM/yyyy"), (DateTime.Today.Year - characterDoB.Year)));
+
+                        void ConfirmDialogHandler(MessageDialogResponse confirmResponse)
+                        {
+                            if (confirmResponse.Response == DialogResponse.LeftButton)
+                            {
+                                charCreationComponent.CreatingCharacter.DateOfBirth = characterDoB;
+
+                                // Next Step
+                                _accountService.CreateCharacter(player, charCreationComponent.CreatingCharacter);
+                                player.DestroyComponents<CharacterCreation>();
+
+                                CharacterSelectionDialog.Open(player, dialogService, actorConversationWithPlayerManager, mainMenuDialogService, discordService, serverEventAggregator, tempCharacterService, accountService);
+                            }
+                            else
+                            {
+                                OpenCreateCharacterDateOfBirth(player, onGoBack);
+                            }
+                        }
+                        ;
+
+                        _dialogService.Show(player.Entity, confirmDateOfBirth, ConfirmDialogHandler);
+                    }
+                    else
+                    {
+                        MessageDialog incorrectFormatDialog = new MessageDialog(DialogHelper.GetTitle("Character Creation", "Date of Birth"), ChatColor.White + "Your chosen format for the Date of Birth is incorrect, please try again.", DialogHelper.Retry);
+
+                        void IncorrectFormatDialogHandler(MessageDialogResponse r)
+                        {
+                            OpenCreateCharacterDateOfBirth(player, onGoBack);
+                        }
+                        ;
+
+                        _dialogService.Show(player.Entity, incorrectFormatDialog, IncorrectFormatDialogHandler);
+                    }
+                }
+                else
+                {
+                    onGoBack?.Invoke();
+                }
+            }
+
+            _dialogService.Show(player.Entity, characterDialog, CreateCharacterDateOfBirthDialogHandler);
         }
     }
 }

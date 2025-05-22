@@ -11,6 +11,7 @@ namespace OpenRP.Framework.Database.Models
         public string? Accent { get; set; }
         public ulong? InventoryId { get; set; }
         public int Skin { get; set; }
+        public ulong? AccountId { get; set; }
 
 
         // Navigational Properties

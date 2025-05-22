@@ -19,5 +19,6 @@ namespace OpenRP.Framework.Features.Accounts.Services
         Account ReloadAccount(Player player, ulong accountId);
         List<CharacterModel> GetCharactersByAccountId(ulong accountId);
         bool CreateAccount(Player player, string username, string password);
+        bool CreateCharacter(Player player);
     }
 }
