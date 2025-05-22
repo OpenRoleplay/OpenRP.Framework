@@ -305,7 +305,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                                 _accountService.CreateCharacter(player, charCreationComponent.CreatingCharacter);
                                 player.DestroyComponents<CharacterCreation>();
 
-                                CharacterSelectionDialog.Open(player, dialogService, actorConversationWithPlayerManager, mainMenuDialogService, discordService, serverEventAggregator, tempCharacterService, accountService);
+                                OpenCharacterSelection(player, onGoBack);
                             }
                             else
                             {
