@@ -29,13 +29,15 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
         private readonly IServerEventAggregator _serverEventAggregator;
         private readonly IActorConversationWithPlayerManager _actorConversationWithPlayerManager;
         private readonly IDiscordService _discordService;
-        public CharacterDialogService(IAccountService accountService, IDialogService dialogService, IServerEventAggregator serverEventAggregator, IActorConversationWithPlayerManager actorConversationWithPlayerManager, IDiscordService discordService)
+        private readonly ITempCharacterService _tempCharacterService;
+        public CharacterDialogService(IAccountService accountService, IDialogService dialogService, IServerEventAggregator serverEventAggregator, IActorConversationWithPlayerManager actorConversationWithPlayerManager, IDiscordService discordService, ITempCharacterService tempCharacterService)
         {
             _accountService = accountService;
             _dialogService = dialogService;
             _serverEventAggregator = serverEventAggregator;
             _actorConversationWithPlayerManager = actorConversationWithPlayerManager;
             _discordService = discordService;
+            _tempCharacterService = tempCharacterService;
         }
 
         public void OpenCharacterSelection(Player player, Action onGoBack)
@@ -188,7 +190,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                             else if (r.InputText.Length > 30)
                             {
                                 BetterMessageDialog middleNameTooLongDialog = new BetterMessageDialog("Retry");
-                                middleNameTooLongDialog.SetTitle("Character Creation", "Middle name");
+                                middleNameTooLongDialog.SetTitle(TitleType.Children, "Character Creation", "Middle name");
                                 middleNameTooLongDialog.SetContent("The middle name for your character may not be longer than 30 characters.");
 
                                 void MiddleNameTooLongDialogHandler(MessageDialogResponse r)
@@ -217,7 +219,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 {
                     onGoBack?.Invoke();
                 }
-            ;
+            }
 
             _dialogService.Show(player.Entity, middleNameYesOrNoDialog, MiddleNameYesOrNoDialogHandler);
         }
