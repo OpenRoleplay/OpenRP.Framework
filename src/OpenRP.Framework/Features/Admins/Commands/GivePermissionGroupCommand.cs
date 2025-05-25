@@ -30,7 +30,7 @@ namespace OpenRP.Framework.Features.Admins.Commands
                 CharacterPermissions targetCharacterPermissions = targetCharacter.GetComponent<CharacterPermissions>();
 
                 // Attempt to give the permission group and capture the success status.
-                bool success = permissionManager.GiveCharacterPermissionGroupByName(targetCharacter.GetDatabaseId(), permission_group);
+                bool success = permissionManager.GiveCharacterPermissionGroupByName(targetCharacter.GetId(), permission_group);
 
                 // Provide feedback based on whether the operation succeeded.
                 if (success)

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Animations.Services;
+using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Features.Characters.Services;
+using OpenRP.Framework.Features.Characters.Services.Dialogs;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,8 @@ namespace OpenRP.Framework.Features.Characters.Extensions
         public static IServiceCollection AddCharacters(this IServiceCollection self)
         {
             return self
-                .AddTransient<ITempCharacterService, TempCharacterService>();
+                .AddTransient<ITempCharacterService, TempCharacterService>()
+                .AddSingleton<ICharacterDialogService, CharacterDialogService>();
         }
     }
 }

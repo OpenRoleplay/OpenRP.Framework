@@ -54,7 +54,7 @@ namespace OpenRP.Framework.Features.Characters.Models.Configuration
             // One-to-One with AccountModel
             builder.HasOne(c => c.Account)
                 .WithMany(a => a.Characters)
-                .HasForeignKey("AccountId")
+                .HasForeignKey(a => a.AccountId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Cascade);
 

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenRP.Framework.Database;
 using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Features.Accounts.Components;
+using OpenRP.Framework.Features.Accounts.Services;
 using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Features.Inventories.Services;
 using SampSharp.Entities;
@@ -19,11 +21,13 @@ namespace OpenRP.Framework.Features.Characters.Services
         private BaseDataContext _dataContext;
         private IEntityManager _entityManager;
         private IInventoryService _inventoryService;
-        public TempCharacterService(BaseDataContext dataContext, IEntityManager entityManager, IInventoryService inventoryService)
+        private IAccountService _accountService;
+        public TempCharacterService(BaseDataContext dataContext, IEntityManager entityManager, IInventoryService inventoryService, IAccountService accountService)
         {
             _dataContext = dataContext;
             _entityManager = entityManager;
             _inventoryService = inventoryService;
+            _accountService = accountService;
         }
 
         public Character ReloadCharacter(Player player, ulong characterId)
@@ -44,7 +48,7 @@ namespace OpenRP.Framework.Features.Characters.Services
         {
             try
             {
-                CharacterModel characterToEdit = _dataContext.Characters.FirstOrDefault(i => i.Id == character.GetDatabaseId());
+                CharacterModel characterToEdit = _dataContext.Characters.FirstOrDefault(i => i.Id == character.GetId());
 
                 if (characterToEdit != null)
                 {
@@ -67,7 +71,7 @@ namespace OpenRP.Framework.Features.Characters.Services
                 CharacterModel characterData = _dataContext.Characters
                     .Include(c => c.Inventory)
                     .ThenInclude(c => c.Items)
-                    .FirstOrDefault(c => c.Id == character.GetDatabaseId());
+                    .FirstOrDefault(c => c.Id == character.GetId());
 
                 // Create inventory if it doesn't exist
                 if (characterData.Inventory == null)

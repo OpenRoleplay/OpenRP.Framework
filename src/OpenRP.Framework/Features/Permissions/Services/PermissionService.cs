@@ -32,7 +32,7 @@ namespace OpenRP.Framework.Features.Permissions.Services
             character.DestroyComponents<CharacterPermissions>();
 
             // Get permissions
-            List<string> permissionList = GetCharacterPermissions(character.GetDatabaseId());
+            List<string> permissionList = GetCharacterPermissions(character.GetId());
 
             // Add Component
             CharacterPermissions characterPermissions = character.AddComponent<CharacterPermissions>(permissionList);

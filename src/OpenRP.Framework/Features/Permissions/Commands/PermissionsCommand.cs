@@ -47,7 +47,7 @@ namespace OpenRP.Framework.Features.Permissions.Commands
                 return;
             }
 
-            ulong characterId = character.GetDatabaseId();
+            ulong characterId = character.GetId();
             List<PermissionModel> permissionModels = permissionManager.GetCharacterPermissionsModels(characterId);
 
             // Create and configure the dialog
