@@ -107,7 +107,7 @@ namespace OpenRP.Framework.Features.Accounts.Services
             await _serverEventAggregator.PublishAsync(eventArgs);
         }
 
-        public Account ReloadAccount(Player player, ulong accountId)
+        public Account? ReloadAccount(Player player, ulong accountId)
         {
             player.DestroyComponents<Account>();
 

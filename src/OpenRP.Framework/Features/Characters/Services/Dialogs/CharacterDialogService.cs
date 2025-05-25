@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Characters.Services.Dialogs
 {
-    public class CharacterDialogService
+    public class CharacterDialogService : ICharacterDialogService
     {
         private readonly IAccountService _accountService;
         private readonly IDialogService _dialogService;
