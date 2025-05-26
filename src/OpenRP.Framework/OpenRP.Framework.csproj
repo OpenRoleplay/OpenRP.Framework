@@ -38,10 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Harvestables\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\OpenRoleplay.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
