@@ -60,7 +60,6 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                         CharacterModel selectedCharacter = characterModels.ElementAt(r.ItemIndex);
                         Character characterComponent = _tempCharacterService.ReloadCharacter(player, selectedCharacter.Id);
                         player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, String.Format("Logged in as {0}{1} {2}{3}!", ChatColor.CornflowerBlue, selectedCharacter.FirstName, selectedCharacter.LastName, ChatColor.White));
-                        // player.OnCharacterSelected();
 
                         // Temporary for testing
                         player.ToggleSpectating(false);
