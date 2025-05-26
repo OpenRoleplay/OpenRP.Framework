@@ -4,6 +4,7 @@ using OpenRP.Framework.Features.Inventories.Entities;
 using OpenRP.Framework.Features.Inventories.Helpers;
 using OpenRP.Framework.Features.Items.Components;
 using OpenRP.Framework.Features.Items.Entities;
+using OpenRP.Framework.Shared.BaseManager.Entities;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Inventories.Components
 {
-    public class InventoryItem : Component
+    public class InventoryItem : Component, IBaseDataComponent, IChangeable, IDeletable
     {
         private readonly InventoryItemModel _inventoryItemModel;
         private bool _hasChanges;
@@ -94,6 +95,19 @@ namespace OpenRP.Framework.Features.Inventories.Components
         public bool HasRemainingUses()
         {
             return _inventoryItemModel.UsesRemaining.HasValue && _inventoryItemModel.UsesRemaining.Value > 0;
+        }
+
+        public void Use()
+        {
+            _inventoryItemModel.UsesRemaining--;
+
+            if( _inventoryItemModel.UsesRemaining > 0)
+            {
+                ProcessChanges();
+            } else
+            {
+                ProcessDeletion();
+            }
         }
 
         public uint? GetRemainingUses()

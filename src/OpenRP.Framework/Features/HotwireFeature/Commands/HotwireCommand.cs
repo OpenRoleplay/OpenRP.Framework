@@ -80,20 +80,20 @@ namespace OpenRP.Framework.Features.HotwireFeature.Commands
             Item? itemWornoutScrewdriver = items.FirstOrDefault(i => i.GetId() == 34);
             Item? itemElectricalTape = items.FirstOrDefault(i => i.GetId() == 35);
 
-            InventoryItem? reqPaperclip = inventory.FindItem(itemRustyPaperclip);
-            bool reqScrewdriver = inventory.HasItem(itemWornoutScrewdriver);
+            InventoryItem? invPaperclip = inventory.FindItem(itemRustyPaperclip);
+            bool hasScrewdriver = inventory.HasItem(itemWornoutScrewdriver);
 
             // Verify that the player has both required items.
-            if (reqPaperclip != null || !reqScrewdriver)
+            if (invPaperclip == null || !hasScrewdriver)
             {
                 player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You need a Rusty Paperclip and a Wornout Screwdriver to hotwire the vehicle!");
                 return;
             }
 
             // Consume the Rusty Paperclip.
-            if (reqPaperclip != null)
+            if (invPaperclip != null)
             {
-                inventory.UseItem(player, reqPaperclip);
+                inventory.UseItem(player, invPaperclip);
 
                 // If available, consume Electrical Tape for a safe hotwire.
                 bool usedElectricalTape = false;

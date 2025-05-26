@@ -58,9 +58,12 @@ namespace OpenRP.Framework.Features.HotwireFeature.Systems
                         {
                             Vehicle veh = entityManager.GetComponent<Vehicle>(player.Vehicle);
                             HotwiredVehicle hotwiredVehicle = veh.GetComponent<HotwiredVehicle>();
-                            hotwiredVehicle.SuccessfulHotwire();
-                            chatService.SendPlayerChatMessage(player, PlayerChatMessageType.DO, "The engine roars to life after a few sparks fly.");
-                            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "You successfully hotwired the vehicle!");
+                            if (hotwiredVehicle != null)
+                            {
+                                hotwiredVehicle.SuccessfulHotwire();
+                                chatService.SendPlayerChatMessage(player, PlayerChatMessageType.DO, "The engine roars to life after a few sparks fly.");
+                                player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "You successfully hotwired the vehicle!");
+                            }
                         }
                         // Re-enable player control and end the hotwire process.
                         hotwiringPlayer.EndHotwiring();

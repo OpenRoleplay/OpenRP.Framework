@@ -72,7 +72,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
 
         public List<InventoryItem> GetInventoryItems()
         {
-            return GetComponentsInChildren<InventoryItem>().ToList();
+            return GetComponentsInChildren<InventoryItem>().Where(i => !i.IsDeleted()).ToList();
         }
 
         public Inventory? GetParentInventory()
@@ -214,7 +214,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
                         continue;
                     }
 
-                    if(amount != 0 && inventoryItemModelToCompareWith.Amount >= amount)
+                    if(amount != 0 && inventoryItemModelToCompareWith.Amount > amount)
                     {
                         continue;
                     }
@@ -258,11 +258,6 @@ namespace OpenRP.Framework.Features.Inventories.Components
                     }
 
                     if (itemModel.KeepOnDeath != inventoryItemModelToCompareWith.KeepOnDeath)
-                    {
-                        continue;
-                    }
-
-                    if (itemModel.MaxUses != inventoryItemModelToCompareWith.UsesRemaining)
                     {
                         continue;
                     }
@@ -392,21 +387,13 @@ namespace OpenRP.Framework.Features.Inventories.Components
 
         public bool UseItem(Player player, InventoryItem inventoryItem)
         {
-            // Retrieve the underlying model from the component.
-            InventoryItemModel inventoryItemModel = inventoryItem.GetRawInventoryItemModel();
-
-            // If the item tracks uses, decrement the count.
-            if (inventoryItemModel.UsesRemaining != null)
+            InventoryItem? inventoryItemToModify = FindItem(inventoryItem, 1);
+            if (inventoryItemToModify != null)
             {
-                inventoryItemModel.UsesRemaining--;
-
-                // If no uses remain, remove the item from the system.
-                if (inventoryItemModel.UsesRemaining == 0)
-                {
-                    inventoryItem.ProcessDeletion();
-                }
+                inventoryItemToModify.Use();
+                return true;
             }
-            return true;
+            return false;
         }
 
     }
