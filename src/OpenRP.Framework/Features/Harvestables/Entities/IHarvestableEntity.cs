@@ -10,6 +10,7 @@ namespace OpenRP.Framework.Features.Harvestables.Entities
     public interface IHarvestableEntity
     {
         bool IsPlayerNearby(Player player);
+        void BeginHarvest();
         void EndHarvest();
     }
 }

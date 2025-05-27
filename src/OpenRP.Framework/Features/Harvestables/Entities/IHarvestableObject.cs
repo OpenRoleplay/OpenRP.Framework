@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Harvestables.Entities
 {
-    public interface IHarvestable
+    public interface IHarvestableObject
     {
         /// <summary>
         /// The name of the resource (e.g. "hemp"). Used for the /harvest command.
@@ -22,9 +22,9 @@ namespace OpenRP.Framework.Features.Harvestables.Entities
         /// <summary>
         /// Create the harvestable in the world.
         /// </summary>
-        /// <param name="positions">The positions of the harvestable.</param>
-        /// <param name="rotations">The rotations of the harvestable.</param>
-        void CreateHarvestable(Vector3 positions, Vector3 rotations);
+        /// <param name="position">The positions of the harvestable.</param>
+        /// <param name="rotation">The rotations of the harvestable.</param>
+        void CreateHarvestable(Vector3 position, Vector3 rotation);
 
         /// <summary>
         /// Performs code at the begin of a player harvesting the resource
