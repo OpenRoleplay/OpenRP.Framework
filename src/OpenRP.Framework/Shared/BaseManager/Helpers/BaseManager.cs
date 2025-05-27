@@ -58,7 +58,15 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             foreach (var model in models)
             {
                 EntityId entityId = GetEntityId(model);
-                _entityManager.Create(entityId);
+                EntityId? parentId = GetParentEntityId(model);
+                if (parentId.HasValue)
+                {
+                    _entityManager.Create(entityId, parentId.Value);
+                }
+                else
+                {
+                    _entityManager.Create(entityId);
+                }
                 _entityManager.AddComponent<TComponent>(entityId, model);
                 count++;
             }
@@ -143,15 +151,14 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
                 if (component is IBaseDataComponent dataComponent && dataComponent.GetId() == 0)
                 {
                     TModel model = GetModelFromComponent(component);
-                    var updatedModel = _dataContext.Update(model).Entity;
+                    TModel updatedModel = _dataContext.Update(model).Entity;
                     if (await _dataContext.SaveChangesAsync() > 0)
                     {
                         if (component is IChangeable changeTrackable)
                             changeTrackable.ProcessChanges(false);
 
                         // Recreate the component with its new id.
-                        EntityId oldEntityId = GetEntityId(model);
-                        _entityManager.Destroy(oldEntityId);
+                        component.DestroyEntity();
                         EntityId newEntityId = GetEntityId(updatedModel);
                         EntityId? parentId = GetParentEntityId(updatedModel);
                         if (parentId.HasValue)
@@ -162,7 +169,7 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
                         {
                             _entityManager.Create(newEntityId);
                         }
-                        _entityManager.AddComponent<TComponent>(newEntityId, model);
+                        _entityManager.AddComponent<TComponent>(newEntityId, updatedModel);
                         count++;
                     }
                 }

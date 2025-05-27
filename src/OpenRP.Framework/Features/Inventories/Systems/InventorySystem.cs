@@ -16,7 +16,7 @@ namespace OpenRP.Framework.Features.Inventories.Systems
         public void OnGameModeInit(IInventoryManager inventoryManager, IInventoryItemManager inventoryItemManager)
         {
             inventoryManager.LoadAll();
-            inventoryItemManager.LoadInventoryItems();
+            inventoryItemManager.LoadAll();
         }
 
         [Timer(60000)]

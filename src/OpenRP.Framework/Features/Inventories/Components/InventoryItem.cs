@@ -42,6 +42,11 @@ namespace OpenRP.Framework.Features.Inventories.Components
 
         public void ProcessDeletion(bool processDeletion = true)
         {
+            if(_inventoryItemModel.Id == 0)
+            {
+                DestroyEntity();
+                return;
+            }
             _isDeleted = processDeletion;
         }
 
@@ -106,6 +111,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
                 ProcessChanges();
             } else
             {
+                ProcessChanges(false);
                 ProcessDeletion();
             }
         }
