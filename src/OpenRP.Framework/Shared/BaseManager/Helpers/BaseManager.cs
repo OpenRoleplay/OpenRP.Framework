@@ -187,12 +187,18 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
                 if (component is IDeletable deletable && deletable.IsDeleted())
                 {
                     TModel model = GetModelFromComponent(component);
-                    _dataContext.Remove(model);
-                    if (await _dataContext.SaveChangesAsync() > 0)
+                    if (model.Id != 0)
                     {
-                        if (component is IChangeable changeTrackable)
-                            changeTrackable.ProcessChanges(false);
-                        count++;
+                        _dataContext.Remove(model);
+                        if (await _dataContext.SaveChangesAsync() > 0)
+                        {
+                            deletable.ProcessDeletion(false);
+
+                            if (component is IChangeable changeTrackable)
+                                changeTrackable.ProcessChanges(false);
+
+                            count++;
+                        }
                     }
                 }
             }
