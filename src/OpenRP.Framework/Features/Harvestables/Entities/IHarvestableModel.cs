@@ -17,7 +17,7 @@ namespace OpenRP.Framework.Features.Harvestables.Entities
         /// <summary>
         /// The object model id of the resource.
         /// </summary>
-        int[] ResourceObjectModelId { get; }
+        int[] ResourceObjectModelIds { get; }
 
         /// <summary>
         /// Create the harvestable in the world.
