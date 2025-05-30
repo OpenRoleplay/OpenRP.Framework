@@ -26,16 +26,19 @@ namespace OpenRP.Framework.Features.Harvestables.Services
             _colAndreasService = colAndreasService;
         }
 
-        public string ResourceName => "indian hemp";
-        public int ResourceObjectModelId => 19473;
+        public string ResourceName 
+            => "indian hemp";
 
-        public void CreateHarvestable(Vector3 position, Vector3 rotation)
+        public int[] ResourceObjectModelIds
+            => new int[] { 19473 };
+
+        public void CreateHarvestable(int modelId, Vector3 position, Vector3 rotation)
         {
             EntityId harvestableId = HarvestableEntities.GenerateIndianHempId();
 
             _entityManager.Create(harvestableId);
 
-            DynamicObject harvestableObject = _streamerService.CreateDynamicObject(ResourceObjectModelId, position, rotation, parent: harvestableId);
+            DynamicObject harvestableObject = _streamerService.CreateDynamicObject(modelId, position, rotation, parent: harvestableId);
             DynamicTextLabel harvestableTextLabel = _streamerService.CreateDynamicTextLabel(String.Empty, Color.White, new Vector3(position.XY, position.Z + 0.25f), 1.5f, parent: harvestableId);
         }
 

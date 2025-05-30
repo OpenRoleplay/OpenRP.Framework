@@ -17,14 +17,14 @@ namespace OpenRP.Framework.Features.Harvestables.Entities
         /// <summary>
         /// The object model id of the resource.
         /// </summary>
-        int ResourceObjectModelId { get; }
+        int[] ResourceObjectModelId { get; }
 
         /// <summary>
         /// Create the harvestable in the world.
         /// </summary>
         /// <param name="position">The positions of the harvestable.</param>
         /// <param name="rotation">The rotations of the harvestable.</param>
-        void CreateHarvestable(Vector3 position, Vector3 rotation);
+        void CreateHarvestable(int modelId, Vector3 position, Vector3 rotation);
 
         /// <summary>
         /// Performs code at the begin of a player harvesting the resource
