@@ -13,34 +13,19 @@ using OpenRP.Framework.Features.Harvestables.Entities;
 
 namespace OpenRP.Framework.Features.Harvestables.Components
 {
-    public class IndianHempPlant : Component, IHarvestableEntity
+    public class IndianHempPlant : Component, IHarvestableObject
     {
         private BiomeObject _generatedObject;
         private int _remainingLeaves;
 
-        public IndianHempPlant(BiomeObject generatedObject)
+        public IndianHempPlant()
         {
-            _generatedObject = generatedObject;
             _remainingLeaves = 10;
-
-            CreateDynamicObject();
-            //CreateDynamicTextLabel();
         }
 
         public string GetTextLabelString()
         {
-            return $"{ChatColor.Highlight}Indian Hemp (Apocynum Cannabinum)\n{ChatColor.White}{_remainingLeaves} leaves remaining\n\nUse {ChatColor.Highlight}/harvest hemp";
-        }
-
-        public Vector3 GetTextLabelPosition()
-        {
-            Vector3 textLabelPosition = new Vector3(_generatedObject.GamePosition.XY, _generatedObject.GamePosition.Z + 0.25f);
-            return textLabelPosition;
-        }
-
-        public void CreateDynamicTextLabel()
-        {
-            Vector3 textLabelPosition = GetTextLabelPosition();
+            return $"{ChatColor.Highlight}Indian Hemp (Apocynum Cannabinum)\n{ChatColor.White}{_remainingLeaves} leaves remaining\n\nUse {ChatColor.Highlight}/harvest indian hemp";
         }
 
         public DynamicTextLabel GetDynamicTextLabel()
@@ -54,11 +39,6 @@ namespace OpenRP.Framework.Features.Harvestables.Components
             dynamicTextLabel.Text = GetTextLabelString();
         }
 
-        public void CreateDynamicObject()
-        {
-            BiomeManager.CreateGeneratorObject(_generatedObject, Entity, _colAndreasService, _streamerService);
-        }
-
         public DynamicObject GetDynamicObject()
         {
             return GetComponentInChildren<DynamicObject>();
@@ -66,7 +46,7 @@ namespace OpenRP.Framework.Features.Harvestables.Components
 
         public bool IsPlayerNearby(Player player)
         {
-            Vector3 textLabelPosition = GetTextLabelPosition();
+            Vector3 textLabelPosition = GetDynamicTextLabel().Position;
             if (player.IsInRangeOfPoint(3.0f, textLabelPosition))
             {
                 return true;
@@ -74,7 +54,12 @@ namespace OpenRP.Framework.Features.Harvestables.Components
             return false;
         }
 
-        public void Harvest()
+        public void BeginHarvest()
+        {
+
+        }
+
+        public void EndHarvest()
         {
             _remainingLeaves -= 1;
             UpdateDynamicTextLabel();

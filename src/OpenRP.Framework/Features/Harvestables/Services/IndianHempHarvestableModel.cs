@@ -14,24 +14,29 @@ using OpenRP.Framework.Features.Harvestables.Components;
 
 namespace OpenRP.Framework.Features.Harvestables.Services
 {
-    public class IndianHempHarvestable : IHarvestable
+    public class IndianHempHarvestableModel : IHarvestableModel
     {
         private readonly IEntityManager _entityManager;
         private readonly IColAndreasService _colAndreasService;
         private readonly IStreamerService _streamerService;
-        public IndianHempHarvestable(IEntityManager entityManager, IColAndreasService colAndreasService, IStreamerService streamerService)
+        public IndianHempHarvestableModel(IEntityManager entityManager, IColAndreasService colAndreasService, IStreamerService streamerService)
         {
             _entityManager = entityManager;
             _streamerService = streamerService;
             _colAndreasService = colAndreasService;
         }
 
-        public string ResourceName => "industrial hemp";
+        public string ResourceName => "indian hemp";
         public int ResourceObjectModelId => 19473;
 
-        public void CreateHarvestable(Vector3 positions, Vector3 rotations)
+        public void CreateHarvestable(Vector3 position, Vector3 rotation)
         {
+            EntityId harvestableId = HarvestableEntities.GenerateIndianHempId();
 
+            _entityManager.Create(harvestableId);
+
+            DynamicObject harvestableObject = _streamerService.CreateDynamicObject(ResourceObjectModelId, position, rotation, parent: harvestableId);
+            DynamicTextLabel harvestableTextLabel = _streamerService.CreateDynamicTextLabel(String.Empty, Color.White, new Vector3(position.XY, position.Z + 0.25f), 1.5f, parent: harvestableId);
         }
 
         public void BeginHarvest(Player player)
@@ -40,7 +45,7 @@ namespace OpenRP.Framework.Features.Harvestables.Services
             {
                 if (indianHempPlant.IsPlayerNearby(player))
                 {
-                    PlayerHarvesting.StartHarvesting(player, this, indianHempPlant, TimeSpan.FromSeconds(10));
+                    //PlayerHarvesting.StartHarvesting(player, this, indianHempPlant, TimeSpan.FromSeconds(10));
                     return;
                 }
             }
