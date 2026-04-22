@@ -216,7 +216,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 }
                 else
                 {
-                    onGoBack?.Invoke();
+                    OpenCreateCharacterLastName(player, onGoBack);
                 }
             }
 
