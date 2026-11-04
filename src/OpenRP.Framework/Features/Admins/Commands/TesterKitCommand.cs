@@ -24,7 +24,7 @@ namespace OpenRP.Framework.Features.Admins.Commands
         [ServerCommand(PermissionGroups = new string[] { "Tester", "Admin" },
             Description = "Ensures you have the hotwire tools: a Rusty Paperclip, a Wornout Screwdriver and Electrical Tape.")]
         public void Testerkit(Player player, IEntityManager entityManager, IInventoryService inventoryService, IDataMemoryService dataMemory)
-        {
+        { 
             // Retrieve the player's current character and inventory.
             Character character = player.GetPlayerCurrentlyPlayingAsCharacter();
             Inventory characterInventory = character.GetInventory();
