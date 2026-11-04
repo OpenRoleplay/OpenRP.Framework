@@ -1,14 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using OpenRP.Framework.Features.Animations.Services;
-using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Features.Characters.Services;
 using OpenRP.Framework.Features.Characters.Services.Dialogs;
-using SampSharp.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Characters.Extensions
 {
@@ -16,9 +8,10 @@ namespace OpenRP.Framework.Features.Characters.Extensions
     {
         public static IServiceCollection AddCharacters(this IServiceCollection self)
         {
+            // Both are transient because CharacterService owns a database context.
             return self
-                .AddTransient<ITempCharacterService, TempCharacterService>()
-                .AddSingleton<ICharacterDialogService, CharacterDialogService>();
+                .AddTransient<ICharacterService, CharacterService>()
+                .AddTransient<ICharacterDialogService, CharacterDialogService>();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using OpenRP.Framework.Features.Characters.Components;
-using OpenRP.Framework.Features.Characters.Services;
 using OpenRP.Framework.Features.Commands.Attributes;
 using OpenRP.Framework.Shared.Chat.Enums;
 using SampSharp.Entities.SAMP;
@@ -19,22 +18,27 @@ namespace OpenRP.Framework.Features.RoleplayChats.Commands
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Change your character's accent.",
             CommandGroups = new[] { "Character" })]
-        public void Accent(Player player, ITempCharacterService characterService, string accent = "")
+        public void Accent(Player player, string accent = "")
         {
-            if (player.IsPlayerPlayingAsCharacter())
+            if (!player.IsPlayerPlayingAsCharacter())
             {
-                Character character = player.GetComponent<Character>();
+                return;
+            }
 
-                bool result = characterService.SetCharacterAccent(character, accent);
+            Character character = player.GetPlayerCurrentlyPlayingAsCharacter();
+            character.SetAccent(accent);
+            SendAccentChangedMessage(player, character);
+        }
 
-                if (result)
-                {
-                    player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"Your accent has been set to {accent}.");
-                }
-                else
-                {
-                    player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, $"Your accent could not be set to {accent}. Make a bug report with the following timestamp: {DateTime.Now.ToString()}.");
-                }
+        private static void SendAccentChangedMessage(Player player, Character character)
+        {
+            if (character.HasAccent())
+            {
+                player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"Your accent has been set to {character.GetAccent()}.");
+            }
+            else
+            {
+                player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "Your accent has been removed.");
             }
         }
     }

@@ -2,7 +2,6 @@
 using OpenRP.Framework.Database;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Accounts.Components;
-using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using OpenRP.Framework.Shared.ServerEvents.Services;
 using SampSharp.Entities.SAMP;
@@ -62,22 +61,6 @@ namespace OpenRP.Framework.Features.Accounts.Services
             return null;
         }
 
-        public List<CharacterModel> GetCharactersByUsername(string username)
-        {
-            return _dataContext.Characters
-                        .Include(i => i.Account)
-                            .Where(i => i.Account.Username == username)
-                            .ToList();
-        }
-
-        public List<CharacterModel> GetCharactersByAccountId(ulong accountId)
-        {
-            return _dataContext.Characters
-                        .Include(i => i.Account)
-                            .Where(i => i.Account.Id == accountId)
-                            .ToList();
-        }
-
         public bool CheckPassword(string username, string password)
         {
             if (DoesAccountExist(username))
@@ -95,9 +78,8 @@ namespace OpenRP.Framework.Features.Accounts.Services
         public async Task LoginPlayer(Player player, string username)
         {
             AccountModel accountModel = GetAccountByUsername(username);
-            List<CharacterModel> characterModels = GetCharactersByUsername(username);
 
-            Account accountComponent = player.AddComponent<Account>(accountModel, characterModels);
+            Account accountComponent = player.AddComponent<Account>(accountModel);
 
             var eventArgs = new OnAccountLoggedInEventArgs
             {
@@ -105,21 +87,6 @@ namespace OpenRP.Framework.Features.Accounts.Services
                 Account = accountComponent
             };
             await _serverEventAggregator.PublishAsync(eventArgs);
-        }
-
-        public Account? ReloadAccount(Player player, ulong accountId)
-        {
-            player.DestroyComponents<Account>();
-
-            AccountModel accountModel = GetAccountById(accountId);
-            List<CharacterModel> characterModels = GetCharactersByAccountId(accountId);
-
-            if (accountModel != null)
-            {
-                return player.AddComponent<Account>(accountModel, characterModels);
-            }
-
-            return null;
         }
 
         public bool CreateAccount(Player player, string username, string password)
@@ -138,35 +105,6 @@ namespace OpenRP.Framework.Features.Accounts.Services
                 player.DestroyComponents<AccountCreation>();
 
                 return changes > 0;
-            }
-            return false;
-        }
-
-        public bool CreateCharacter(Player player, CharacterModel newCharacter)
-        {
-            try
-            {
-                CharacterCreation charCreationComponent = player.GetComponent<CharacterCreation>();
-                Account accountComponent = player.GetComponent<Account>();
-
-                if (charCreationComponent != null && charCreationComponent.CreatingCharacter != null)
-                {
-                    newCharacter.AccountId = accountComponent.GetAccountId();
-                    _dataContext.Characters.Add(newCharacter);
-                    _dataContext.SaveChanges();
-
-                    ReloadAccount(player, newCharacter.AccountId.Value);
-
-                    return true;
-                }
-                else
-                {
-                    Console.WriteLine("There is no character to create!");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
             }
             return false;
         }
