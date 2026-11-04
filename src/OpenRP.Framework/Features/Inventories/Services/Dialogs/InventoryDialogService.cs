@@ -1,6 +1,7 @@
 ﻿using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Database.Services;
 using OpenRP.Framework.Features.Characters.Components;
+using OpenRP.Framework.Features.DroppedItems.Services;
 using OpenRP.Framework.Features.Inventories.Components;
 using OpenRP.Framework.Features.Inventories.Enums;
 using OpenRP.Framework.Features.Inventories.Helpers;
@@ -29,10 +30,12 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
     {
         private IDialogService _dialogService;
         private IChatService _chatService;
-        public InventoryDialogService(IDialogService dialogService, IChatService chatService)
+        private IDroppedItemService _droppedItemService;
+        public InventoryDialogService(IDialogService dialogService, IChatService chatService, IDroppedItemService droppedItemService)
         {
             _dialogService = dialogService;
             _chatService = chatService;
+            _droppedItemService = droppedItemService;
         }
 
         public void OpenInventory(Player player, Inventory inventory, InventoryArguments inventoryArguments = InventoryArguments.None)
@@ -240,27 +243,24 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
 
                 if (item.IsDroppable())
                 {
+                    InventoryItem selectedInventoryItem = inventoryOpened.SelectedInventoryItem;
                     actions["Drop"] = () =>
                     {
                         BetterInputDialog dropAmountDialog = new BetterInputDialog("Drop", "Go Back");
                         dropAmountDialog.SetTitle(TitleType.Children, item.GetName(), "Drop");
-                        dropAmountDialog.SetContent($"You can enter the amount of the item you want to drop here.\r\n\r\n{ChatColor.CornflowerBlue}Note:{ChatColor.White} If you want to drop all items, just type in the maximum amount ({ChatColor.Highlight}{inventoryOpened.SelectedInventoryItem.GetAmount()}{ChatColor.White}) you have.");
+                        dropAmountDialog.SetContent($"You can enter the amount of the item you want to drop here.\r\n\r\n{ChatColor.CornflowerBlue}Note:{ChatColor.White} If you want to drop all items, just type in the maximum amount ({ChatColor.Highlight}{selectedInventoryItem.GetAmount()}{ChatColor.White}) you have.");
 
-                        void DropAmountDialog(InputDialogResponse r)
+                        // async void because dialog callbacks can't be awaited; DroppedItemService catches and logs its own errors.
+                        async void DropAmountDialog(InputDialogResponse r)
                         {
                             if (r.Response == DialogResponse.RightButtonOrCancel)
                             {
-                                _dialogService.Show(player, dropAmountDialog, DropAmountDialog);
                                 return;
                             }
 
-                            if (int.TryParse(r.InputText, out int amount) && amount > 0)
+                            if (uint.TryParse(r.InputText, out uint amount) && await _droppedItemService.DropItem(player, selectedInventoryItem, amount))
                             {
-                                bool success = false;//TODO: port over droppedItemService.DropItem(player, openInventoryComponent.selectedInventoryItem, amount);
-                                if (success)
-                                {
-                                    return;
-                                }
+                                return;
                             }
 
                             BetterMessageDialog invalidAmountDialog = new BetterMessageDialog("Ok");
