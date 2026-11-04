@@ -70,5 +70,11 @@ namespace OpenRP.Framework.Features.MainMenu.Entities.Scenes
 
             _actorConversationWithPlayerManager.AttachPlayerToConversationAsync("CONV_FAMILY", player);
         }
+
+        public void Leave(Player player)
+        {
+            player.StopAudioStream();
+            _actorConversationWithPlayerManager.DetachPlayerFromConversationAsync("CONV_FAMILY", player);
+        }
     }
 }

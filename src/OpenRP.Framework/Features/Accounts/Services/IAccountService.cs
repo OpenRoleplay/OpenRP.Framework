@@ -16,9 +16,6 @@ namespace OpenRP.Framework.Features.Accounts.Services
         AccountModel? GetAccountByUsername(string username);
         bool CheckPassword(string username, string password);
         Task LoginPlayer(Player player, string username);
-        Account ReloadAccount(Player player, ulong accountId);
-        List<CharacterModel> GetCharactersByAccountId(ulong accountId);
         bool CreateAccount(Player player, string username, string password);
-        bool CreateCharacter(Player player, CharacterModel newCharacter);
     }
 }

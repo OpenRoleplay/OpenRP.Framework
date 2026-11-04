@@ -1,0 +1,18 @@
+using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Features.Accounts.Components;
+using OpenRP.Framework.Features.Characters.Components;
+using SampSharp.Entities.SAMP;
+
+namespace OpenRP.Framework.Features.Characters.Services
+{
+    public interface ICharacterService
+    {
+        List<CharacterModel> GetCharactersByAccountId(ulong accountId);
+        bool CreateCharacter(Account account, CharacterModel newCharacter);
+        Character? LoadCharacter(Player player, ulong characterId);
+        Task SelectCharacterAsync(Player player, ulong characterId);
+        void SaveCharacter(Character character);
+        void SaveCharacterPreferences(CharacterPreferences characterPreferences);
+        void SaveChangedCharacters();
+    }
+}
