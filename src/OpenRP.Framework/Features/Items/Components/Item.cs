@@ -1,5 +1,6 @@
 ﻿using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Items.Enums;
+using OpenRP.Framework.Features.Inventories.Helpers;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace OpenRP.Framework.Features.Items.Components
 {
     public class Item : Component
     {
+        private const string CurrencyUnitKey = "CURRENCY_UNIT";
+
         private ItemModel _itemModel;
         public Item(ItemModel itemModel) 
         { 
@@ -98,6 +101,19 @@ namespace OpenRP.Framework.Features.Items.Components
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// The currency unit (for example a $20 bill) this currency item represents, or null for other items.
+        /// </summary>
+        public ulong? GetCurrencyUnitId()
+        {
+            if (!IsItemCurrency())
+            {
+                return null;
+            }
+
+            return ItemAdditionalData.Parse(_itemModel.UseValue).GetUlong(CurrencyUnitKey);
         }
 
         public bool IsItemVehicleKey()

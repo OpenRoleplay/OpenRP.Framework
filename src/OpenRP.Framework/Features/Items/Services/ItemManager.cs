@@ -39,7 +39,7 @@ namespace OpenRP.Framework.Features.Items.Services
         public void ProcessChanges()
         {
             DateTime changesSince = _lastUpdate;
-            _lastUpdate = DateTime.Now;
+            _lastUpdate = DateTime.UtcNow; // BaseDataContext stores CreatedOn and UpdatedOn in UTC
 
             int itemsAdded = LoadNewItems(changesSince);
             int itemsUpdated = UpdateItems(changesSince);
@@ -80,6 +80,11 @@ namespace OpenRP.Framework.Features.Items.Services
             foreach (ItemModel itemModel in itemModels)
             {
                 EntityId itemEntityId = ItemEntities.GetItemId((int)itemModel.Id);
+                if (_entityManager.Exists(itemEntityId))
+                {
+                    continue;
+                }
+
                 _entityManager.Create(itemEntityId);
 
                 Item item = _entityManager.AddComponent<Item>(itemEntityId, itemModel);
@@ -101,8 +106,13 @@ namespace OpenRP.Framework.Features.Items.Services
             foreach (ItemModel itemModel in itemModels)
             {
                 EntityId itemEntityId = ItemEntities.GetItemId((int)itemModel.Id);
+                if (!_entityManager.Exists(itemEntityId))
+                {
+                    _entityManager.Create(itemEntityId);
+                }
 
-                _entityManager.Destroy(itemEntityId);
+                // Replace only the component: destroying the entity would make AddComponent fail.
+                _entityManager.Destroy<Item>(itemEntityId);
                 Item item = _entityManager.AddComponent<Item>(itemEntityId, itemModel);
 
                 amountLoaded++;

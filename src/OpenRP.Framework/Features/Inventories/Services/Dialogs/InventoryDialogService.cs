@@ -28,9 +28,11 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
     public class InventoryDialogService : IInventoryDialogService
     {
         private IDialogService _dialogService;
-        public InventoryDialogService(IDialogService dialogService) 
+        private IChatService _chatService;
+        public InventoryDialogService(IDialogService dialogService, IChatService chatService)
         {
             _dialogService = dialogService;
+            _chatService = chatService;
         }
 
         public void OpenInventory(Player player, Inventory inventory, InventoryArguments inventoryArguments = InventoryArguments.None)
@@ -174,33 +176,32 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
                 {
                     actions["Open"] = () =>
                     {
-                        // Assuming the wallet's inventory is stored in the item itself.
-                        Inventory itemInventory = inventoryOpened.SelectedInventoryItem.GetItemInventory();
+                        Inventory? itemInventory = inventoryOpened.SelectedInventoryItem.GetItemInventory();
+                        if (itemInventory == null)
+                        {
+                            player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "This wallet can't be opened right now.");
+                            return;
+                        }
                         OpenInventory(player, itemInventory);
                     };
 
                     actions["Set As Default"] = () =>
                     {
-                        if (item.IsItemWallet())
-                        {
-                            //characterService.SetCharacterDefaultWallet(character, openInventoryComponent.selectedInventoryItem);
-                        }
+                        SetWalletAsDefault(player, inventoryOpened.OpenedInventory, inventoryOpened.SelectedInventoryItem);
                     };
                 }
-                else if (item.IsItemSkin() || item.IsItemAttachment())
+                else if (item.IsItemSkin())
                 {
                     actions["Wear"] = () =>
                     {
-                        /*bool success = characterService.SetCharacterWearingInventorySkin(character, openInventoryComponent.selectedInventoryItem);
-                        if (success)
-                        {
-                            chatService.SendPlayerChatMessage(player, PlayerChatMessageType.ME, "changed their clothes.");
-                            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "You have successfully changed your clothes.");
-                        }
-                        else
-                        {
-                            player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "An unknown problem occurred and we could not change your clothes.");
-                        }*/
+                        WearSkin(player, character, inventoryOpened.OpenedInventory, inventoryOpened.SelectedInventoryItem);
+                    };
+                }
+                else if (item.IsItemAttachment())
+                {
+                    actions["Wear"] = () =>
+                    {
+                        // Wearing attachments isn't implemented yet.
                     };
                 }
                 else
@@ -280,6 +281,34 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
             }
 
             return actions;
+        }
+
+        private static void SetWalletAsDefault(Player player, Inventory inventory, InventoryItem? wallet)
+        {
+            if (wallet == null)
+            {
+                return;
+            }
+
+            inventory.SetDefaultWallet(wallet);
+            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"Your {wallet.GetName()} is now your default wallet.");
+        }
+
+        private void WearSkin(Player player, Character character, Inventory inventory, InventoryItem? skin)
+        {
+            int? skinModelId = skin?.GetSkinModelId();
+            if (skin == null || skinModelId == null)
+            {
+                player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "An unknown problem occurred and we could not change your clothes.");
+                return;
+            }
+
+            inventory.SetWornSkin(skin);
+            character.SetSkin(skinModelId.Value);
+            player.Skin = skinModelId.Value;
+
+            _chatService.SendPlayerChatMessage(player, PlayerChatMessageType.ME, "changed their clothes.");
+            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "You have successfully changed your clothes.");
         }
     }
 }

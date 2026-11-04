@@ -16,6 +16,9 @@ namespace OpenRP.Framework.Features.Inventories.Components
 {
     public class Inventory : Component, IBaseDataComponent, IChangeable, IDeletable
     {
+        private const string DefaultWalletKey = "DEFAULT_WALLET";
+        private const string WearingKey = "WEARING";
+
         private InventoryModel _inventoryModel;
         private bool _hasChanges;
         private bool _isDeleted;
@@ -214,7 +217,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
                         continue;
                     }
 
-                    if(amount != 0 && inventoryItemModelToCompareWith.Amount > amount)
+                    if(amount != 0 && !inventoryItemToCompareWith.HasAmount(amount))
                     {
                         continue;
                     }
@@ -236,46 +239,34 @@ namespace OpenRP.Framework.Features.Inventories.Components
                     continue;
                 }
 
-                if (item.GetId() == inventoryItemToCompareWith.GetItem().GetId())
+                if (!IsUnchangedCopyOf(inventoryItemToCompareWith, item))
                 {
-                    ItemModel itemModel = item.GetRawItemModel();
-                    ItemModel itemModelToCompareWith = inventoryItemToCompareWith.GetItem().GetRawItemModel();
-                    InventoryItemModel inventoryItemModelToCompareWith = inventoryItemToCompareWith.GetRawInventoryItemModel();
-
-                    if (itemModel.Id != itemModelToCompareWith.Id)
-                    {
-                        continue;
-                    }
-
-                    if (itemModel.CanDestroy != inventoryItemModelToCompareWith.CanDestroy)
-                    {
-                        continue;
-                    }
-
-                    if (itemModel.CanDrop != inventoryItemModelToCompareWith.CanDrop)
-                    {
-                        continue;
-                    }
-
-                    if (itemModel.KeepOnDeath != inventoryItemModelToCompareWith.KeepOnDeath)
-                    {
-                        continue;
-                    }
-
-                    if (inventoryItemModelToCompareWith.Weight != null)
-                    {
-                        continue;
-                    }
-
-                    if (amount != 0 && inventoryItemToCompareWith.HasAmount(amount))
-                    {
-                        continue;
-                    }
-
-                    return inventoryItemToCompareWith;
+                    continue;
                 }
+
+                if (amount != 0 && !inventoryItemToCompareWith.HasAmount(amount))
+                {
+                    continue;
+                }
+
+                return inventoryItemToCompareWith;
             }
             return null;
+        }
+
+        /// <summary>
+        /// True when the inventory item is this item with its default properties (not personalised, no custom weight).
+        /// </summary>
+        private static bool IsUnchangedCopyOf(InventoryItem inventoryItem, Item item)
+        {
+            ItemModel itemModel = item.GetRawItemModel();
+            InventoryItemModel inventoryItemModel = inventoryItem.GetRawInventoryItemModel();
+
+            return inventoryItem.GetItem().GetId() == item.GetId()
+                && itemModel.CanDestroy == inventoryItemModel.CanDestroy
+                && itemModel.CanDrop == inventoryItemModel.CanDrop
+                && itemModel.KeepOnDeath == inventoryItemModel.KeepOnDeath
+                && inventoryItemModel.Weight == null;
         }
 
         public bool HasItem(InventoryItem inventoryItem, uint amount = 0)
@@ -307,54 +298,67 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return false;
         }
 
+        /// <summary>
+        /// Adds the item, on top of a matching stack when the item is stackable. False when it doesn't fit.
+        /// </summary>
         public bool AddItem(Item item, uint amount, ItemAdditionalData? customAdditionalData = null)
         {
-            if (DoesItemFit(item, amount))
+            if (!DoesItemFit(item, amount))
             {
-                bool hasItem = HasItem(item, amount);
-
-                if (hasItem && !item.IsStackable())
-                {
-                    InventoryItem? existingItem = FindItem(item, amount);
-
-                    if (existingItem != null)
-                    {
-                        existingItem.Add(amount);
-                    }
-                } 
-                else
-                {
-                    ItemModel itemModel = item.GetRawItemModel();
-
-                    InventoryItemModel inventoryItemModel = new InventoryItemModel()
-                    {
-                        ItemId = item.GetId(),
-                        Amount = amount,
-                        CanDestroy = itemModel.CanDestroy,
-                        CanDrop = itemModel.CanDrop,
-                        KeepOnDeath = itemModel.KeepOnDeath,
-                        InventoryId = GetId(),
-                        UsesRemaining = itemModel.MaxUses,
-                    };
-
-                    if (customAdditionalData != null)
-                    {
-                        string requestedAdditionalData = customAdditionalData.ToString().Trim();
-                        string itemAdditionalData = itemModel.UseValue.Trim();
-
-                        string combined = ItemAdditionalData.Combine(requestedAdditionalData, itemAdditionalData).ToString();
-
-                        inventoryItemModel.AdditionalData = combined;
-                    }
-
-                    int newInventoryItemId = InventoryNewEntities.GenerateNewInventoryItemId();
-                    EntityId newInventoryItemEntityId = InventoryEntities.GetInventoryItemId(newInventoryItemId);
-
-                    Manager.Create(newInventoryItemEntityId, Entity);
-                    Manager.AddComponent<InventoryItem>(newInventoryItemEntityId, inventoryItemModel);
-                }
+                return false;
             }
-            return false;
+
+            string? additionalData = GetAdditionalDataForNewItem(item, customAdditionalData);
+            InventoryItem? existingStack = item.IsStackable() ? FindStack(item, additionalData) : null;
+            if (existingStack != null)
+            {
+                existingStack.Add(amount);
+                return true;
+            }
+
+            CreateInventoryItem(item, amount, additionalData);
+            return true;
+        }
+
+        private static string? GetAdditionalDataForNewItem(Item item, ItemAdditionalData? customAdditionalData)
+        {
+            string requestedAdditionalData = customAdditionalData?.ToString().Trim() ?? string.Empty;
+            if (requestedAdditionalData.Length == 0)
+            {
+                return null;
+            }
+
+            string itemAdditionalData = item.GetRawItemModel().UseValue?.Trim() ?? string.Empty;
+            return ItemAdditionalData.Combine(requestedAdditionalData, itemAdditionalData).ToString();
+        }
+
+        private InventoryItem? FindStack(Item item, string? additionalData)
+        {
+            return GetInventoryItems().FirstOrDefault(inventoryItem =>
+                IsUnchangedCopyOf(inventoryItem, item)
+                && ItemAdditionalData.Equals(inventoryItem.GetRawInventoryItemModel().AdditionalData, additionalData));
+        }
+
+        private void CreateInventoryItem(Item item, uint amount, string? additionalData)
+        {
+            ItemModel itemModel = item.GetRawItemModel();
+            InventoryItemModel inventoryItemModel = new InventoryItemModel()
+            {
+                ItemId = item.GetId(),
+                Amount = amount,
+                CanDestroy = itemModel.CanDestroy,
+                CanDrop = itemModel.CanDrop,
+                KeepOnDeath = itemModel.KeepOnDeath,
+                InventoryId = GetId(),
+                UsesRemaining = itemModel.MaxUses,
+                AdditionalData = additionalData,
+            };
+
+            int newInventoryItemId = InventoryNewEntities.GenerateNewInventoryItemId();
+            EntityId newInventoryItemEntityId = InventoryEntities.GetInventoryItemId(newInventoryItemId);
+
+            Manager.Create(newInventoryItemEntityId, Entity);
+            Manager.AddComponent<InventoryItem>(newInventoryItemEntityId, inventoryItemModel);
         }
 
         public bool RemoveItem(Item item, uint amount = 0)
@@ -396,5 +400,104 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return false;
         }
 
+        /// <summary>
+        /// How many of this item are in this inventory, counted over all of its stacks.
+        /// </summary>
+        public uint GetItemAmount(Item item)
+        {
+            return (uint)GetStacksOf(item).Sum(inventoryItem => inventoryItem.GetAmount());
+        }
+
+        /// <summary>
+        /// Removes this amount of the item, spread over its stacks. Removes nothing and returns false when there isn't enough.
+        /// </summary>
+        public bool TakeItem(Item item, uint amount)
+        {
+            if (GetItemAmount(item) < amount)
+            {
+                return false;
+            }
+
+            // InventoryItem.Subtract(0) means "everything", so taking nothing must not reach it.
+            if (amount == 0)
+            {
+                return true;
+            }
+
+            uint amountLeft = amount;
+            foreach (InventoryItem stack in GetStacksOf(item))
+            {
+                amountLeft -= TakeFromStack(stack, amountLeft);
+                if (amountLeft == 0)
+                {
+                    break;
+                }
+            }
+            return true;
+        }
+
+        private List<InventoryItem> GetStacksOf(Item item)
+        {
+            return GetInventoryItems().Where(inventoryItem => inventoryItem.GetItem().GetId() == item.GetId()).ToList();
+        }
+
+        private static uint TakeFromStack(InventoryItem stack, uint amountWanted)
+        {
+            uint amountTaken = Math.Min(stack.GetAmount(), amountWanted);
+            stack.Subtract(amountTaken);
+            if (stack.GetAmount() == 0)
+            {
+                stack.ProcessDeletion();
+            }
+            return amountTaken;
+        }
+
+        /// <summary>
+        /// The wallet items directly in this inventory.
+        /// </summary>
+        public List<InventoryItem> GetWallets()
+        {
+            return GetInventoryItems().Where(inventoryItem => inventoryItem.GetItem().IsItemWallet()).ToList();
+        }
+
+        /// <summary>
+        /// The contents of the wallet marked as default, or null when no wallet is marked.
+        /// </summary>
+        public Inventory? GetDefaultWallet()
+        {
+            return GetWallets().FirstOrDefault(wallet => wallet.HasAdditionalDataFlag(DefaultWalletKey))?.GetItemInventory();
+        }
+
+        /// <summary>
+        /// Marks this wallet as the default one and unmarks every other wallet in this inventory.
+        /// </summary>
+        public void SetDefaultWallet(InventoryItem wallet)
+        {
+            foreach (InventoryItem otherWallet in GetWallets())
+            {
+                otherWallet.SetAdditionalDataFlag(DefaultWalletKey, false);
+            }
+            wallet.SetAdditionalDataFlag(DefaultWalletKey, true);
+        }
+
+        /// <summary>
+        /// The skin items directly in this inventory.
+        /// </summary>
+        public List<InventoryItem> GetSkins()
+        {
+            return GetInventoryItems().Where(inventoryItem => inventoryItem.GetItem().IsItemSkin()).ToList();
+        }
+
+        /// <summary>
+        /// Marks this skin as worn and every other skin in this inventory as not worn.
+        /// </summary>
+        public void SetWornSkin(InventoryItem skin)
+        {
+            foreach (InventoryItem otherSkin in GetSkins())
+            {
+                otherSkin.SetAdditionalDataFlag(WearingKey, false);
+            }
+            skin.SetAdditionalDataFlag(WearingKey, true);
+        }
     }
 }
