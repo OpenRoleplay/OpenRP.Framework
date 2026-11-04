@@ -19,7 +19,7 @@ namespace OpenRP.Framework.Features.Inventories.Extensions
                 .AddTransient<IInventoryService, InventoryService>()
                 .AddSingleton<IInventoryItemManager, InventoryItemManager>()
                 .AddSingleton<IInventoryManager, InventoryManager>()
-                .AddSingleton<IInventoryDialogService, InventoryDialogService>();
+                .AddTransient<IInventoryDialogService, InventoryDialogService>(); // Transient because it uses IDroppedItemService, which uses a database context.
         }
     }
 }
