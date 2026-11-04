@@ -129,7 +129,7 @@ namespace OpenRP.Framework.Features.Inventories.Helpers
             Dictionary<string, string> customDataDictOne = additionalDataOne.GetAllCustomData();
 
             ItemAdditionalData additionalDataTwo = ItemAdditionalData.Parse(customDataTwo);
-            Dictionary<string, string> customDataDictTwo = additionalDataOne.GetAllCustomData();
+            Dictionary<string, string> customDataDictTwo = additionalDataTwo.GetAllCustomData();
 
             List<string> keysFound = new List<string>();
             keysFound.AddRange(customDataDictOne.Keys);

@@ -9,31 +9,17 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Permissions.Components
 {
+    /// <summary>
+    /// The permissions of the selected character, loaded when the character is selected. To change them, use
+    /// IPermissionService.ReloadCharacterPermissions, which replaces this component.
+    /// </summary>
     public class CharacterPermissions : Component
     {
-        private Character _character;
-        private List<string> _characterPermissions;
+        private readonly List<string> _characterPermissions;
 
         public CharacterPermissions(List<string> permissions)
         {
             _characterPermissions = permissions;
-        }
-
-        private Character GetCharacter()
-        {
-            if (_character != null)
-            {
-                return _character;
-            }
-
-            return _character = GetComponent<Character>();
-        }
-
-        public void UpdateCharacterPermissions()
-        {
-            Character currentCharacter = GetCharacter();
-
-            _characterPermissions = null;
         }
 
         public List<string> GetCharacterPermissions()

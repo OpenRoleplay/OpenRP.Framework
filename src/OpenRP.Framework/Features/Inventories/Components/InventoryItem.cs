@@ -17,6 +17,9 @@ namespace OpenRP.Framework.Features.Inventories.Components
 {
     public class InventoryItem : Component, IBaseDataComponent, IChangeable, IDeletable
     {
+        private const string InventoryKey = "INVENTORY";
+        private const string SkinKey = "SKIN";
+
         private readonly InventoryItemModel _inventoryItemModel;
         private bool _hasChanges;
         private bool _isDeleted;
@@ -153,27 +156,66 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return ItemAdditionalData.Parse(_inventoryItemModel.AdditionalData);
         }
 
-        public Inventory GetItemInventory()
+        /// <summary>
+        /// True when the boolean flag (for example DEFAULT_WALLET or WEARING) is set in this item's additional data.
+        /// </summary>
+        public bool HasAdditionalDataFlag(string key)
         {
-            List<Inventory> allInventories = Manager.GetComponents<Inventory>().ToList();
+            return GetAdditionalData().GetBoolean(key) == true;
+        }
 
-            return allInventories.SingleOrDefault(inv =>
-                inv.GetInventoryItems().Any(item =>
-                {
-                    Item itemInstance = item.GetItem();
-                    // Check that this item is an inventory item and that its AdditionalData contains a reference to the given inventory's ID.
-                    return itemInstance.IsItemInventory() &&
-                        GetAdditionalData().GetString("INVENTORY") == inv.GetId().ToString();
-                }));
+        /// <summary>
+        /// Sets a boolean flag in this item's additional data and marks the item as changed.
+        /// </summary>
+        public void SetAdditionalDataFlag(string key, bool value)
+        {
+            if (HasAdditionalDataFlag(key) == value)
+            {
+                return;
+            }
+
+            ItemAdditionalData additionalData = GetAdditionalData();
+            additionalData.SetBoolean(key, value);
+            _inventoryItemModel.AdditionalData = additionalData.ToString();
+            ProcessChanges();
+        }
+
+        /// <summary>
+        /// The skin model this clothing item puts on the character, or null when it isn't a skin item.
+        /// </summary>
+        public int? GetSkinModelId()
+        {
+            if (!GetItem().IsItemSkin())
+            {
+                return null;
+            }
+
+            return GetAdditionalData().GetInt(SkinKey)
+                ?? ItemAdditionalData.Parse(GetItem().GetRawItemModel().UseValue).GetInt(SkinKey);
+        }
+
+        /// <summary>
+        /// The inventory inside this item, such as the contents of a wallet. Null for items that don't hold an inventory.
+        /// </summary>
+        public Inventory? GetItemInventory()
+        {
+            ulong? inventoryId = GetAdditionalData().GetUlong(InventoryKey);
+            if (!GetItem().IsItemInventory() || inventoryId == null)
+            {
+                return null;
+            }
+
+            return Manager.GetComponent<Inventory>(InventoryEntities.GetInventoryId((int)inventoryId.Value));
         }
 
         public uint GetTotalWeight(uint amount)
         {
             uint totalWeight = GetWeight() * amount;
 
-            if (GetItem().IsItemInventory())
+            Inventory? itemInventory = GetItemInventory();
+            if (itemInventory != null)
             {
-                totalWeight += GetItemInventory().GetInventoryItems()
+                totalWeight += itemInventory.GetInventoryItems()
                     .Aggregate(0u, (sum, i) => sum + i.GetTotalWeight());
             }
 

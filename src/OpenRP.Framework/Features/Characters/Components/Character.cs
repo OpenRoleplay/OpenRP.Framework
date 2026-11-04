@@ -18,8 +18,6 @@ namespace OpenRP.Framework.Features.Characters.Components
 {
     public class Character : Component, IBaseDataComponent, IChangeable
     {
-        private const string DefaultWalletKey = "DEFAULT_WALLET";
-
         private Player? _player;
         private CharacterModel _characterModel;
         private bool _hasChanges;
@@ -72,20 +70,37 @@ namespace OpenRP.Framework.Features.Characters.Components
             return null;
         }
 
+        /// <summary>
+        /// Where this character keeps money: the default wallet, otherwise the first wallet, otherwise the
+        /// character inventory itself (loose bills in the pockets). Null only while the inventory isn't loaded.
+        /// </summary>
         public Inventory? GetWallet()
         {
-            Inventory? inventoryToCheck = GetInventory();
-            if(inventoryToCheck != null)
+            Inventory? inventory = GetInventory();
+            if (inventory == null)
             {
-                foreach(InventoryItem inventoryItem in inventoryToCheck.GetInventoryItems())
-                {
-                    if(inventoryItem.GetItem().IsItemWallet() && inventoryItem.GetAdditionalData().GetBoolean(DefaultWalletKey) == true)
-                    {
-                        return inventoryItem.GetItemInventory();
-                    }
-                }
+                return null;
             }
-            return null;
+
+            return inventory.GetDefaultWallet()
+                ?? GetFirstWallet(inventory)
+                ?? inventory;
+        }
+
+        /// <summary>
+        /// True when this character carries money in an actual wallet rather than loose in the inventory.
+        /// </summary>
+        public bool HasWallet()
+        {
+            Inventory? inventory = GetInventory();
+            return inventory != null && inventory.GetWallets().Count > 0;
+        }
+
+        private static Inventory? GetFirstWallet(Inventory inventory)
+        {
+            return inventory.GetWallets()
+                .Select(wallet => wallet.GetItemInventory())
+                .FirstOrDefault(walletInventory => walletInventory != null);
         }
 
         /// <summary>

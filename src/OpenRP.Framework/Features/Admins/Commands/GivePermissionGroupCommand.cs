@@ -27,7 +27,6 @@ namespace OpenRP.Framework.Features.Admins.Commands
             {
                 // Retrieve the character associated with the target player.
                 Character targetCharacter = playerid.GetPlayerCurrentlyPlayingAsCharacter();
-                CharacterPermissions targetCharacterPermissions = targetCharacter.GetComponent<CharacterPermissions>();
 
                 // Attempt to give the permission group and capture the success status.
                 bool success = permissionManager.GiveCharacterPermissionGroupByName(targetCharacter.GetId(), permission_group);
@@ -35,7 +34,8 @@ namespace OpenRP.Framework.Features.Admins.Commands
                 // Provide feedback based on whether the operation succeeded.
                 if (success)
                 {
-                    targetCharacterPermissions.UpdateCharacterPermissions();
+                    // Reload so the new group applies right away, without reconnecting.
+                    permissionManager.ReloadCharacterPermissions(targetCharacter);
 
                     player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO,
                         $"Successfully granted the permission group '{permission_group}' to player {targetCharacter.GetName()}.");

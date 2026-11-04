@@ -9,12 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Shared.BaseManager.Entities;
 using Microsoft.Extensions.Logging;
-using OpenRP.Framework.Database.Models;
-using OpenRP.Framework.Features.Inventories.Components;
-using OpenRP.Framework.Features.Inventories.Entities;
 
 namespace OpenRP.Framework.Shared.BaseManager.Helpers
 {
+    /// <summary>
+    /// Keeps the components of one table in sync with the database: loads everything at startup, picks up rows
+    /// that other code wrote to the database, and saves, creates and deletes changed components.
+    /// </summary>
     public abstract class BaseManager<TModel, TComponent>
         where TModel : BaseModel, new()
         where TComponent : Component
@@ -22,6 +23,8 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         protected BaseDataContext _dataContext;
         protected IEntityManager _entityManager;
         protected ILogger _logger;
+
+        // UTC, because BaseDataContext stores CreatedOn and UpdatedOn in UTC.
         protected DateTime _lastUpdate;
 
         protected BaseManager(BaseDataContext dataContext, IEntityManager entityManager, ILogger logger)
@@ -34,14 +37,21 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
 
         public async void ProcessChanges()
         {
-            DateTime changesSince = _lastUpdate;
-            _lastUpdate = DateTime.Now;
+            try
+            {
+                DateTime changesSince = _lastUpdate;
+                _lastUpdate = DateTime.UtcNow;
 
-            int added = LoadNew(changesSince);
-            int updated = Update(changesSince);
-            int saved = await SaveAsync();
-            int created = await CreateAsync();
-            int deleted = await DeleteAsync();
+                LoadNew(changesSince);
+                Update(changesSince);
+                await SaveAsync();
+                await CreateAsync();
+                await DeleteAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to process changes for {ModelName}.", typeof(TModel).Name);
+            }
         }
 
         protected abstract DbSet<TModel> GetDbSet();
@@ -53,71 +63,49 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         public int LoadAll()
         {
             _logger.LogInformation($"Begin loading all {typeof(TModel).Name} from database.");
-            var models = GetDbSet().AsNoTracking().ToList();
-            int count = 0;
-            foreach (var model in models)
+            List<TModel> models = GetDbSet().AsNoTracking().ToList();
+            foreach (TModel model in models)
             {
-                EntityId entityId = GetEntityId(model);
-                EntityId? parentId = GetParentEntityId(model);
-                if (parentId.HasValue)
-                {
-                    _entityManager.Create(entityId, parentId.Value);
-                }
-                else
-                {
-                    _entityManager.Create(entityId);
-                }
-                _entityManager.AddComponent<TComponent>(entityId, model);
-                count++;
+                CreateEntityWithComponent(model);
             }
-            _logger.LogInformation($"Loaded {count} {typeof(TModel).Name}.");
-            return count;
+            _logger.LogInformation($"Loaded {models.Count} {typeof(TModel).Name}.");
+            return models.Count;
         }
 
+        /// <summary>
+        /// Loads rows that other code inserted into the database. Rows this manager created itself are already loaded.
+        /// </summary>
         protected int LoadNew(DateTime changesSince)
         {
-            var models = GetDbSet().Where(m => m.CreatedOn > changesSince)
-                                   .AsNoTracking()
-                                   .ToList();
             int count = 0;
-            foreach (var model in models)
+            foreach (TModel model in GetModelsCreatedSince(changesSince))
             {
-                EntityId entityId = GetEntityId(model);
-                EntityId? parentId = GetParentEntityId(model);
-                if (parentId.HasValue)
+                if (IsEntityLoaded(GetEntityId(model)))
                 {
-                    _entityManager.Create(entityId, parentId.Value);
+                    continue;
                 }
-                else
-                {
-                    _entityManager.Create(entityId);
-                }
-                _entityManager.AddComponent<TComponent>(entityId, model);
+
+                CreateEntityWithComponent(model);
                 count++;
             }
             return count;
         }
 
+        /// <summary>
+        /// Reloads rows that other code changed in the database. Components with unsaved changes keep their own state.
+        /// </summary>
         protected int Update(DateTime changesSince)
         {
-            var models = GetDbSet().Where(m => m.UpdatedOn > changesSince)
-                                   .AsNoTracking()
-                                   .ToList();
             int count = 0;
-            foreach (var model in models)
+            foreach (TModel model in GetModelsUpdatedSince(changesSince))
             {
                 EntityId entityId = GetEntityId(model);
-                EntityId? parentId = GetParentEntityId(model);
-                _entityManager.Destroy(entityId);
-                if (parentId.HasValue)
+                if (HasUnsavedChanges(entityId) || IsComponentUpToDate(entityId, model))
                 {
-                    _entityManager.Create(entityId, parentId.Value);
+                    continue;
                 }
-                else
-                {
-                    _entityManager.Create(entityId);
-                }
-                _entityManager.AddComponent<TComponent>(entityId, model);
+
+                ReloadEntity(entityId, model);
                 count++;
             }
             return count;
@@ -126,18 +114,17 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         protected async Task<int> SaveAsync()
         {
             int count = 0;
-            foreach (var component in _entityManager.GetComponents<TComponent>())
+            foreach (TComponent component in _entityManager.GetComponents<TComponent>().ToList())
             {
-                // Assume each TComponent implements IChangeable for change tracking.
-                if (component is IChangeable changeTrackable && changeTrackable.HasChanges())
+                if (component is not IChangeable changeable || !changeable.HasChanges())
                 {
-                    TModel model = GetModelFromComponent(component);
-                    _dataContext.Update(model);
-                    if (await _dataContext.SaveChangesAsync() > 0)
-                    {
-                        changeTrackable.ProcessChanges(false);
-                        count++;
-                    }
+                    continue;
+                }
+
+                if (await SaveModelAsync(GetModelFromComponent(component)))
+                {
+                    changeable.ProcessChanges(false);
+                    count++;
                 }
             }
             return count;
@@ -146,32 +133,18 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         protected async Task<int> CreateAsync()
         {
             int count = 0;
-            foreach (var component in _entityManager.GetComponents<TComponent>())
+            foreach (TComponent component in _entityManager.GetComponents<TComponent>().ToList())
             {
-                if (component is IBaseDataComponent dataComponent && dataComponent.GetId() == 0)
+                if (component is not IBaseDataComponent dataComponent || dataComponent.GetId() != 0)
                 {
-                    TModel model = GetModelFromComponent(component);
-                    TModel updatedModel = _dataContext.Update(model).Entity;
-                    if (await _dataContext.SaveChangesAsync() > 0)
-                    {
-                        if (component is IChangeable changeTrackable)
-                            changeTrackable.ProcessChanges(false);
+                    continue;
+                }
 
-                        // Recreate the component with its new id.
-                        component.DestroyEntity();
-                        EntityId newEntityId = GetEntityId(updatedModel);
-                        EntityId? parentId = GetParentEntityId(updatedModel);
-                        if (parentId.HasValue)
-                        {
-                            _entityManager.Create(newEntityId, parentId.Value);
-                        }
-                        else
-                        {
-                            _entityManager.Create(newEntityId);
-                        }
-                        _entityManager.AddComponent<TComponent>(newEntityId, updatedModel);
-                        count++;
-                    }
+                TModel model = GetModelFromComponent(component);
+                if (await SaveModelAsync(model))
+                {
+                    RecreateEntityWithNewId(component, model);
+                    count++;
                 }
             }
             ResetNewId();
@@ -181,28 +154,165 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         protected async Task<int> DeleteAsync()
         {
             int count = 0;
-            foreach (var component in _entityManager.GetComponents<TComponent>())
+            foreach (TComponent component in _entityManager.GetComponents<TComponent>().ToList())
             {
-                // Assume TComponent implements IDeletable for deletion state.
-                if (component is IDeletable deletable && deletable.IsDeleted())
+                if (component is not IDeletable deletable || !deletable.IsDeleted())
                 {
-                    TModel model = GetModelFromComponent(component);
-                    if (model.Id != 0)
+                    continue;
+                }
+
+                TModel model = GetModelFromComponent(component);
+                if (model.Id != 0 && await DeleteModelAsync(model))
+                {
+                    deletable.ProcessDeletion(false);
+                    if (component is IChangeable changeable)
                     {
-                        _dataContext.Remove(model);
-                        if (await _dataContext.SaveChangesAsync() > 0)
-                        {
-                            deletable.ProcessDeletion(false);
-
-                            if (component is IChangeable changeTrackable)
-                                changeTrackable.ProcessChanges(false);
-
-                            count++;
-                        }
+                        changeable.ProcessChanges(false);
                     }
+                    count++;
                 }
             }
             return count;
+        }
+
+        private List<TModel> GetModelsCreatedSince(DateTime changesSince)
+        {
+            return GetDbSet().Where(m => m.CreatedOn > changesSince).AsNoTracking().ToList();
+        }
+
+        private List<TModel> GetModelsUpdatedSince(DateTime changesSince)
+        {
+            return GetDbSet().Where(m => m.UpdatedOn > changesSince).AsNoTracking().ToList();
+        }
+
+        private bool IsEntityLoaded(EntityId entityId)
+        {
+            return _entityManager.Exists(entityId);
+        }
+
+        private bool HasUnsavedChanges(EntityId entityId)
+        {
+            if (!IsEntityLoaded(entityId))
+            {
+                return false;
+            }
+
+            TComponent? component = _entityManager.GetComponent<TComponent>(entityId);
+            bool hasChanges = component is IChangeable changeable && changeable.HasChanges();
+            bool isDeleted = component is IDeletable deletable && deletable.IsDeleted();
+            return hasChanges || isDeleted;
+        }
+
+        /// <summary>
+        /// True when the loaded component already has this version of the row, for example because this manager saved it.
+        /// </summary>
+        private bool IsComponentUpToDate(EntityId entityId, TModel model)
+        {
+            if (!IsEntityLoaded(entityId))
+            {
+                return false;
+            }
+
+            TComponent? component = _entityManager.GetComponent<TComponent>(entityId);
+            return component != null && GetModelFromComponent(component).UpdatedOn >= model.UpdatedOn;
+        }
+
+        private bool HasParentChanged(EntityId entityId, TModel model)
+        {
+            EntityId? newParentId = GetParentEntityId(model);
+            return newParentId.HasValue && _entityManager.GetParent(entityId) != newParentId.Value;
+        }
+
+        /// <summary>
+        /// Swaps the component for one built from the new model. The entity itself is kept when possible,
+        /// so its child entities (for example the items of an inventory) stay loaded.
+        /// </summary>
+        private void ReloadEntity(EntityId entityId, TModel model)
+        {
+            if (!IsEntityLoaded(entityId))
+            {
+                CreateEntityWithComponent(model);
+                return;
+            }
+
+            if (HasParentChanged(entityId, model))
+            {
+                _entityManager.Destroy(entityId);
+                CreateEntityWithComponent(model);
+                return;
+            }
+
+            _entityManager.Destroy<TComponent>(entityId);
+            _entityManager.AddComponent<TComponent>(entityId, model);
+        }
+
+        private void CreateEntityWithComponent(TModel model)
+        {
+            EntityId entityId = GetEntityId(model);
+            EntityId? parentId = GetParentEntityId(model);
+            if (parentId.HasValue)
+            {
+                _entityManager.Create(entityId, parentId.Value);
+            }
+            else
+            {
+                _entityManager.Create(entityId);
+            }
+            _entityManager.AddComponent<TComponent>(entityId, model);
+        }
+
+        /// <summary>
+        /// A new component gets its database id on its first save, so it moves to the entity matching that id.
+        /// </summary>
+        private void RecreateEntityWithNewId(TComponent component, TModel savedModel)
+        {
+            if (component is IChangeable changeable)
+            {
+                changeable.ProcessChanges(false);
+            }
+
+            component.DestroyEntity();
+            CreateEntityWithComponent(savedModel);
+        }
+
+        /// <summary>
+        /// Inserts or updates the model. It is detached afterwards, because the component keeps the instance and
+        /// a reloaded copy of the same row would otherwise clash with it in this long-lived context.
+        /// </summary>
+        private async Task<bool> SaveModelAsync(TModel model)
+        {
+            try
+            {
+                _dataContext.Update(model);
+                return await _dataContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to save {ModelName} {ModelId}.", typeof(TModel).Name, model.Id);
+                return false;
+            }
+            finally
+            {
+                _dataContext.Entry(model).State = EntityState.Detached;
+            }
+        }
+
+        private async Task<bool> DeleteModelAsync(TModel model)
+        {
+            try
+            {
+                _dataContext.Remove(model);
+                return await _dataContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete {ModelName} {ModelId}.", typeof(TModel).Name, model.Id);
+                return false;
+            }
+            finally
+            {
+                _dataContext.Entry(model).State = EntityState.Detached;
+            }
         }
     }
 }
