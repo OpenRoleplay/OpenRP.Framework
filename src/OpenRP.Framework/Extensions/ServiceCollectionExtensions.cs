@@ -9,6 +9,7 @@ using OpenRP.Framework.Features.BiomeGenerator.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
 using OpenRP.Framework.Features.Currencies.Extensions;
 using OpenRP.Framework.Features.DroppedItems.Extensions;
+using OpenRP.Framework.Features.Skills.Extensions;
 using OpenRP.Framework.Features.DebugSettingsFeature.Extensions;
 using OpenRP.Framework.Features.Fishing.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
@@ -53,6 +54,7 @@ namespace OpenRP.Framework.Extensions
                 .AddInventories()
                 .AddCurrencies()
                 .AddDroppedItems()
+                .AddSkills()
                 .AddDebugSettings()
                 .AddBiomeGenerator()
                 .AddCommands()

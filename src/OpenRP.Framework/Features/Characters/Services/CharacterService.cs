@@ -103,7 +103,7 @@ namespace OpenRP.Framework.Features.Characters.Services
 
         public void SaveCharacter(Character character)
         {
-            SaveModel(character.GetCharacterModel());
+            SaveModel(character.GetRawCharacterModel());
             character.ProcessChanges(false);
         }
 
