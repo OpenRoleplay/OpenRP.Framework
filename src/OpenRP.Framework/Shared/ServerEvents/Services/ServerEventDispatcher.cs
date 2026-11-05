@@ -1,172 +1,174 @@
-﻿using OpenRP.Framework.Shared.ServerEvents.Attributes;
-using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using OpenRP.Framework.Shared.ServerEvents.Attributes;
 using OpenRP.Framework.Shared.ServerEvents.Entities;
+using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using OpenRP.Framework.Shared.ServerEvents.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using CacheManager.Core.Logging;
-using Microsoft.Extensions.Logging;
 
 namespace OpenRP.Framework.Shared.ServerEvents.Services
 {
+    /// <summary>
+    /// Finds every [ServerEvent] method in the registered IServerSystem classes and runs them when their event is
+    /// published. A handler's event is the type of its ServerEventArgs parameter; its name doesn't matter.
+    /// </summary>
     public class ServerEventDispatcher : IServerEventDispatcher
     {
-        private readonly IServerEventAggregator _serverEventAggregator;
-        private readonly Dictionary<string, List<MethodInfo>> _eventHandlers = new Dictionary<string, List<MethodInfo>>();
-        private readonly List<object> _systemInstances = new List<object>();
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<ServerEventDispatcher> _logger;
+        private readonly List<ServerEventHandler> _handlers = new List<ServerEventHandler>();
 
-        public ServerEventDispatcher(IServiceProvider serviceProvider, IServerEventAggregator serverEventAggregator, ILogger<ServerEventDispatcher> logger)
+        public ServerEventDispatcher(IServiceProvider serviceProvider, ILogger<ServerEventDispatcher> logger)
         {
             _serviceProvider = serviceProvider;
-            _serverEventAggregator = serverEventAggregator;
             _logger = logger;
-
-            RegisterEventHandlers();
-            SubscribeToEvents();
-
-            _logger.LogInformation("Loaded ServerEventDispatcher");
+            RegisterHandlers();
         }
 
-        private void SubscribeToEvents()
+        public async Task DispatchAsync(ServerEventArgs eventArgs)
         {
-            // Subscribe to specific events via the aggregator
-            _serverEventAggregator.Subscribe<OnAccountLoggedInEventArgs>(HandleOnAccountLoggedIn);
-            _serverEventAggregator.Subscribe<OnPlayerCashUpdateEventArgs>(HandleOnPlayerCashUpdate);
-            _serverEventAggregator.Subscribe<OnCharacterSelectedEventArgs>(HandleOnCharacterSelected);
-            _serverEventAggregator.Subscribe<OnPlayerInventoryItemUsedEventArgs>(HandleOnPlayerInventoryItemUsed);
-        }
+            List<ServerEventHandler> handlers = GetHandlersFor(eventArgs);
+            _logger.LogDebug("Dispatching {EventName} to {HandlerCount} handlers.", eventArgs.GetType().Name, handlers.Count);
 
-        private async Task HandleOnAccountLoggedIn(OnAccountLoggedInEventArgs eventArgs)
-        {
-            Console.WriteLine($"Handling OnAccountLoggedIn for username: {eventArgs.Account.GetAccountUsername()}");
-            await DispatchEventAsync("OnAccountLoggedIn", eventArgs);
-        }
-        private async Task HandleOnCharacterSelected(OnCharacterSelectedEventArgs eventArgs)
-        {
-            Console.WriteLine($"Handling OnCharacterSelected for username: {eventArgs.Account.GetAccountUsername()}");
-            await DispatchEventAsync("OnCharacterSelected", eventArgs);
-        }
-
-        private async Task HandleOnPlayerCashUpdate(OnPlayerCashUpdateEventArgs eventArgs)
-        {
-            Console.WriteLine($"Handling OnPlayerCashUpdate for player: {eventArgs.Player.Name}");
-            await DispatchEventAsync("OnPlayerCashUpdate", eventArgs);
-        }
-
-        private async Task HandleOnPlayerInventoryItemUsed(OnPlayerInventoryItemUsedEventArgs eventArgs)
-        {
-            Console.WriteLine($"Handling OnPlayerInventoryItemUsed for player: {eventArgs.Player.Name}");
-            await DispatchEventAsync("OnPlayerInventoryItemUsed", eventArgs);
-        }
-
-        private void RegisterEventHandlers()
-        {
-            foreach (var assembly in ServerSystemRegistry.RegisteredAssemblies)
+            foreach (ServerEventHandler handler in handlers)
             {
-                // Get all IServerSystem types in the assembly
-                var systemTypes = assembly.GetTypes()
-                    .Where(t => typeof(IServerSystem).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+                await InvokeHandlerAsync(handler, eventArgs);
+            }
+        }
 
-                foreach (var type in systemTypes)
+        private List<ServerEventHandler> GetHandlersFor(ServerEventArgs eventArgs)
+        {
+            Type eventArgsType = eventArgs.GetType();
+            return _handlers.Where(handler => handler.EventType.IsAssignableFrom(eventArgsType)).ToList();
+        }
+
+        private void RegisterHandlers()
+        {
+            foreach (Type systemType in GetServerSystemTypes())
+            {
+                object? system = _serviceProvider.GetService(systemType);
+                if (system == null)
                 {
-                    // Resolve the instance from DI
-                    var instance = _serviceProvider.GetService(type);
-                    if (instance == null) continue;
-
-                    _systemInstances.Add(instance);
-
-                    // Get methods with the ServerEvent attribute
-                    var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                        .Where(m => m.GetCustomAttributes(typeof(ServerEventAttribute), inherit: false).Any());
-
-                    foreach (var method in methods)
-                    {
-                        var attribute = method.GetCustomAttribute<ServerEventAttribute>();
-                        string eventName = attribute?.EventName ?? method.Name;
-
-                        if (!_eventHandlers.ContainsKey(eventName))
-                        {
-                            _eventHandlers[eventName] = new List<MethodInfo>();
-                        }
-
-                        _eventHandlers[eventName].Add(method);
-
-                        _logger.LogDebug($"Registered method {method.Name} to EventHandler \"{eventName}\".");
-                    }
+                    _logger.LogWarning("Server system {SystemName} is not registered as a service, so its handlers are ignored.", systemType.Name);
+                    continue;
                 }
+
+                foreach (MethodInfo method in GetServerEventMethods(systemType))
+                {
+                    RegisterHandler(system, method);
+                }
+            }
+
+            int eventCount = _handlers.Select(handler => handler.EventType).Distinct().Count();
+            _logger.LogInformation("Registered {HandlerCount} server event handlers for {EventCount} events.", _handlers.Count, eventCount);
+        }
+
+        private static IEnumerable<Type> GetServerSystemTypes()
+        {
+            return ServerSystemRegistry.RegisteredAssemblies
+                .Distinct()
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => typeof(IServerSystem).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+        }
+
+        private static IEnumerable<MethodInfo> GetServerEventMethods(Type systemType)
+        {
+            return systemType
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(method => method.IsDefined(typeof(ServerEventAttribute), inherit: false));
+        }
+
+        private void RegisterHandler(object system, MethodInfo method)
+        {
+            string handlerName = $"{method.DeclaringType?.Name}.{method.Name}";
+            string? error = GetHandlerError(method);
+            if (error != null)
+            {
+                _logger.LogError("Server event handler {HandlerName} is ignored: {Reason}", handlerName, error);
+                return;
+            }
+
+            if (IsAsyncVoid(method))
+            {
+                _logger.LogWarning("Server event handler {HandlerName} is async void, so it isn't awaited and its errors are lost. Make it return Task.", handlerName);
+            }
+
+            ParameterInfo[] parameters = method.GetParameters();
+            Type eventType = parameters.Single(IsEventParameter).ParameterType;
+            _handlers.Add(new ServerEventHandler(system, method, parameters, eventType));
+        }
+
+        /// <summary>
+        /// Why this method can't be a handler, or null when it can.
+        /// </summary>
+        private string? GetHandlerError(MethodInfo method)
+        {
+            ParameterInfo[] parameters = method.GetParameters();
+            int eventParameterCount = parameters.Count(IsEventParameter);
+            if (eventParameterCount != 1)
+            {
+                return $"it needs exactly one parameter deriving from {nameof(ServerEventArgs)}, but has {eventParameterCount}.";
+            }
+
+            ParameterInfo? unresolvableParameter = parameters
+                .Where(parameter => !IsEventParameter(parameter))
+                .FirstOrDefault(parameter => !IsService(parameter.ParameterType));
+            if (unresolvableParameter != null)
+            {
+                return $"parameter '{unresolvableParameter.Name}' of type {unresolvableParameter.ParameterType.Name} is not a registered service.";
+            }
+            return null;
+        }
+
+        private static bool IsEventParameter(ParameterInfo parameter)
+        {
+            return typeof(ServerEventArgs).IsAssignableFrom(parameter.ParameterType);
+        }
+
+        private bool IsService(Type type)
+        {
+            IServiceProviderIsService? serviceChecker = _serviceProvider.GetService<IServiceProviderIsService>();
+            return serviceChecker == null || serviceChecker.IsService(type);
+        }
+
+        private static bool IsAsyncVoid(MethodInfo method)
+        {
+            return method.ReturnType == typeof(void) && method.IsDefined(typeof(AsyncStateMachineAttribute), inherit: false);
+        }
+
+        private async Task InvokeHandlerAsync(ServerEventHandler handler, ServerEventArgs eventArgs)
+        {
+            try
+            {
+                object?[] arguments = ResolveArguments(handler, eventArgs);
+                if (handler.Method.Invoke(handler.System, arguments) is Task task)
+                {
+                    await task;
+                }
+            }
+            catch (Exception ex)
+            {
+                Exception error = ex is TargetInvocationException { InnerException: not null } invocationException ? invocationException.InnerException : ex;
+                _logger.LogError(error, "Server event handler {HandlerName} failed while handling {EventName}.", handler.GetName(), eventArgs.GetType().Name);
             }
         }
 
         /// <summary>
-        /// Dispatches an event to all registered handlers.
+        /// Fills the handler's parameters: the event args, and services from the root provider. Not from a scope,
+        /// because a handler may pass its services on to dialogs whose callbacks run after it returns (for example
+        /// OnAccountLoggedIn opening the character selection), so they must outlive the handler. SampSharp resolves
+        /// the services of [Event] handlers the same way.
         /// </summary>
-        /// <param name="eventName">The name of the event to dispatch.</param>
-        /// <param name="eventArgs">The event arguments.</param>
-        public async Task DispatchEventAsync(string eventName, ServerEventArgs eventArgs)
+        private object?[] ResolveArguments(ServerEventHandler handler, ServerEventArgs eventArgs)
         {
-            if (_eventHandlers.TryGetValue(eventName, out var handlers))
-            {
-                foreach (var handler in handlers)
-                {
-                    // Find the instance that contains this method
-                    var systemInstance = _systemInstances.FirstOrDefault(inst => handler.DeclaringType.IsInstanceOfType(inst));
-                    if (systemInstance == null)
-                        continue;
-
-                    try
-                    {
-                        var parameters = handler.GetParameters();
-                        object[] invokeParameters = new object[parameters.Length];
-
-                        for (int i = 0; i < parameters.Length; i++)
-                        {
-                            var param = parameters[i];
-                            if (param.ParameterType.IsAssignableFrom(eventArgs.GetType()))
-                            {
-                                invokeParameters[i] = eventArgs;
-                            }
-                            else
-                            {
-                                // Resolve other dependencies via DI
-                                var service = _serviceProvider.GetService(param.ParameterType);
-                                if (service == null)
-                                {
-                                    Console.WriteLine($"Unable to resolve service for type '{param.ParameterType}' required by method '{handler.Name}'.");
-                                    invokeParameters[i] = null; // Assign null or handle as needed
-                                }
-                                else
-                                {
-                                    invokeParameters[i] = service;
-                                }
-                            }
-                        }
-
-                        // Invoke the handler method with resolved parameters
-                        var result = handler.Invoke(systemInstance, invokeParameters);
-
-                        // If the handler is asynchronous, await its completion
-                        if (result is Task task)
-                        {
-                            await task;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error invoking handler for event '{eventName}': {ex.Message}");
-                        Console.WriteLine(ex.ToString());
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine($"No handlers registered for event '{eventName}'.");
-            }
+            return handler.Parameters
+                .Select(parameter => IsEventParameter(parameter) ? eventArgs : _serviceProvider.GetRequiredService(parameter.ParameterType))
+                .ToArray();
         }
     }
 }
