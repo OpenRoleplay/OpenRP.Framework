@@ -30,7 +30,6 @@ namespace OpenRP.Framework.Features.HotwireFeature.Commands
             CommandGroups = new string[] { "Vehicles", "General" })]
         public void Hotwire(Player player,
                             IEntityManager entityManager,
-                            IInventoryService inventoryService,
                             IChatService chatService)
         {
             // Must be in a vehicle and in the driver's seat.
