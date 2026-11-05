@@ -22,6 +22,16 @@ namespace OpenRP.Framework.Features.Inventories.Services
         public InventoryManager(BaseDataContext dataContext, IEntityManager entityManager, ILogger<InventoryManager> logger)
             : base(dataContext, entityManager, logger) { }
 
+        public Inventory CreateInventory(string inventoryName, uint? maxWeightInGrams)
+        {
+            return CreateAndLoad(new InventoryModel { Name = inventoryName, MaxWeight = maxWeightInGrams });
+        }
+
+        public Inventory? LoadInventory(ulong inventoryId)
+        {
+            return LoadById(inventoryId);
+        }
+
         protected override DbSet<InventoryModel> GetDbSet() => _dataContext.Inventories;
 
         protected override EntityId GetEntityId(InventoryModel model)
@@ -32,11 +42,6 @@ namespace OpenRP.Framework.Features.Inventories.Services
         protected override InventoryModel GetModelFromComponent(Inventory component)
         {
             return component.GetRawInventoryModel();
-        }
-
-        protected override void ResetNewId()
-        {
-            InventoryNewEntities.ResetNewInventoryId();
         }
     }
 }

@@ -8,29 +8,13 @@ namespace OpenRP.Framework.Features.Inventories.Entities
 {
     public static class InventoryNewEntities
     {
+        // Unsaved inventory items get entity ids counting down from the top, far away from database ids. The counter
+        // is never reset: an id may still be in use by an item whose save hasn't happened yet.
         private static int NewInventoryItemId = int.MaxValue;
-        private static int NewInventoryId = int.MaxValue;
-
-        public static void ResetNewInventoryItemId()
-        {
-            NewInventoryItemId = int.MaxValue;
-        }
-
-        public static void ResetNewInventoryId()
-        {
-            NewInventoryId = int.MaxValue;
-        }
 
         public static int GenerateNewInventoryItemId()
         {
-            // Atomically decrement the counter to ensure thread-safety.
             return Interlocked.Decrement(ref NewInventoryItemId);
-        }
-
-        public static int GenerateNewInventoryId()
-        {
-            // Atomically decrement the counter to ensure thread-safety.
-            return Interlocked.Decrement(ref NewInventoryId);
         }
     }
 }

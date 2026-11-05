@@ -39,7 +39,7 @@ namespace OpenRP.Framework.Features.Characters.Components
 
         public ulong GetId()
         {
-            return GetCharacterModel().Id;
+            return GetRawCharacterModel().Id;
         }
 
         public Player? GetPlayer()
@@ -104,9 +104,9 @@ namespace OpenRP.Framework.Features.Characters.Components
         }
 
         /// <summary>
-        /// Method to get the Character Model. Don't use, will be deprecated in the future.
+        /// The raw database model, for saving the character inside the Framework. Gameplay code reads the Get… methods instead.
         /// </summary>
-        public CharacterModel GetCharacterModel()
+        internal CharacterModel GetRawCharacterModel()
         {
             return _characterModel;
         }

@@ -5,6 +5,7 @@ using OpenRP.Framework.Database.Entities;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Accounts.Components;
 using OpenRP.Framework.Features.Characters.Components;
+using OpenRP.Framework.Features.Inventories.Components;
 using OpenRP.Framework.Features.Inventories.Services;
 using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using OpenRP.Framework.Shared.ServerEvents.Services;
@@ -19,15 +20,15 @@ namespace OpenRP.Framework.Features.Characters.Services
 
         private readonly BaseDataContext _dataContext;
         private readonly IEntityManager _entityManager;
-        private readonly IInventoryService _inventoryService;
+        private readonly IInventoryManager _inventoryManager;
         private readonly IServerEventAggregator _serverEventAggregator;
         private readonly ILogger<CharacterService> _logger;
 
-        public CharacterService(BaseDataContext dataContext, IEntityManager entityManager, IInventoryService inventoryService, IServerEventAggregator serverEventAggregator, ILogger<CharacterService> logger)
+        public CharacterService(BaseDataContext dataContext, IEntityManager entityManager, IInventoryManager inventoryManager, IServerEventAggregator serverEventAggregator, ILogger<CharacterService> logger)
         {
             _dataContext = dataContext;
             _entityManager = entityManager;
-            _inventoryService = inventoryService;
+            _inventoryManager = inventoryManager;
             _serverEventAggregator = serverEventAggregator;
             _logger = logger;
         }
@@ -71,7 +72,7 @@ namespace OpenRP.Framework.Features.Characters.Services
                 return null;
             }
 
-            EnsureCharacterHasInventory(characterModel);
+            EnsureCharacterHasLoadedInventory(characterModel);
 
             Character character = player.AddComponent<Character>(characterModel);
             player.AddComponent<CharacterPreferences>(GetOrCreateCharacterPreferencesModel(characterId));
@@ -102,7 +103,7 @@ namespace OpenRP.Framework.Features.Characters.Services
 
         public void SaveCharacter(Character character)
         {
-            SaveModel(character.GetCharacterModel());
+            SaveModel(character.GetRawCharacterModel());
             character.ProcessChanges(false);
         }
 
@@ -170,23 +171,30 @@ namespace OpenRP.Framework.Features.Characters.Services
         }
 
         /// <summary>
-        /// Characters created before inventories were added automatically may not have one yet.
+        /// Makes sure the character's inventory component exists before the character is played.
         /// </summary>
-        private void EnsureCharacterHasInventory(CharacterModel characterModel)
+        private void EnsureCharacterHasLoadedInventory(CharacterModel characterModel)
         {
             if (characterModel.InventoryId != null)
             {
+                // A new character's inventory is inserted by BaseDataContext, straight into the database; load it now
+                // instead of waiting for the next inventory sync.
+                _inventoryManager.LoadInventory(characterModel.InventoryId.Value);
                 return;
             }
 
+            CreateCharacterInventory(characterModel);
+        }
+
+        /// <summary>
+        /// Characters created before inventories were added automatically may not have one yet.
+        /// </summary>
+        private void CreateCharacterInventory(CharacterModel characterModel)
+        {
             string inventoryName = $"{characterModel.FirstName} {characterModel.LastName}`s Inventory";
-            InventoryModel? inventory = _inventoryService.CreateInventory(inventoryName, CharacterInventoryMaxWeightInGrams);
-            if (inventory == null)
-            {
-                return;
-            }
+            Inventory inventory = _inventoryManager.CreateInventory(inventoryName, CharacterInventoryMaxWeightInGrams);
 
-            characterModel.InventoryId = inventory.Id;
+            characterModel.InventoryId = inventory.GetId();
             SaveModel(characterModel);
         }
 

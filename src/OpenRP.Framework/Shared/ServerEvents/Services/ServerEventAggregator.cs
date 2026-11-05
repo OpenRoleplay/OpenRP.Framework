@@ -1,42 +1,24 @@
-﻿using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
+﻿using Microsoft.Extensions.DependencyInjection;
+using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Shared.ServerEvents.Services
 {
     public class ServerEventAggregator : IServerEventAggregator
     {
-        private readonly ConcurrentDictionary<Type, List<Func<ServerEventArgs, Task>>> _handlers
-            = new ConcurrentDictionary<Type, List<Func<ServerEventArgs, Task>>>();
+        // Resolved on first publish, not in the constructor: building the dispatcher creates the server systems,
+        // and their services (for example AccountService) take this aggregator, which would be a circular dependency.
+        private readonly Lazy<IServerEventDispatcher> _serverEventDispatcher;
 
-        public void Subscribe<TEvent>(Func<TEvent, Task> handler) where TEvent : ServerEventArgs
+        public ServerEventAggregator(IServiceProvider serviceProvider)
         {
-            var eventType = typeof(TEvent);
-            var wrappedHandler = new Func<ServerEventArgs, Task>(e => handler((TEvent)e));
-
-            _handlers.AddOrUpdate(eventType,
-                new List<Func<ServerEventArgs, Task>> { wrappedHandler },
-                (type, existingHandlers) =>
-                {
-                    existingHandlers.Add(wrappedHandler);
-                    return existingHandlers;
-                });
+            _serverEventDispatcher = new Lazy<IServerEventDispatcher>(() => serviceProvider.GetRequiredService<IServerEventDispatcher>());
         }
 
-        public async Task PublishAsync<TEvent>(TEvent eventArgs) where TEvent : ServerEventArgs
+        public Task PublishAsync<TEvent>(TEvent eventArgs) where TEvent : ServerEventArgs
         {
-            var eventType = typeof(TEvent);
-            if (_handlers.TryGetValue(eventType, out var handlers))
-            {
-                foreach (var handler in handlers)
-                {
-                    await handler(eventArgs);
-                }
-            }
+            return _serverEventDispatcher.Value.DispatchAsync(eventArgs);
         }
     }
 }

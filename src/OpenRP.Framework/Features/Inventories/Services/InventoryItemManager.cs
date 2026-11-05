@@ -35,10 +35,5 @@ namespace OpenRP.Framework.Features.Inventories.Services
         {
             return component.GetRawInventoryItemModel();
         }
-
-        protected override void ResetNewId()
-        {
-            InventoryNewEntities.ResetNewInventoryItemId();
-        }
     }
 }

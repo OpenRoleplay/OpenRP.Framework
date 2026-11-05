@@ -19,11 +19,24 @@ namespace OpenRP.Framework.Features.Inventories.Systems
             inventoryItemManager.LoadAll();
         }
 
-        [Timer(60000)]
+        private const int SyncIntervalInMilliseconds = 60000;
+
+        [Timer(SyncIntervalInMilliseconds)]
         public void ProcessChanges(IInventoryManager inventoryManager, IInventoryItemManager inventoryItemManager)
         {
             inventoryManager.ProcessChanges();
             inventoryItemManager.ProcessChanges();
+        }
+
+        /// <summary>
+        /// Saves what changed since the last sync, so a restart doesn't lose up to a minute of inventory changes.
+        /// Inventories go first because items belong to them.
+        /// </summary>
+        [Event]
+        public void OnGameModeExit(IInventoryManager inventoryManager, IInventoryItemManager inventoryItemManager)
+        {
+            inventoryManager.SaveNow();
+            inventoryItemManager.SaveNow();
         }
     }
 }

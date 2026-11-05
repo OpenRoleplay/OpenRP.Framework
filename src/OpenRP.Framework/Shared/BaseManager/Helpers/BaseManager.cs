@@ -5,59 +5,45 @@ using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenRP.Framework.Shared.BaseManager.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace OpenRP.Framework.Shared.BaseManager.Helpers
 {
     /// <summary>
-    /// Keeps the components of one table in sync with the database: loads everything at startup, picks up rows
-    /// that other code wrote to the database, and saves, creates and deletes changed components.
+    /// Keeps the components of one table in sync with the database. Components in memory are the live state:
+    /// the manager loads everything at startup, saves what changed, and picks up rows that other code or other
+    /// servers wrote to the same database. When two servers change the same row, the last save wins.
     /// </summary>
+    /// <remarks>
+    /// Everything runs synchronously on the main thread, so components are never touched from another thread and
+    /// a shutdown save can't overlap a running cycle on the same database context.
+    /// </remarks>
     public abstract class BaseManager<TModel, TComponent>
         where TModel : BaseModel, new()
-        where TComponent : Component
+        where TComponent : Component, IBaseDataComponent, IChangeable
     {
+        // Pulling a little further back than the newest change seen covers small clock differences between servers;
+        // it's harmless because components that are already up to date are skipped.
+        private static readonly TimeSpan SyncOverlap = TimeSpan.FromSeconds(5);
+
         protected BaseDataContext _dataContext;
         protected IEntityManager _entityManager;
         protected ILogger _logger;
 
-        // UTC, because BaseDataContext stores CreatedOn and UpdatedOn in UTC.
-        protected DateTime _lastUpdate;
+        // The newest CreatedOn/UpdatedOn seen in the database, in the database's (UTC) timestamps.
+        private DateTime _newestChangeSeen = DateTime.MinValue;
 
         protected BaseManager(BaseDataContext dataContext, IEntityManager entityManager, ILogger logger)
         {
             _dataContext = dataContext;
             _entityManager = entityManager;
             _logger = logger;
-            _lastUpdate = DateTime.UtcNow;
-        }
-
-        public async void ProcessChanges()
-        {
-            try
-            {
-                DateTime changesSince = _lastUpdate;
-                _lastUpdate = DateTime.UtcNow;
-
-                LoadNew(changesSince);
-                Update(changesSince);
-                await SaveAsync();
-                await CreateAsync();
-                await DeleteAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to process changes for {ModelName}.", typeof(TModel).Name);
-            }
         }
 
         protected abstract DbSet<TModel> GetDbSet();
         protected abstract EntityId GetEntityId(TModel model);
         protected abstract TModel GetModelFromComponent(TComponent component);
-        protected abstract void ResetNewId();
         protected virtual EntityId? GetParentEntityId(TModel model) => null;
 
         public int LoadAll()
@@ -68,121 +54,276 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             {
                 CreateEntityWithComponent(model);
             }
+            RememberNewestChange(models);
             _logger.LogInformation($"Loaded {models.Count} {typeof(TModel).Name}.");
             return models.Count;
         }
 
         /// <summary>
-        /// Loads rows that other code inserted into the database. Rows this manager created itself are already loaded.
+        /// Saves this server's changes, then picks up the changes of others. Called on a timer.
         /// </summary>
-        protected int LoadNew(DateTime changesSince)
+        public void ProcessChanges()
         {
-            int count = 0;
-            foreach (TModel model in GetModelsCreatedSince(changesSince))
+            try
             {
-                if (IsEntityLoaded(GetEntityId(model)))
-                {
-                    continue;
-                }
-
-                CreateEntityWithComponent(model);
-                count++;
+                SaveNow();
+                PullExternalChanges();
             }
-            return count;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to process changes for {ModelName}.", typeof(TModel).Name);
+            }
         }
 
         /// <summary>
-        /// Reloads rows that other code changed in the database. Components with unsaved changes keep their own state.
+        /// Saves changed components, inserts new ones and deletes marked ones, right now. Called on shutdown too.
         /// </summary>
-        protected int Update(DateTime changesSince)
+        public void SaveNow()
         {
-            int count = 0;
-            foreach (TModel model in GetModelsUpdatedSince(changesSince))
+            SaveChangedComponents();
+            CreateNewComponents();
+            DeleteMarkedComponents();
+        }
+
+        /// <summary>
+        /// Inserts the row right away and loads its component, for when the real id is needed immediately.
+        /// </summary>
+        public TComponent CreateAndLoad(TModel model)
+        {
+            try
             {
-                EntityId entityId = GetEntityId(model);
-                if (HasUnsavedChanges(entityId) || IsComponentUpToDate(entityId, model))
+                _dataContext.Add(model);
+                _dataContext.SaveChanges();
+            }
+            finally
+            {
+                _dataContext.ChangeTracker.Clear();
+            }
+            return CreateEntityWithComponent(model);
+        }
+
+        /// <summary>
+        /// The component of this row, loading it from the database first when it isn't loaded yet. Null when the
+        /// row doesn't exist.
+        /// </summary>
+        public TComponent? LoadById(ulong id)
+        {
+            TComponent? loadedComponent = GetLoadedComponent(id);
+            if (loadedComponent != null)
+            {
+                return loadedComponent;
+            }
+
+            TModel? model = GetDbSet().AsNoTracking().FirstOrDefault(m => m.Id == id);
+            return model == null ? null : CreateEntityWithComponent(model);
+        }
+
+        private TComponent? GetLoadedComponent(ulong id)
+        {
+            return GetComponents().FirstOrDefault(component => component.GetId() == id);
+        }
+
+        private List<TComponent> GetComponents()
+        {
+            return _entityManager.GetComponents<TComponent>().ToList();
+        }
+
+        private static bool IsMarkedDeleted(TComponent component)
+        {
+            return component is IDeletable deletable && deletable.IsDeleted();
+        }
+
+        private static bool IsUnsaved(TComponent component)
+        {
+            return component.GetId() == 0;
+        }
+
+        private void SaveChangedComponents()
+        {
+            List<TComponent> changedComponents = GetComponents()
+                .Where(component => component.HasChanges() && !IsUnsaved(component) && !IsMarkedDeleted(component))
+                .ToList();
+
+            foreach (TComponent component in SaveComponents(changedComponents))
+            {
+                component.ProcessChanges(false);
+            }
+        }
+
+        private void CreateNewComponents()
+        {
+            List<TComponent> newComponents = GetComponents()
+                .Where(component => IsUnsaved(component) && !IsMarkedDeleted(component))
+                .ToList();
+
+            foreach (TComponent component in SaveComponents(newComponents))
+            {
+                RecreateEntityWithNewId(component);
+            }
+        }
+
+        private void DeleteMarkedComponents()
+        {
+            List<TComponent> markedComponents = GetComponents().Where(IsMarkedDeleted).ToList();
+            foreach (TComponent component in markedComponents.Where(IsUnsaved))
+            {
+                component.DestroyEntity();
+            }
+
+            foreach (TComponent component in DeleteComponents(markedComponents.Where(component => !IsUnsaved(component)).ToList()))
+            {
+                component.DestroyEntity();
+            }
+        }
+
+        /// <summary>
+        /// Inserts or updates the components' rows in one go. When that fails, they are saved one by one, so one bad
+        /// row doesn't block the rest. Returns the components whose rows were saved.
+        /// </summary>
+        private List<TComponent> SaveComponents(List<TComponent> components)
+        {
+            if (components.Count == 0 || TrySaveComponents(components))
+            {
+                return components;
+            }
+            return components.Where(component => TrySaveComponents(new List<TComponent> { component })).ToList();
+        }
+
+        private bool TrySaveComponents(List<TComponent> components)
+        {
+            try
+            {
+                foreach (TComponent component in components)
+                {
+                    _dataContext.Update(GetModelFromComponent(component));
+                }
+                _dataContext.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to save {Count} {ModelName}.", components.Count, typeof(TModel).Name);
+                return false;
+            }
+            finally
+            {
+                // The components keep their model instances; a reloaded copy of a row must not clash with a tracked one.
+                _dataContext.ChangeTracker.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Deletes the components' rows, one by one when deleting them together fails. A row that is already gone
+        /// counts as deleted. Returns the components whose rows are gone.
+        /// </summary>
+        private List<TComponent> DeleteComponents(List<TComponent> components)
+        {
+            if (components.Count == 0 || TryDeleteComponents(components))
+            {
+                return components;
+            }
+            return components.Where(component => TryDeleteComponents(new List<TComponent> { component })).ToList();
+        }
+
+        private bool TryDeleteComponents(List<TComponent> components)
+        {
+            try
+            {
+                foreach (TComponent component in components)
+                {
+                    _dataContext.Remove(GetModelFromComponent(component));
+                }
+                _dataContext.SaveChanges();
+                return true;
+            }
+            catch (DbUpdateConcurrencyException) when (components.Count == 1)
+            {
+                // Deleted elsewhere already.
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete {Count} {ModelName}.", components.Count, typeof(TModel).Name);
+                return false;
+            }
+            finally
+            {
+                _dataContext.ChangeTracker.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Loads rows that other code or other servers inserted or changed, and removes rows they deleted.
+        /// </summary>
+        private void PullExternalChanges()
+        {
+            DateTime changesSince = _newestChangeSeen == DateTime.MinValue ? DateTime.MinValue : _newestChangeSeen - SyncOverlap;
+            List<TModel> changedModels = GetModelsChangedSince(changesSince);
+            foreach (TModel model in changedModels)
+            {
+                LoadOrReloadModel(model);
+            }
+            RememberNewestChange(changedModels);
+            RemoveComponentsDeletedElsewhere();
+        }
+
+        private List<TModel> GetModelsChangedSince(DateTime changesSince)
+        {
+            return GetDbSet()
+                .Where(m => m.CreatedOn > changesSince || m.UpdatedOn > changesSince)
+                .AsNoTracking()
+                .ToList();
+        }
+
+        private void RememberNewestChange(List<TModel> models)
+        {
+            foreach (TModel model in models)
+            {
+                DateTime newestOfModel = model.UpdatedOn > model.CreatedOn ? model.UpdatedOn : model.CreatedOn;
+                if (newestOfModel > _newestChangeSeen)
+                {
+                    _newestChangeSeen = newestOfModel;
+                }
+            }
+        }
+
+        private void LoadOrReloadModel(TModel model)
+        {
+            EntityId entityId = GetEntityId(model);
+            if (!IsEntityLoaded(entityId))
+            {
+                CreateEntityWithComponent(model);
+                return;
+            }
+
+            // Unsaved local changes win until they are saved; up-to-date components (for example our own saves) stay.
+            if (HasUnsavedChanges(entityId) || IsComponentUpToDate(entityId, model))
+            {
+                return;
+            }
+            ReloadEntity(entityId, model);
+        }
+
+        /// <summary>
+        /// Destroys loaded components whose row no longer exists. A deletion elsewhere wins over local changes,
+        /// because those could never be saved anymore.
+        /// </summary>
+        private void RemoveComponentsDeletedElsewhere()
+        {
+            HashSet<ulong> existingIds = GetDbSet().Select(m => m.Id).ToHashSet();
+            foreach (TComponent component in GetComponents())
+            {
+                if (IsUnsaved(component) || existingIds.Contains(component.GetId()))
                 {
                     continue;
                 }
 
-                ReloadEntity(entityId, model);
-                count++;
+                if (component.HasChanges())
+                {
+                    _logger.LogWarning("{ModelName} {Id} was deleted elsewhere while it had unsaved changes here; the changes are dropped.", typeof(TModel).Name, component.GetId());
+                }
+                component.DestroyEntity();
             }
-            return count;
-        }
-
-        protected async Task<int> SaveAsync()
-        {
-            int count = 0;
-            foreach (TComponent component in _entityManager.GetComponents<TComponent>().ToList())
-            {
-                if (component is not IChangeable changeable || !changeable.HasChanges())
-                {
-                    continue;
-                }
-
-                if (await SaveModelAsync(GetModelFromComponent(component)))
-                {
-                    changeable.ProcessChanges(false);
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        protected async Task<int> CreateAsync()
-        {
-            int count = 0;
-            foreach (TComponent component in _entityManager.GetComponents<TComponent>().ToList())
-            {
-                if (component is not IBaseDataComponent dataComponent || dataComponent.GetId() != 0)
-                {
-                    continue;
-                }
-
-                TModel model = GetModelFromComponent(component);
-                if (await SaveModelAsync(model))
-                {
-                    RecreateEntityWithNewId(component, model);
-                    count++;
-                }
-            }
-            ResetNewId();
-            return count;
-        }
-
-        protected async Task<int> DeleteAsync()
-        {
-            int count = 0;
-            foreach (TComponent component in _entityManager.GetComponents<TComponent>().ToList())
-            {
-                if (component is not IDeletable deletable || !deletable.IsDeleted())
-                {
-                    continue;
-                }
-
-                TModel model = GetModelFromComponent(component);
-                if (model.Id != 0 && await DeleteModelAsync(model))
-                {
-                    deletable.ProcessDeletion(false);
-                    if (component is IChangeable changeable)
-                    {
-                        changeable.ProcessChanges(false);
-                    }
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        private List<TModel> GetModelsCreatedSince(DateTime changesSince)
-        {
-            return GetDbSet().Where(m => m.CreatedOn > changesSince).AsNoTracking().ToList();
-        }
-
-        private List<TModel> GetModelsUpdatedSince(DateTime changesSince)
-        {
-            return GetDbSet().Where(m => m.UpdatedOn > changesSince).AsNoTracking().ToList();
         }
 
         private bool IsEntityLoaded(EntityId entityId)
@@ -192,15 +333,8 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
 
         private bool HasUnsavedChanges(EntityId entityId)
         {
-            if (!IsEntityLoaded(entityId))
-            {
-                return false;
-            }
-
             TComponent? component = _entityManager.GetComponent<TComponent>(entityId);
-            bool hasChanges = component is IChangeable changeable && changeable.HasChanges();
-            bool isDeleted = component is IDeletable deletable && deletable.IsDeleted();
-            return hasChanges || isDeleted;
+            return component != null && (component.HasChanges() || IsMarkedDeleted(component));
         }
 
         /// <summary>
@@ -208,11 +342,6 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         /// </summary>
         private bool IsComponentUpToDate(EntityId entityId, TModel model)
         {
-            if (!IsEntityLoaded(entityId))
-            {
-                return false;
-            }
-
             TComponent? component = _entityManager.GetComponent<TComponent>(entityId);
             return component != null && GetModelFromComponent(component).UpdatedOn >= model.UpdatedOn;
         }
@@ -229,12 +358,6 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         /// </summary>
         private void ReloadEntity(EntityId entityId, TModel model)
         {
-            if (!IsEntityLoaded(entityId))
-            {
-                CreateEntityWithComponent(model);
-                return;
-            }
-
             if (HasParentChanged(entityId, model))
             {
                 _entityManager.Destroy(entityId);
@@ -246,7 +369,7 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             _entityManager.AddComponent<TComponent>(entityId, model);
         }
 
-        private void CreateEntityWithComponent(TModel model)
+        private TComponent CreateEntityWithComponent(TModel model)
         {
             EntityId entityId = GetEntityId(model);
             EntityId? parentId = GetParentEntityId(model);
@@ -258,61 +381,18 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             {
                 _entityManager.Create(entityId);
             }
-            _entityManager.AddComponent<TComponent>(entityId, model);
+            return _entityManager.AddComponent<TComponent>(entityId, model);
         }
 
         /// <summary>
         /// A new component gets its database id on its first save, so it moves to the entity matching that id.
         /// </summary>
-        private void RecreateEntityWithNewId(TComponent component, TModel savedModel)
+        private void RecreateEntityWithNewId(TComponent component)
         {
-            if (component is IChangeable changeable)
-            {
-                changeable.ProcessChanges(false);
-            }
-
+            TModel savedModel = GetModelFromComponent(component);
+            component.ProcessChanges(false);
             component.DestroyEntity();
             CreateEntityWithComponent(savedModel);
-        }
-
-        /// <summary>
-        /// Inserts or updates the model. It is detached afterwards, because the component keeps the instance and
-        /// a reloaded copy of the same row would otherwise clash with it in this long-lived context.
-        /// </summary>
-        private async Task<bool> SaveModelAsync(TModel model)
-        {
-            try
-            {
-                _dataContext.Update(model);
-                return await _dataContext.SaveChangesAsync() > 0;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to save {ModelName} {ModelId}.", typeof(TModel).Name, model.Id);
-                return false;
-            }
-            finally
-            {
-                _dataContext.Entry(model).State = EntityState.Detached;
-            }
-        }
-
-        private async Task<bool> DeleteModelAsync(TModel model)
-        {
-            try
-            {
-                _dataContext.Remove(model);
-                return await _dataContext.SaveChangesAsync() > 0;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to delete {ModelName} {ModelId}.", typeof(TModel).Name, model.Id);
-                return false;
-            }
-            finally
-            {
-                _dataContext.Entry(model).State = EntityState.Detached;
-            }
         }
     }
 }

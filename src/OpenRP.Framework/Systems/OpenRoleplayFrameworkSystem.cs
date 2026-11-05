@@ -12,7 +12,7 @@ namespace OpenRP.Framework.Systems
 {
     public class OpenRoleplayFrameworkSystem : ISystem
     {
-        // IServerEventDispatcher is added here in order to initiate the Singleton, do not remove.
+        // Resolving IServerEventDispatcher here builds it at startup, so invalid [ServerEvent] handlers are logged right away.
         [Event]
         public void OnGameModeInit(IServerService serverService, IServerEventDispatcher serverEventDispatcher)
         {
