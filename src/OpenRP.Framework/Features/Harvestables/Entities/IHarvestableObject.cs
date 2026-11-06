@@ -1,16 +1,19 @@
 ﻿using SampSharp.Entities.SAMP;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Harvestables.Entities
 {
+    /// <summary>
+    /// What the harvest code needs from any plant, whatever its type.
+    /// </summary>
     public interface IHarvestableObject
     {
+        string GetResourceName();
         bool IsPlayerNearby(Player player);
-        void BeginHarvest();
-        void EndHarvest();
+        bool HasHarvestsLeft();
+
+        /// <summary>
+        /// Takes one harvest (for example a leaf) off the plant.
+        /// </summary>
+        void RemoveOneHarvest();
     }
 }

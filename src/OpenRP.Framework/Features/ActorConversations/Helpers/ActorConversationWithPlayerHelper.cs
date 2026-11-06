@@ -83,7 +83,10 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
                 if (!_conversationIsActive)
                 {
                     _conversationIsActive = true;
-                    _ = Task.Run(() => RunConversationLoopAsync());
+
+                    // Started from the main thread (no Task.Run): after each await (ChatGPT, delays) SampSharp brings the
+                    // loop back to the main thread, where it may safely send messages and read components.
+                    _ = RunConversationLoopAndLogErrorsAsync();
                 }
             }
             finally
@@ -125,6 +128,22 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
         private List<ActorConversationWithPlayerState> GetCurrentlyAttachedPlayerStates()
         {
             return _entityManager.GetComponents<ActorConversationWithPlayerState>().Where(i => i.ConversationId == _conversationId).ToList();
+        }
+
+        /// <summary>
+        /// The conversation loop is fire-and-forget, so its errors are written out here instead of disappearing.
+        /// </summary>
+        private async Task RunConversationLoopAndLogErrorsAsync()
+        {
+            try
+            {
+                await RunConversationLoopAsync();
+            }
+            catch (Exception ex)
+            {
+                _conversationIsActive = false;
+                Console.WriteLine($"Actor conversation '{_conversationId}' stopped after an error: {ex}");
+            }
         }
 
         /// <summary>

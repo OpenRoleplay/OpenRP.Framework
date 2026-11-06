@@ -21,19 +21,19 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
         private readonly IDialogService _dialogService;
         private readonly IEntityManager _entityManager;
         private readonly IVehicleManager _vehicleManager;
-        private readonly BaseDataContext _context;
 
-        public EditVehicleCommand(IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, BaseDataContext context)
+        public EditVehicleCommand(IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager)
         {
             _dialogService = dialogService;
             _entityManager = entityManager;
             _vehicleManager = vehicleManager;
-            _context = context;
         }
 
+        // The database context is a method parameter, not a constructor one: systems are singletons, and a context
+        // kept for the whole server run grows and goes stale.
         [ServerCommand(PermissionGroups = new string[] { "Admin" },
             Description = "Edit a persistent vehicle that can be owned.")]
-        public void EditVehicle(Player player)
+        public void EditVehicle(Player player, BaseDataContext dataContext)
         {
             if (player.IsPlayerPlayingAsCharacter())
             {
@@ -68,7 +68,7 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
                 };
 
                 // Open the vehicle editing dialog
-                CreateOrUpdateVehicleDialog.Open(player, _dialogService, _entityManager, _vehicleManager, _context, createOrUpdateVehicleDataComponent);
+                CreateOrUpdateVehicleDialog.Open(player, _dialogService, _entityManager, _vehicleManager, dataContext, createOrUpdateVehicleDataComponent);
             }
         }
     }

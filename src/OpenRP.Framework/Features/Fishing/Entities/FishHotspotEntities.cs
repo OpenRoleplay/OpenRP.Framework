@@ -16,7 +16,7 @@ namespace OpenRP.Framework.Features.Fishing.Entities
 
         public static EntityId GenerateFishHotspotId()
         {
-            return new EntityId(FishHotspotType, FishHotspotId++);
+            return new EntityId(FishHotspotType, Interlocked.Increment(ref FishHotspotId));
         }
     }
 }

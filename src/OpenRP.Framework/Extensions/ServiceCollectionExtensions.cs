@@ -7,15 +7,19 @@ using OpenRP.Framework.Features.Actors.Extensions;
 using OpenRP.Framework.Features.Animations.Extensions;
 using OpenRP.Framework.Features.BiomeGenerator.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
+using OpenRP.Framework.Features.ChickenCoops.Extensions;
 using OpenRP.Framework.Features.Currencies.Extensions;
 using OpenRP.Framework.Features.DroppedItems.Extensions;
+using OpenRP.Framework.Features.Factions.Extensions;
 using OpenRP.Framework.Features.Skills.Extensions;
+using OpenRP.Framework.Features.Harvestables.Extensions;
 using OpenRP.Framework.Features.DebugSettingsFeature.Extensions;
 using OpenRP.Framework.Features.Fishing.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
 using OpenRP.Framework.Features.Items.Extensions;
 using OpenRP.Framework.Features.MainMenu.Extensions;
 using OpenRP.Framework.Features.Permissions.Extensions;
+using OpenRP.Framework.Features.Properties.Extensions;
 using OpenRP.Framework.Features.Vehicles.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
 using OpenRP.Framework.Shared.Chat.Extensions;
@@ -55,6 +59,10 @@ namespace OpenRP.Framework.Extensions
                 .AddCurrencies()
                 .AddDroppedItems()
                 .AddSkills()
+                .AddHarvestables()
+                .AddProperties()
+                .AddChickenCoops()
+                .AddFactions()
                 .AddDebugSettings()
                 .AddBiomeGenerator()
                 .AddCommands()
