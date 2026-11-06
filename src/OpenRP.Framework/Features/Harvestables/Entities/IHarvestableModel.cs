@@ -1,41 +1,39 @@
-﻿using SampSharp.Entities.SAMP;
+﻿using OpenRP.Framework.Features.Harvestables.Components;
+using SampSharp.Entities;
+using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Harvestables.Entities
 {
+    /// <summary>
+    /// Describes one type of harvestable plant. Derive from HarvestableModel&lt;TPlant&gt; and register it with
+    /// AddHarvestableModel&lt;T&gt;() to add a new plant.
+    /// </summary>
     public interface IHarvestableModel
     {
         /// <summary>
-        /// The name of the resource (e.g. "hemp"). Used for the /harvest command.
+        /// The name players use with /harvest, for example "hemp". One word, so the command parses cleanly.
         /// </summary>
         string ResourceName { get; }
 
         /// <summary>
-        /// The object model id of the resource.
+        /// The object models that are this plant.
         /// </summary>
         int[] ResourceObjectModelIds { get; }
 
-        /// <summary>
-        /// Create the harvestable in the world.
-        /// </summary>
-        /// <param name="position">The positions of the harvestable.</param>
-        /// <param name="rotation">The rotations of the harvestable.</param>
-        void CreateHarvestable(int modelId, Vector3 position, Vector3 rotation);
+        TimeSpan HarvestDuration { get; }
+        string HarvestAnimationLibrary { get; }
+        string HarvestAnimationName { get; }
 
         /// <summary>
-        /// Performs code at the begin of a player harvesting the resource
+        /// Adds this plant's component to the entity and returns it.
         /// </summary>
-        /// <param name="player">The player harvesting.</param>
-        void BeginHarvest(Player player);
+        HarvestablePlant AddPlant(EntityId entityId, Vector3 labelPosition);
 
         /// <summary>
-        /// Performs code at the end of a player harvesting the resource
+        /// All plants of this type in the world.
         /// </summary>
-        /// <param name="player">The player harvesting.</param>
-        void EndHarvest(Player player);
+        IEnumerable<HarvestablePlant> GetPlants();
     }
 }
