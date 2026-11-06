@@ -13,7 +13,8 @@ namespace OpenRP.Framework.Features.Vehicles.Extensions
         public static IServiceCollection AddVehicles(this IServiceCollection self)
         {
             return self
-                .AddSingleton<IVehicleManager, VehicleManager>();
+                .AddSingleton<IVehicleManager, VehicleManager>()
+                .AddSingleton<IVehicleKeyService, VehicleKeyService>();
         }
     }
 }

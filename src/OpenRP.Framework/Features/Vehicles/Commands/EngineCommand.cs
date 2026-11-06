@@ -20,33 +20,33 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Toggle your vehicle's engine status. Use /engine to toggle the engine on or off.",
             CommandGroups = new string[] { "Vehicles", "General" })]
-        public void Engine(Player player, IEntityManager entityManager, ICharacterVehicleManager characterVehicleManager, IChatService chatService, BaseDataContext baseDataContext)
+        public void Engine(Player player, IEntityManager entityManager, IVehicleKeyService vehicleKeyService, IChatService chatService, BaseDataContext baseDataContext)
         {
-            HandleEngineCommand(player, entityManager, chatService, characterVehicleManager, baseDataContext, null);
+            HandleEngineCommand(player, entityManager, chatService, vehicleKeyService, baseDataContext, null);
         }
 
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Toggle your vehicle's engine status. Use /e to toggle the engine on or off.",
             CommandGroups = new string[] { "Vehicles", "General" })]
-        public void E(Player player, IEntityManager entityManager, ICharacterVehicleManager characterVehicleManager, IChatService chatService, BaseDataContext baseDataContext)
+        public void E(Player player, IEntityManager entityManager, IVehicleKeyService vehicleKeyService, IChatService chatService, BaseDataContext baseDataContext)
         {
-            Engine(player, entityManager, characterVehicleManager, chatService, baseDataContext);
+            Engine(player, entityManager, vehicleKeyService, chatService, baseDataContext);
         }
 
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Toggle your vehicle's engine status. Use /eon to turn the engine on.",
             CommandGroups = new string[] { "Vehicles", "General" })]
-        public void EOn(Player player, IEntityManager entityManager, ICharacterVehicleManager characterVehicleManager, IChatService chatService, BaseDataContext baseDataContext)
+        public void EOn(Player player, IEntityManager entityManager, IVehicleKeyService vehicleKeyService, IChatService chatService, BaseDataContext baseDataContext)
         {
-            HandleEngineCommand(player, entityManager, chatService, characterVehicleManager, baseDataContext, true);
+            HandleEngineCommand(player, entityManager, chatService, vehicleKeyService, baseDataContext, true);
         }
 
         [ServerCommand(PermissionGroups = new string[] { "Default" },
             Description = "Toggle your vehicle's engine status. Use /eoff to turn the engine off.",
             CommandGroups = new string[] { "Vehicles", "General" })]
-        public void EOff(Player player, IEntityManager entityManager, ICharacterVehicleManager characterVehicleManager, IChatService chatService, BaseDataContext baseDataContext)
+        public void EOff(Player player, IEntityManager entityManager, IVehicleKeyService vehicleKeyService, IChatService chatService, BaseDataContext baseDataContext)
         {
-            HandleEngineCommand(player, entityManager, chatService, characterVehicleManager, baseDataContext, false);
+            HandleEngineCommand(player, entityManager, chatService, vehicleKeyService, baseDataContext, false);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
         /// <param name="player">The player executing the command.</param>
         /// <param name="entityManager">The entity manager.</param>
         /// <param name="forceEngineState">Set to true to force engine on, false to force engine off, or null to toggle.</param>
-        private void HandleEngineCommand(Player player, IEntityManager entityManager, IChatService chatService, ICharacterVehicleManager characterVehicleManager, BaseDataContext baseDataContext, bool? forceEngineState)
+        private void HandleEngineCommand(Player player, IEntityManager entityManager, IChatService chatService, IVehicleKeyService vehicleKeyService, BaseDataContext baseDataContext, bool? forceEngineState)
         {
             if (!player.IsPlayerPlayingAsCharacter() || !player.InAnyVehicle)
             {
@@ -86,7 +86,7 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
                 return;
             }
 
-            bool hasKey = characterVehicleManager.HasVehicleKey(character, vehicleDataComponent.VehicleData.Id);
+            bool hasKey = vehicleKeyService.HasVehicleKey(character, vehicleDataComponent.VehicleData.Id);
 
             if (!hasKey)
             {

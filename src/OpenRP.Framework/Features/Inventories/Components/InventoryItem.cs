@@ -19,6 +19,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
     {
         private const string InventoryKey = "INVENTORY";
         private const string SkinKey = "SKIN";
+        private const string VehicleIdKey = "VEHICLE_ID";
 
         private readonly InventoryItemModel _inventoryItemModel;
         private bool _hasChanges;
@@ -178,6 +179,18 @@ namespace OpenRP.Framework.Features.Inventories.Components
             additionalData.SetBoolean(key, value);
             _inventoryItemModel.AdditionalData = additionalData.ToString();
             ProcessChanges();
+        }
+
+        /// <summary>
+        /// The vehicle this key opens, or null when the item isn't a vehicle key.
+        /// </summary>
+        public ulong? GetVehicleId()
+        {
+            if (!GetItem().IsItemVehicleKey())
+            {
+                return null;
+            }
+            return GetAdditionalData().GetUlong(VehicleIdKey);
         }
 
         /// <summary>
