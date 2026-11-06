@@ -15,13 +15,17 @@ namespace OpenRP.Framework.Features.Accounts.Services
 {
     public class AccountService : IAccountService
     {
+        private const string AlreadyLoggedInError = "This account is already logged in. If you just disconnected or the server restarted, try again in a few minutes.";
+
         private BaseDataContext _dataContext;
         private IServerEventAggregator _serverEventAggregator;
+        private readonly IAccountSessionService _accountSessionService;
 
-        public AccountService(BaseDataContext context, IServerEventAggregator serverEventAggregator)
+        public AccountService(BaseDataContext context, IServerEventAggregator serverEventAggregator, IAccountSessionService accountSessionService)
         {
             _dataContext = context;
             _serverEventAggregator = serverEventAggregator;
+            _accountSessionService = accountSessionService;
         }
 
         public bool DoesAccountExist(string username)
@@ -75,9 +79,17 @@ namespace OpenRP.Framework.Features.Accounts.Services
             return false;
         }
 
-        public async Task LoginPlayer(Player player, string username)
+        public async Task<string?> LoginPlayer(Player player, string username)
         {
-            AccountModel accountModel = GetAccountByUsername(username);
+            AccountModel? accountModel = GetAccountByUsername(username);
+            if (accountModel == null)
+            {
+                return "This account doesn't exist.";
+            }
+            if (!_accountSessionService.TryClaimSession(accountModel.Id))
+            {
+                return AlreadyLoggedInError;
+            }
 
             Account accountComponent = player.AddComponent<Account>(accountModel);
 
@@ -87,6 +99,7 @@ namespace OpenRP.Framework.Features.Accounts.Services
                 Account = accountComponent
             };
             await _serverEventAggregator.PublishAsync(eventArgs);
+            return null;
         }
 
         public bool CreateAccount(Player player, string username, string password)

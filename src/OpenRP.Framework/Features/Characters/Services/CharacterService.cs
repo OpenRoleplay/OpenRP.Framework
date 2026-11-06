@@ -41,6 +41,15 @@ namespace OpenRP.Framework.Features.Characters.Services
                 .ToList();
         }
 
+        public Dictionary<ulong, string> GetCharacterNames(IEnumerable<ulong> characterIds)
+        {
+            List<ulong> ids = characterIds.Distinct().ToList();
+            return _dataContext.Characters
+                .AsNoTracking()
+                .Where(character => ids.Contains(character.Id))
+                .ToDictionary(character => character.Id, character => $"{character.FirstName} {character.LastName}");
+        }
+
         /// <summary>
         /// Saves a new character for the account. BaseDataContext gives every new character an inventory.
         /// </summary>

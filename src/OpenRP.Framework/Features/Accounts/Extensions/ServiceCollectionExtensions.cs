@@ -16,6 +16,7 @@ namespace OpenRP.Framework.Features.Accounts.Extensions
         {
             return self
                 .AddSingleton<IAccountService, AccountService>()
+                .AddSingleton<IAccountSessionService, AccountSessionService>()
                 .AddTransient<IAccountDialogService, AccountDialogService>();
         }
     }

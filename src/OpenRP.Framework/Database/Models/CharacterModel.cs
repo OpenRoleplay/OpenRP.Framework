@@ -20,7 +20,7 @@ namespace OpenRP.Framework.Database.Models
         public List<CharacterSkillModel> Skills { get; set; }
         public CharacterPreferencesModel? Preferences { get; set; }
         public List<VehicleModel>? Vehicles { get; set; }
-        public List<CharacterFactionModel>? Factions { get; set; }
+        public List<FactionMemberModel>? Factions { get; set; }
 
         // Constructor
         public CharacterModel()

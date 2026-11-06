@@ -1,5 +1,8 @@
 using OpenRP.Framework.Features.Factions.Services;
+using OpenRP.Framework.Features.Permissions.Services;
+using OpenRP.Framework.Shared.BaseManager.Helpers;
 using SampSharp.Entities;
+using System.Collections.Generic;
 
 namespace OpenRP.Framework.Features.Factions.Systems
 {
@@ -7,22 +10,31 @@ namespace OpenRP.Framework.Features.Factions.Systems
     {
         private const int SyncIntervalInMilliseconds = 60000;
 
-        [Event]
-        public void OnGameModeInit(IFactionManager factionManager)
+        // Parents first: faction permissions, ranks and members are child entities of their faction, rank permissions of their rank.
+        private readonly List<IBaseManager> _managersInLoadOrder;
+
+        public FactionSystem(IFactionManager factionManager, IFactionPermissionManager factionPermissionManager, IFactionRankManager factionRankManager, IFactionRankPermissionManager factionRankPermissionManager, IFactionMemberManager factionMemberManager)
         {
-            factionManager.LoadAll();
+            _managersInLoadOrder = new List<IBaseManager> { factionManager, factionPermissionManager, factionRankManager, factionRankPermissionManager, factionMemberManager };
+        }
+
+        [Event]
+        public void OnGameModeInit(IFactionPermissionService factionPermissionService, IPermissionService permissionService)
+        {
+            factionPermissionService.Initialize(permissionService);
+            _managersInLoadOrder.ForEach(manager => manager.LoadAll());
         }
 
         [Timer(SyncIntervalInMilliseconds)]
-        public void ProcessChanges(IFactionManager factionManager)
+        public void ProcessChanges()
         {
-            factionManager.ProcessChanges();
+            _managersInLoadOrder.ForEach(manager => manager.ProcessChanges());
         }
 
         [Event]
-        public void OnGameModeExit(IFactionManager factionManager)
+        public void OnGameModeExit()
         {
-            factionManager.SaveNow();
+            _managersInLoadOrder.ForEach(manager => manager.SaveNow());
         }
     }
 }

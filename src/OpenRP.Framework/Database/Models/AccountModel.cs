@@ -15,6 +15,17 @@ namespace OpenRP.Framework.Database.Models
         public uint Level { get; set; }
         public uint Experience { get; set; }
 
+        /// <summary>
+        /// True while the account is logged in on a server. Only counts while LastSeenAt is recent: a crashed server
+        /// can't reset it, so it expires instead.
+        /// </summary>
+        public bool IsOnline { get; set; }
+
+        /// <summary>
+        /// When the server the account is logged in on last confirmed it's still online (UTC).
+        /// </summary>
+        public DateTime? LastSeenAt { get; set; }
+
         // Navigational Properties
         public List<CharacterModel> Characters { get; set; }
 

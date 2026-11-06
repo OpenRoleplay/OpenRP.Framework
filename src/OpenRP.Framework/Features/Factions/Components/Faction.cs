@@ -1,4 +1,5 @@
 using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Features.Factions.Enums;
 using OpenRP.Framework.Shared.BaseManager.Entities;
 using SampSharp.Entities;
 
@@ -53,6 +54,31 @@ namespace OpenRP.Framework.Features.Factions.Components
         public bool HasParentFaction()
         {
             return _factionModel.ParentFactionId.HasValue;
+        }
+
+        /// <summary>
+        /// Moves this faction under another faction, or to the top with null. The new parent controls it from then on.
+        /// </summary>
+        public void SetParentFactionId(ulong? parentFactionId)
+        {
+            _factionModel.ParentFactionId = parentFactionId;
+            ProcessChanges();
+        }
+
+        public FactionType GetFactionType()
+        {
+            return _factionModel.Type;
+        }
+
+        public bool IsGovernment()
+        {
+            return _factionModel.Type == FactionType.Government;
+        }
+
+        public void SetFactionType(FactionType type)
+        {
+            _factionModel.Type = type;
+            ProcessChanges();
         }
     }
 }

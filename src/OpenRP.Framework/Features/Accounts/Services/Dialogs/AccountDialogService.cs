@@ -1,4 +1,5 @@
-﻿using OpenRP.Framework.Database.Models;
+﻿using Microsoft.Extensions.Logging;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Accounts.Components;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Shared.Dialogs.Helpers;
@@ -21,11 +22,13 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
         private IDialogService _dialogService;
         private IAccountService _accountService;
         private IActorConversationWithPlayerManager _actorConversationWithPlayerManager;
-        public AccountDialogService(IDialogService dialogService, IAccountService accountService, IActorConversationWithPlayerManager actorConversationWithPlayerManager)
+        private readonly ILogger<AccountDialogService> _logger;
+        public AccountDialogService(IDialogService dialogService, IAccountService accountService, IActorConversationWithPlayerManager actorConversationWithPlayerManager, ILogger<AccountDialogService> logger)
         {
             _dialogService = dialogService;
             _accountService = accountService;
             _actorConversationWithPlayerManager = actorConversationWithPlayerManager;
+            _logger = logger;
         }
         public void OpenLoginAskUsernameDialog(Player player, Action onGoBack)
         {
@@ -76,6 +79,31 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
             _dialogService.Show(player.Entity, loginDialog, StepOneDialogHandler);
         }
 
+        /// <summary>
+        /// Async void because it's started from a dialog response; errors are caught and shown here instead of being lost.
+        /// </summary>
+        private async void LoginOrShowError(Player player, string username, Action onGoBack)
+        {
+            string? error;
+            try
+            {
+                error = await _accountService.LoginPlayer(player, username);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Logging {Username} in failed.", username);
+                error = "Logging in failed. Please try again.";
+            }
+
+            if (error != null)
+            {
+                BetterMessageDialog loginFailedDialog = new BetterMessageDialog("Back");
+                loginFailedDialog.SetTitle(TitleType.Children, "Login", "Not possible");
+                loginFailedDialog.SetContent(error);
+                _dialogService.Show(player.Entity, loginFailedDialog, _ => onGoBack?.Invoke());
+            }
+        }
+
         public void OpenLoginAskPasswordDialog(Player player, string username, Action onGoBack)
         {
             BetterInputDialog loginDialog = new BetterInputDialog("Continue", "Go Back");
@@ -90,7 +118,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                 {
                     if (_accountService.CheckPassword(username, r.InputText))
                     {
-                        _accountService.LoginPlayer(player, username);
+                        LoginOrShowError(player, username, onGoBack);
                     }
                     else
                     {

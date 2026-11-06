@@ -6,6 +6,7 @@ using OpenRP.Framework.Features.Characters.Models.Configuration;
 using OpenRP.Framework.Features.Currencies.Models.Configuration;
 using OpenRP.Framework.Features.Currencies.Models.DefaultData;
 using OpenRP.Framework.Features.DroppedItems.Models.Configurations;
+using OpenRP.Framework.Features.Factions.Models.Configurations;
 using OpenRP.Framework.Features.Fishing.Models;
 using OpenRP.Framework.Features.Inventories.Models.Configurations;
 using OpenRP.Framework.Features.Inventories.Models.DefaultData;
@@ -37,6 +38,11 @@ namespace OpenRP.Framework.Extensions
 
             modelBuilder.ApplyConfiguration(new DroppedInventoryItemModelConfiguration());
 
+            modelBuilder.ApplyConfiguration(new FactionRankModelConfiguration());
+            modelBuilder.ApplyConfiguration(new FactionMemberModelConfiguration());
+            modelBuilder.ApplyConfiguration(new FactionRankPermissionModelConfiguration());
+            modelBuilder.ApplyConfiguration(new FactionPermissionModelConfiguration());
+
             modelBuilder.ApplyConfiguration(new ActorModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new FishLootModelConfiguration());
@@ -48,6 +54,7 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new ItemModelConfiguration());
             modelBuilder.ApplyConfiguration(new ItemModelDefaultData());
 
+            modelBuilder.ApplyConfiguration(new PermissionModelConfiguration());
             modelBuilder.ApplyConfiguration(new CharacterPermissionGroupModelConfiguration());
             modelBuilder.ApplyConfiguration(new PermissionGroupModelConfiguration());
             modelBuilder.ApplyConfiguration(new PermissionGroupPermissionModelConfiguration());

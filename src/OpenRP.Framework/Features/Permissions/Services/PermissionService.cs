@@ -5,6 +5,7 @@ using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Features.Commands.Attributes;
 using OpenRP.Framework.Features.Commands.Helpers;
 using OpenRP.Framework.Features.Permissions.Components;
+using OpenRP.Framework.Features.Permissions.Entities;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -19,11 +20,13 @@ namespace OpenRP.Framework.Features.Permissions.Services
     {
         private IEntityManager _entityManager;
         private BaseDataContext _dataContext;
+        private readonly List<ICharacterPermissionSource> _permissionSources;
 
-        public PermissionService(IEntityManager entityManager, BaseDataContext dataContext)
+        public PermissionService(IEntityManager entityManager, BaseDataContext dataContext, IEnumerable<ICharacterPermissionSource> permissionSources)
         {
             _entityManager = entityManager;
             _dataContext = dataContext;
+            _permissionSources = permissionSources.ToList();
         }
 
         public CharacterPermissions ReloadCharacterPermissions(Character character)
@@ -52,6 +55,7 @@ namespace OpenRP.Framework.Features.Permissions.Services
             List<PermissionModel> permissions = new List<PermissionModel>();
 
             permissions.AddRange(GetCharacterPermissionGroups(characterId));
+            permissions.AddRange(GetPermissionsFromSources(characterId));
 
             // Merge duplicates
             permissions = permissions.GroupBy(i => i.Name, (key, value) => value.OrderBy(e => e.Name).First()).ToList();
@@ -94,6 +98,68 @@ namespace OpenRP.Framework.Features.Permissions.Services
             return false;
         }
 
+        /// <summary>
+        /// The permissions that other features (for example faction ranks) give the character.
+        /// </summary>
+        private List<PermissionModel> GetPermissionsFromSources(ulong characterId)
+        {
+            List<string> names = _permissionSources.SelectMany(source => source.GetPermissions(characterId)).Distinct().ToList();
+            if (names.Count == 0)
+            {
+                return new List<PermissionModel>();
+            }
+            return _dataContext.Permissions.AsNoTracking().Where(permission => names.Contains(permission.Name)).ToList();
+        }
+
+        public PermissionModel CreatePermissionIfNotExists(string name, string description)
+        {
+            PermissionModel? permission = _dataContext.Permissions.FirstOrDefault(p => p.Name == name);
+            if (permission != null)
+            {
+                return permission;
+            }
+
+            try
+            {
+                permission = new PermissionModel { Name = name, Description = description };
+                _dataContext.Permissions.Add(permission);
+                _dataContext.SaveChanges();
+                return permission;
+            }
+            catch (DbUpdateException)
+            {
+                // Another server created it at the same moment; the unique name makes our insert fail, so use theirs.
+                _dataContext.ChangeTracker.Clear();
+                return _dataContext.Permissions.First(p => p.Name == name);
+            }
+        }
+
+        public List<PermissionModel> GetAllPermissions()
+        {
+            return _dataContext.Permissions.AsNoTracking().ToList();
+        }
+
+        public List<ulong> GetPermissionGroupPermissionIds(string groupName)
+        {
+            return _dataContext.PermissionGroupPermissions
+                .AsNoTracking()
+                .Where(groupPermission => groupPermission.PermissionGroup.Name == groupName)
+                .Select(groupPermission => groupPermission.PermissionId)
+                .ToList();
+        }
+
+        public void AddPermissionToGroupIfMissing(ulong permissionId, string groupName)
+        {
+            PermissionGroupModel? group = _dataContext.PermissionGroups.FirstOrDefault(permissionGroup => permissionGroup.Name == groupName);
+            if (group == null || _dataContext.PermissionGroupPermissions.Any(groupPermission => groupPermission.PermissionGroupId == group.Id && groupPermission.PermissionId == permissionId))
+            {
+                return;
+            }
+
+            _dataContext.PermissionGroupPermissions.Add(new PermissionGroupPermissionModel { PermissionGroupId = group.Id, PermissionId = permissionId, GamemodeManaged = true });
+            _dataContext.SaveChanges();
+        }
+
         public void CreateDatabaseCommandPermissionsIfNotExists()
         {
             Console.WriteLine("\nBegin Gamemode Automatic Command Permission Management");
@@ -118,21 +184,7 @@ namespace OpenRP.Framework.Features.Permissions.Services
                             try
                             {
                                 // Retrieve or create the PermissionModel
-                                var permission = _dataContext.Permissions
-                                    .FirstOrDefault(p => p.Name == permissionName);
-
-                                if (permission == null)
-                                {
-                                    permission = new PermissionModel
-                                    {
-                                        Name = permissionName
-                                        ,
-                                        Description = $"This permission grants the ability to use the /{commandName.ToLower()} command."
-                                    };
-                                    _dataContext.Permissions.Add(permission);
-                                    Console.WriteLine($"Created permission for command: {commandName} (new permission = {permissionName}).");
-                                    _dataContext.SaveChanges(); // Save to generate the ID if it's auto-generated
-                                }
+                                var permission = CreatePermissionIfNotExists(permissionName, $"This permission grants the ability to use the /{commandName.ToLower()} command.");
 
                                 // Update description if it has none.
                                 if (String.IsNullOrEmpty(permission.Description))

@@ -29,6 +29,12 @@ namespace OpenRP.Framework.Features.Permissions.Models.DefaultData
                 {
                     Id = 3
                     , Name = "Tester"
+                },
+                // Not given to characters: its permissions are the ones every faction has.
+                new PermissionGroupModel
+                {
+                    Id = 4
+                    , Name = "Faction"
                 }
             );
         }

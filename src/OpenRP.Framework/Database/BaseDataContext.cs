@@ -33,6 +33,10 @@ namespace OpenRP.Framework.Database
         public DbSet<PropertyDoorModel> PropertyDoors { get; set; }
         public DbSet<MainMenuSceneModel> MainMenuScenes { get; set; }
         public DbSet<FactionModel> Factions { get; set; }
+        public DbSet<FactionRankModel> FactionRanks { get; set; }
+        public DbSet<FactionMemberModel> FactionMembers { get; set; }
+        public DbSet<FactionRankPermissionModel> FactionRankPermissions { get; set; }
+        public DbSet<FactionPermissionModel> FactionPermissions { get; set; }
         public DbSet<VehicleModelModel> VehicleModels { get; set; }
         public DbSet<VehicleModelDefaultColorModel> VehicleModelDefaultColors { get; set; }
         public DbSet<VehicleModelSpawnTypeModel> VehicleModelSpawnTypes { get; set; }

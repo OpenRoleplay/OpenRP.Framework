@@ -1,4 +1,5 @@
 ﻿using OpenRP.Framework.Database.Entities;
+using OpenRP.Framework.Features.Factions.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace OpenRP.Framework.Database.Models
     {
         public string Name { get; set; }
         public ulong? ParentFactionId { get; set; }
+        public FactionType Type { get; set; }
 
         // Navigational Properties
         public FactionModel ParentFaction { get; set; }

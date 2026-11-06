@@ -8,6 +8,11 @@ namespace OpenRP.Framework.Features.Characters.Services
     public interface ICharacterService
     {
         List<CharacterModel> GetCharactersByAccountId(ulong accountId);
+
+        /// <summary>
+        /// The "First Last" names of these characters, online or not, by character id.
+        /// </summary>
+        Dictionary<ulong, string> GetCharacterNames(IEnumerable<ulong> characterIds);
         bool CreateCharacter(Account account, CharacterModel newCharacter);
         Character? LoadCharacter(Player player, ulong characterId);
         Task SelectCharacterAsync(Player player, ulong characterId);
