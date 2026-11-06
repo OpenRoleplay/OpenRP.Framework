@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Inventories.Services;
 using OpenRP.Framework.Shared.Commands.Services;
+using OpenRP.Framework.Shared.Commands.Services.Dialogs;
 using SampSharp.Entities.SAMP.Commands;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,8 @@ namespace OpenRP.Framework.Shared.Commands.Extensions
         public static IServiceCollection AddCommands(this IServiceCollection self)
         {
             return self
-                .AddSingleton<IPlayerCommandService, PlayerServerCommandService>();
+                .AddSingleton<IPlayerCommandService, PlayerServerCommandService>()
+                .AddSingleton<IHelpDialogService, HelpDialogService>();
         }
     }
 }
