@@ -17,6 +17,7 @@ using OpenRP.Framework.Features.Inventories.Extensions;
 using OpenRP.Framework.Features.Items.Extensions;
 using OpenRP.Framework.Features.MainMenu.Extensions;
 using OpenRP.Framework.Features.Permissions.Extensions;
+using OpenRP.Framework.Features.Properties.Extensions;
 using OpenRP.Framework.Features.Vehicles.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
 using OpenRP.Framework.Shared.Chat.Extensions;
@@ -57,6 +58,7 @@ namespace OpenRP.Framework.Extensions
                 .AddDroppedItems()
                 .AddSkills()
                 .AddHarvestables()
+                .AddProperties()
                 .AddDebugSettings()
                 .AddBiomeGenerator()
                 .AddCommands()

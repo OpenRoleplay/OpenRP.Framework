@@ -46,6 +46,11 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         protected abstract TModel GetModelFromComponent(TComponent component);
         protected virtual EntityId? GetParentEntityId(TModel model) => null;
 
+        /// <summary>
+        /// Called whenever a component is loaded or reloaded from its row, for example to create its objects or labels.
+        /// </summary>
+        protected virtual void OnComponentLoaded(TComponent component) { }
+
         public int LoadAll()
         {
             _logger.LogInformation($"Begin loading all {typeof(TModel).Name} from database.");
@@ -366,7 +371,7 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             }
 
             _entityManager.Destroy<TComponent>(entityId);
-            _entityManager.AddComponent<TComponent>(entityId, model);
+            OnComponentLoaded(_entityManager.AddComponent<TComponent>(entityId, model));
         }
 
         private TComponent CreateEntityWithComponent(TModel model)
@@ -381,7 +386,9 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
             {
                 _entityManager.Create(entityId);
             }
-            return _entityManager.AddComponent<TComponent>(entityId, model);
+            TComponent component = _entityManager.AddComponent<TComponent>(entityId, model);
+            OnComponentLoaded(component);
+            return component;
         }
 
         /// <summary>
