@@ -7,6 +7,7 @@ using OpenRP.Framework.Features.Actors.Extensions;
 using OpenRP.Framework.Features.Animations.Extensions;
 using OpenRP.Framework.Features.BiomeGenerator.Extensions;
 using OpenRP.Framework.Features.Characters.Extensions;
+using OpenRP.Framework.Features.ChickenCoops.Extensions;
 using OpenRP.Framework.Features.Currencies.Extensions;
 using OpenRP.Framework.Features.DroppedItems.Extensions;
 using OpenRP.Framework.Features.Skills.Extensions;
@@ -59,6 +60,7 @@ namespace OpenRP.Framework.Extensions
                 .AddSkills()
                 .AddHarvestables()
                 .AddProperties()
+                .AddChickenCoops()
                 .AddDebugSettings()
                 .AddBiomeGenerator()
                 .AddCommands()

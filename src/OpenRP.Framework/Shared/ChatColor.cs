@@ -21,6 +21,7 @@ namespace OpenRP.Framework.Shared
         public const string EstorilBlue = "{2F539B}";
         public const string WarmYellow = "{9C772F}";
         public const string ButterflyBlue = "{38ACEC}";
+        public const string LightGray = "{D3D3D3}";
 
         // Open Roleplay Colors
         public const string Main = CornflowerBlue; // Reusing the value from CornflowerBlue

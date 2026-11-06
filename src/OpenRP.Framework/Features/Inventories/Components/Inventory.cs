@@ -354,8 +354,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
                 AdditionalData = additionalData,
             };
 
-            int newInventoryItemId = InventoryNewEntities.GenerateNewInventoryItemId();
-            EntityId newInventoryItemEntityId = InventoryEntities.GetInventoryItemId(newInventoryItemId);
+            EntityId newInventoryItemEntityId = UnsavedEntities.GenerateUnsavedId();
 
             Manager.Create(newInventoryItemEntityId, Entity);
             Manager.AddComponent<InventoryItem>(newInventoryItemEntityId, inventoryItemModel);
