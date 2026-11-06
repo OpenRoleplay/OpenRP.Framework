@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenRP.Framework.Database.Extensions;
 
 namespace OpenRP.Framework.Features.Currencies.Models.DefaultData
 {
@@ -13,7 +14,7 @@ namespace OpenRP.Framework.Features.Currencies.Models.DefaultData
     {
         public void Configure(EntityTypeBuilder<CurrencyModel> builder)
         {
-            builder.HasData(
+            builder.HasDefaultData(
                 new CurrencyModel
                 {
                     Id = 1

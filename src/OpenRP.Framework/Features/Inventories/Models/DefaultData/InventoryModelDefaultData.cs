@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenRP.Framework.Database.Extensions;
 
 namespace OpenRP.Framework.Features.Inventories.Models.DefaultData
 {
@@ -13,7 +14,7 @@ namespace OpenRP.Framework.Features.Inventories.Models.DefaultData
     {
         public void Configure(EntityTypeBuilder<InventoryModel> builder)
         {
-            builder.HasData(
+            builder.HasDefaultData(
                 new InventoryModel
                 {
                     Id = 1
