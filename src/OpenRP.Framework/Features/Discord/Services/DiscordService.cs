@@ -1,4 +1,4 @@
-﻿using SampSharp.Entities.SAMP;
+using SampSharp.Entities.SAMP;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,8 @@ using OpenRP.Framework.Features.CDN.Entities;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using OpenRP.Framework.Features.Discord.Entities;
-using System.Threading.Channels;
+using Microsoft.Extensions.Logging;
+using OpenRP.Framework.Features.Discord.Helpers;
 
 namespace OpenRP.Framework.Features.Discord.Services
 {
@@ -22,12 +23,17 @@ namespace OpenRP.Framework.Features.Discord.Services
         private readonly DiscordOptions _options;
         private readonly Task? _initializationTask;
         private readonly IServerService _serverService;
+        private readonly IDiscordChannelNameQueue _channelNameQueue;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<DiscordService> _logger;
 
-        // Private constructor to enforce the use of the factory method
-        public DiscordService(IOptions<DiscordOptions> options, IEntityManager entityManager, IServerService serverService)
+        public DiscordService(IOptions<DiscordOptions> options, IEntityManager entityManager, IServerService serverService, IDiscordChannelNameQueue channelNameQueue, ILoggerFactory loggerFactory, ILogger<DiscordService> logger)
         {
             _entityManager = entityManager;
             _serverService = serverService;
+            _channelNameQueue = channelNameQueue;
+            _loggerFactory = loggerFactory;
+            _logger = logger;
             _options = options.Value;
             if (!String.IsNullOrEmpty(_options.DiscordBotToken))
             {
@@ -42,7 +48,9 @@ namespace OpenRP.Framework.Features.Discord.Services
             {
                 Token = _options.DiscordBotToken,
                 TokenType = TokenType.Bot,
-                Intents = DiscordIntents.AllUnprivileged | DiscordIntents.MessageContents
+                Intents = DiscordIntents.AllUnprivileged | DiscordIntents.MessageContents,
+                // Without this, DSharpPlus only writes to the console, so rate limit warnings never reach the logs.
+                LoggerFactory = _loggerFactory
             };
 
             _discordClient = new DiscordClient(discordConfiguration);
@@ -247,91 +255,79 @@ namespace OpenRP.Framework.Features.Discord.Services
             return System.Threading.Tasks.Task.CompletedTask;
         }
 
-        public async Task<bool> UpdatePlayerCount(bool decrease = false)
+        public void UpdatePlayerCount(bool decrease = false)
         {
-            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
+            if (!IsConfigured() || _options.PlayerCountChannelId == default)
             {
-                // Ensure the client is initialized and connected
-                await _initializationTask;
-
-                // Get player count
-                int playerCount = _entityManager.GetComponents<Player>().Count();
-                if (decrease)
-                {
-                    playerCount--;
-                }
-
-                string playerCountString = $"Players Online: {playerCount}/{_serverService.MaxPlayers}";
-
-
-                try
-                {
-                    // Get the channel by its ID
-                    // Retrieve the channel
-                    var channel = await _discordClient.GetChannelAsync(_options.PlayerCountChannelId);
-                    if (channel == null)
-                    {
-                        Console.WriteLine($"Channel with ID {_options.PlayerCountChannelId} not found.");
-                        return false;
-                    }
-
-                    // Change its name to "new-channel-name"
-                    await channel.ModifyAsync(x => x.Name = playerCountString);
-
-
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error updating channel: {ex}");
-                    return false;
-                }
+                return;
             }
-            return false;
+
+            int playerCount = _entityManager.GetComponents<Player>().Count();
+            if (decrease)
+            {
+                playerCount--;
+            }
+            _channelNameQueue.SetChannelName(_options.PlayerCountChannelId, DiscordChannelNames.GetPlayerCountName(playerCount, _serverService.MaxPlayers), DateTime.UtcNow);
         }
 
-        public async Task<bool> UpdateDateTime(DateTime date, TimeSpan time)
+        public void UpdateDateTime(DateTime date, TimeSpan time)
         {
-
-            if (!String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null)
+            if (!IsConfigured() || _options.ServerDateTimeChannelId == default)
             {
-                // Ensure the client is initialized and connected.
-                await _initializationTask;
-
-                // Build the desired channel names.
-                string serverDateString = $"Server Date: {date:dd/MM/yyyy}";
-                string serverTimeString = $"Server Time: {time.Hours:D2}:{time.Minutes:D2}";
-
-                bool updated = false;
-
-                // Update the date channel name if configured.
-                if (_options.ServerDateChannelId != default(ulong))
-                {
-                    var dateChannel = await _discordClient.GetChannelAsync(_options.ServerDateChannelId);
-                    if (dateChannel != null && dateChannel.Name != serverDateString)
-                    {
-                        // Modify the channel's name.
-                        await dateChannel.ModifyAsync(m => m.Name = serverDateString);
-                        updated = true;
-                    }
-                }
-
-                // Update the time channel name if configured.
-                if (_options.ServerTimeChannelId != default(ulong))
-                {
-                    var timeChannel = await _discordClient.GetChannelAsync(_options.ServerTimeChannelId);
-                    if (timeChannel != null && timeChannel.Name != serverTimeString)
-                    {
-                        // Modify the channel's name.
-                        await timeChannel.ModifyAsync(m => m.Name = serverTimeString);
-                        updated = true;
-                    }
-                }
-
-                return updated;
+                return;
             }
-            return false;
+            _channelNameQueue.SetChannelName(_options.ServerDateTimeChannelId, DiscordChannelNames.GetServerDateTimeName(date, time), DateTime.UtcNow);
         }
 
+        public async Task SendNextChannelRenameAsync()
+        {
+            if (!IsConfigured())
+            {
+                return;
+            }
+
+            DiscordChannelRename? rename = _channelNameQueue.TakeNextRename(DateTime.UtcNow);
+            if (rename == null)
+            {
+                return;
+            }
+
+            try
+            {
+                bool renamed = await RenameChannelAsync(rename.ChannelId, rename.Name);
+                _channelNameQueue.MarkRenamed(rename, renamed ? DateTime.UtcNow : null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to rename Discord channel {ChannelId} to {Name}; it stays in the queue.", rename.ChannelId, rename.Name);
+                _channelNameQueue.MarkRenameFailed(rename);
+            }
+        }
+
+        private bool IsConfigured()
+        {
+            return !String.IsNullOrEmpty(_options.DiscordBotToken) && _initializationTask != null;
+        }
+
+        /// <summary>
+        /// Renames the channel, and returns whether Discord had to be asked (false when it already has the name).
+        /// </summary>
+        private async Task<bool> RenameChannelAsync(ulong channelId, string name)
+        {
+            await _initializationTask!;
+
+            DiscordChannel channel = await _discordClient.GetChannelAsync(channelId);
+            if (channel == null)
+            {
+                throw new InvalidOperationException($"Channel with ID {channelId} not found.");
+            }
+            if (channel.Name == name)
+            {
+                return false;
+            }
+
+            await channel.ModifyAsync(model => model.Name = name);
+            return true;
+        }
     }
 }

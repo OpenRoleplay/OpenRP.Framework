@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,9 @@ namespace OpenRP.Framework.Features.Discord.Entities
         public ulong GeneralChatChannelId { get; set; }
         public ulong SupportChannelId { get; set; }
         public ulong PlayerCountChannelId { get; set; }
-        public ulong ServerDateChannelId { get; set; }
-        public ulong ServerTimeChannelId { get; set; }
+        /// <summary>
+        /// The channel whose name shows the in-game date and time.
+        /// </summary>
+        public ulong ServerDateTimeChannelId { get; set; }
     }
 }

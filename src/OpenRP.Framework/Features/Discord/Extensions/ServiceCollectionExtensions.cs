@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.CDN.Entities;
 using OpenRP.Framework.Features.CDN.Services;
 using OpenRP.Framework.Features.Discord.Entities;
@@ -21,7 +21,7 @@ namespace OpenRP.Framework.Features.Discord.Extensions
             // Configure the options using the provided delegate
             services.Configure(configureOptions);
 
-            // Register the CDN service as a singleton
+            services.AddSingleton<IDiscordChannelNameQueue, DiscordChannelNameQueue>();
             services.AddSingleton<IDiscordService, DiscordService>();
 
             return services;
