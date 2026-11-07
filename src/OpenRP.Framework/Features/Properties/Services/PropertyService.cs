@@ -5,6 +5,7 @@ using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Streamer;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OpenRP.Framework.Features.Properties.Services
@@ -41,17 +42,17 @@ namespace OpenRP.Framework.Features.Properties.Services
                 return;
             }
 
-            MovePlayerThroughDoor(player, linkedDoor);
+            MovePlayerToDoor(player, linkedDoor);
         }
 
         public PropertyDoor? GetNearbyDoor(Player player)
         {
-            return _entityManager.GetComponents<PropertyDoor>().FirstOrDefault(door => IsPlayerAtDoor(player, door));
+            return GetDoors().FirstOrDefault(door => IsPlayerAtDoor(player, door));
         }
 
         public PropertyDoor? GetDoor(ulong doorId)
         {
-            return _entityManager.GetComponents<PropertyDoor>().FirstOrDefault(door => door.GetId() == doorId);
+            return GetDoors().FirstOrDefault(door => door.GetId() == doorId);
         }
 
         public int GetDoorVirtualWorld(PropertyDoor door)
@@ -64,9 +65,17 @@ namespace OpenRP.Framework.Features.Properties.Services
             return _virtualWorldManager.GetPropertyVirtualWorld(property.GetId());
         }
 
+        public void MovePlayerToDoor(Player player, PropertyDoor door)
+        {
+            player.Interior = door.GetInterior();
+            player.VirtualWorld = GetDoorVirtualWorld(door);
+            player.Position = door.GetPosition();
+            player.Angle = door.GetAngle();
+        }
+
         public void CreateDoorLabel(PropertyDoor door)
         {
-            DestroyDoorLabels(door);
+            DestroyDoorLabel(door);
             _streamerService.CreateDynamicTextLabel(
                 door.GetLabelText(),
                 Color.White,
@@ -77,12 +86,20 @@ namespace OpenRP.Framework.Features.Properties.Services
                 parent: door.Entity);
         }
 
-        private void DestroyDoorLabels(PropertyDoor door)
+        public void DestroyDoorLabel(PropertyDoor door)
         {
             foreach (DynamicTextLabel label in door.GetComponentsInChildren<DynamicTextLabel>().ToList())
             {
                 _entityManager.Destroy(label.Entity);
             }
+        }
+
+        /// <summary>
+        /// Deleted doors stay loaded until the next save, but are already gone from the game.
+        /// </summary>
+        private IEnumerable<PropertyDoor> GetDoors()
+        {
+            return _entityManager.GetComponents<PropertyDoor>().Where(door => !door.IsDeleted());
         }
 
         /// <summary>
@@ -99,14 +116,6 @@ namespace OpenRP.Framework.Features.Properties.Services
         {
             ulong? linkedDoorId = door.GetLinkedDoorId();
             return linkedDoorId.HasValue ? GetDoor(linkedDoorId.Value) : null;
-        }
-
-        private void MovePlayerThroughDoor(Player player, PropertyDoor linkedDoor)
-        {
-            player.Interior = linkedDoor.GetInterior();
-            player.VirtualWorld = GetDoorVirtualWorld(linkedDoor);
-            player.Position = linkedDoor.GetPosition();
-            player.Angle = linkedDoor.GetAngle();
         }
     }
 }

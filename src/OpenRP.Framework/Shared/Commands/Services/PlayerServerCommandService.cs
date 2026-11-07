@@ -16,6 +16,8 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Shared.Chat.Extensions;
+using OpenRP.Framework.Shared.Commands.Helpers;
+using SampSharp.Entities.SAMP.Commands.Parsers;
 
 namespace OpenRP.Framework.Shared.Commands.Services
 {
@@ -39,6 +41,18 @@ namespace OpenRP.Framework.Shared.Commands.Services
             var type = parameters[0]
                 .ParameterType;
             return type == typeof(EntityId) || typeof(Component).IsAssignableFrom(type);
+        }
+
+        /// <summary>
+        /// Floats are read the same on every server culture; see <see cref="InvariantFloatParser"/>.
+        /// </summary>
+        protected override ICommandParameterParser CreateParameterParser(ParameterInfo[] parameters, int index)
+        {
+            if (parameters[index].ParameterType == typeof(float))
+            {
+                return new InvariantFloatParser();
+            }
+            return base.CreateParameterParser(parameters, index);
         }
 
         /// <inheritdoc />

@@ -26,8 +26,18 @@ namespace OpenRP.Framework.Features.Properties.Services
         int GetDoorVirtualWorld(PropertyDoor door);
 
         /// <summary>
+        /// Puts the player at the door, in its interior and virtual world, facing the way the door faces.
+        /// </summary>
+        void MovePlayerToDoor(Player player, PropertyDoor door);
+
+        /// <summary>
         /// Creates the text label above the door, replacing the one it had.
         /// </summary>
         void CreateDoorLabel(PropertyDoor door);
+
+        /// <summary>
+        /// Removes the text label above the door.
+        /// </summary>
+        void DestroyDoorLabel(PropertyDoor door);
     }
 }

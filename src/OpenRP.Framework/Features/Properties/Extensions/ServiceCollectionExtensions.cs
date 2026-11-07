@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Properties.Services;
+using OpenRP.Framework.Features.Properties.Services.Dialogs;
 
 namespace OpenRP.Framework.Features.Properties.Extensions
 {
@@ -10,7 +11,10 @@ namespace OpenRP.Framework.Features.Properties.Extensions
             return self
                 .AddSingleton<IPropertyService, PropertyService>()
                 .AddSingleton<IPropertyManager, PropertyManager>()
-                .AddSingleton<IPropertyDoorManager, PropertyDoorManager>();
+                .AddSingleton<IPropertyDoorManager, PropertyDoorManager>()
+                .AddSingleton<IPropertyEditorService, PropertyEditorService>()
+                .AddSingleton<IPropertyDefaultDataExporter, PropertyDefaultDataExporter>()
+                .AddSingleton<IPropertyDialogService, PropertyDialogService>();
         }
     }
 }

@@ -8,13 +8,15 @@ namespace OpenRP.Framework.Features.Properties.Systems
         private const int SyncIntervalInMilliseconds = 60000;
 
         /// <summary>
-        /// Properties go first because doors are their child entities.
+        /// Properties go first because doors are their child entities. Right after loading, the components match the
+        /// database exactly, so that's when they're exported as default data.
         /// </summary>
         [Event]
-        public void OnGameModeInit(IPropertyManager propertyManager, IPropertyDoorManager propertyDoorManager)
+        public void OnGameModeInit(IPropertyManager propertyManager, IPropertyDoorManager propertyDoorManager, IPropertyDefaultDataExporter propertyDefaultDataExporter)
         {
             propertyManager.LoadAll();
             propertyDoorManager.LoadAll();
+            propertyDefaultDataExporter.ExportDefaultData();
         }
 
         [Timer(SyncIntervalInMilliseconds)]

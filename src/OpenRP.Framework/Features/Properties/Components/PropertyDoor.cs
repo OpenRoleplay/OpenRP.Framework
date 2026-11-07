@@ -8,13 +8,14 @@ namespace OpenRP.Framework.Features.Properties.Components
     /// <summary>
     /// A door of a property, linked to the door on the other side (for example an entrance and its exit).
     /// </summary>
-    public class PropertyDoor : Component, IBaseDataComponent, IChangeable
+    public class PropertyDoor : Component, IBaseDataComponent, IChangeable, IDeletable
     {
         private const float NearbyRange = 3.0f;
         private const int OutsideInterior = 0;
 
         private readonly PropertyDoorModel _propertyDoorModel;
         private bool _hasChanges;
+        private bool _isDeleted;
 
         public PropertyDoor(PropertyDoorModel propertyDoorModel)
         {
@@ -29,6 +30,16 @@ namespace OpenRP.Framework.Features.Properties.Components
         public void ProcessChanges(bool processChanges = true)
         {
             _hasChanges = processChanges;
+        }
+
+        public bool IsDeleted()
+        {
+            return _isDeleted;
+        }
+
+        public void ProcessDeletion(bool processDeletion = true)
+        {
+            _isDeleted = processDeletion;
         }
 
         public PropertyDoorModel GetRawPropertyDoorModel()
@@ -46,6 +57,12 @@ namespace OpenRP.Framework.Features.Properties.Components
             return _propertyDoorModel.Name;
         }
 
+        public void SetName(string name)
+        {
+            _propertyDoorModel.Name = name;
+            ProcessChanges();
+        }
+
         public ulong? GetPropertyId()
         {
             return _propertyDoorModel.PropertyId;
@@ -59,9 +76,31 @@ namespace OpenRP.Framework.Features.Properties.Components
             return _propertyDoorModel.LinkedToPropertyDoorId;
         }
 
+        /// <summary>
+        /// Makes this door lead to the door with this id, or nowhere when it's null.
+        /// </summary>
+        public void SetLinkedDoorId(ulong? linkedDoorId)
+        {
+            _propertyDoorModel.LinkedToPropertyDoorId = linkedDoorId;
+            ProcessChanges();
+        }
+
+        public bool IsLinkedTo(PropertyDoor otherDoor)
+        {
+            return GetLinkedDoorId() == otherDoor.GetId();
+        }
+
         public Vector3 GetPosition()
         {
             return new Vector3(_propertyDoorModel.X, _propertyDoorModel.Y, _propertyDoorModel.Z);
+        }
+
+        public void SetPosition(Vector3 position)
+        {
+            _propertyDoorModel.X = position.X;
+            _propertyDoorModel.Y = position.Y;
+            _propertyDoorModel.Z = position.Z;
+            ProcessChanges();
         }
 
         public float GetAngle()
@@ -69,9 +108,21 @@ namespace OpenRP.Framework.Features.Properties.Components
             return _propertyDoorModel.Angle;
         }
 
+        public void SetAngle(float angle)
+        {
+            _propertyDoorModel.Angle = angle;
+            ProcessChanges();
+        }
+
         public int GetInterior()
         {
             return _propertyDoorModel.Interior ?? OutsideInterior;
+        }
+
+        public void SetInterior(int interior)
+        {
+            _propertyDoorModel.Interior = interior;
+            ProcessChanges();
         }
 
         /// <summary>
