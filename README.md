@@ -15,6 +15,7 @@
   - [AI Actors](#-ai-actors)
   - [AI Actors 2.0 (WIP)](#-ai-actors-20-wip)
 - [Technical Documentation](#technical-documentation)
+  - [Documentation](#-documentation)
   - [File Structure](#-file-structure)
 - [Join The Team](#join-the-team)
   - [Positions](#-positions)
@@ -98,6 +99,21 @@ Click on any thumbnail to watch the video, or [click here](https://www.youtube.c
 
 ## Technical Documentation
 
+### 📚 Documentation
+
+The full documentation is in [`docs/`](docs/README.md). Start here:
+
+| Page | For |
+|---|---|
+| [Getting started](docs/getting-started.md) | Building a server on the Framework |
+| [Architecture](docs/architecture.md) | How the code is organised and how to add a feature |
+| [Persistence](docs/persistence.md) | How data is loaded and saved, seed data and migrations |
+| [Permissions](docs/permissions.md) | Permission groups, command and faction permissions |
+| [Commands](docs/commands.md) | Every player command |
+| [Server events](docs/server-events.md) | The Framework's gameplay events |
+| [Database](docs/database.md) | Every table |
+| [Features](docs/README.md#features) | One page per feature, from accounts to world weather |
+
 ### 📁 File Structure
 
 | Path                                              | Description                                                                                                                         |
@@ -112,7 +128,7 @@ Click on any thumbnail to watch the video, or [click here](https://www.youtube.c
 | `Features/**/Extensions/ServiceCollectionExtensions.cs` | Registers service extensions belonging to a feature.                                                                             |
 | `Features/**/Services`                            | Contains all service classes and interfaces for a feature.                                                                             |
 | `Features/**/Systems`                             | Contains system implementations for a feature (including both `ISystem` and `IServerSystem` types).                                   |
-| `Features/**/Entities`                            | Holds all entity classes associated with a feature.                                                                                 |
+| `Features/**/Entities`                            | Entity type Guids and `EntityId` helpers, plus plain data/options types and interfaces of a feature.                                |
 | `Features/**/Helpers`                             | Contains miscellaneous helper classes for a feature.                                                                                |
 | `Shared/Chat/`                                    | Contains shared logic related to chat functionality.                                                                                |
 | `Shared/Dialogs/`                                 | Contains shared dialog logic used across the project.                                                                               |
