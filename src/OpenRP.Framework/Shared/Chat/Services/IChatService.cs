@@ -11,7 +11,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
     public interface IChatService
     {
         void SendInfoMessage(PlayerInfoMessageType type, string text);
-        void SendTalkMessage(string name, Vector3 position, string text, string accent = null);
+        void SendTalkMessage(string name, Vector3 position, string text, string accent = null, int virtualWorld = 0);
         void SendTalkMessage(Player player, string text);
         void SendPlayerChatMessage(Player player, PlayerChatMessageType type, string text);
     }

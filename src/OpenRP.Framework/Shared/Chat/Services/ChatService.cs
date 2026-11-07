@@ -45,60 +45,37 @@ namespace OpenRP.Framework.Shared.Chat.Services
             }
         }
 
-        public void SendTalkMessage(string name, Vector3 position, string text, string accent = null)
+        private const float TalkRange = 7.0f;
+        private const float TalkClearRange = 5.0f;
+        private static readonly Color TalkColor = Color.FromString("F5F5F5", ColorFormat.RGB);
+
+        public void SendTalkMessage(string name, Vector3 position, string text, string accent = null, int virtualWorld = 0)
         {
-            foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
+            foreach (Player listener in GetTalkListeners(position, virtualWorld))
             {
-                float distance = foreachPlayer.GetDistanceFromPoint(position);
-
-                if (distance <= 7.0f)
-                {
-                    Color min_color = Color.FromString("F5F5F5", ColorFormat.RGB);
-                    Color max_color = Color.FromString("C0C0C0", ColorFormat.RGB);
-                    Color result_color;
-
-                    if (distance >= 5.0f)
-                    {
-                        // TODO: Think of a more future-proof solution for this
-                        /*Random change_words_perc = new Random();
-                        if (change_words_perc.Next(0, 100) <= 5)
-                        {
-                            new_text = Regex.Replace(new_text, "([Ff])at(?!tie)", "$1attie");
-                            new_text = Regex.Replace(new_text, "[Gg]reat(?! [pP]olzin(?:i)?)", "Great Polzini");
-                            new_text = Regex.Replace(new_text, "([Kk])im ([Jj])ong ([Uu])n", "$1ir $2ong $3n");
-                            new_text = Regex.Replace(new_text, "([Kk])im", "$1ir");
-                        }*/
-
-                        text = text.Muffle(distance, 3, 5);
-
-                        float distance_in_perc = (100 / 2) * distance;
-
-                        double resultRed = min_color.R + distance_in_perc * (max_color.R - min_color.R);
-                        double resultGreen = min_color.G + distance_in_perc * (max_color.G - min_color.G);
-                        double resultBlue = min_color.B + distance_in_perc * (max_color.B - min_color.B);
-
-                        result_color = new Color(Convert.ToByte(resultRed), Convert.ToByte(resultGreen), Convert.ToByte(resultBlue));
-
-                        result_color = min_color;
-                    }
-                    else
-                    {
-                        result_color = min_color;
-                    }
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(String.Format("{0} ", name));
-
-                    if (!String.IsNullOrEmpty(accent))
-                    {
-                        sb.Append(String.Format("[{0} accent] ", accent));
-                    }
-
-                    sb.Append(String.Format("says: {0}", text));
-
-                    foreachPlayer.SendClientMessage(result_color, sb.ToString());
-                }
+                string heardText = GetTalkTextForDistance(text, listener.GetDistanceFromPoint(position));
+                listener.SendClientMessage(TalkColor, FormatTalkMessage(name, accent, heardText));
             }
+        }
+
+        private IEnumerable<Player> GetTalkListeners(Vector3 position, int virtualWorld)
+        {
+            return _entityManager.GetComponents<Player>()
+                .Where(player => player.VirtualWorld == virtualWorld && player.GetDistanceFromPoint(position) <= TalkRange);
+        }
+
+        /// <summary>
+        /// Listeners near the edge of the range hear part of the text; each listener gets their own muffling.
+        /// </summary>
+        private static string GetTalkTextForDistance(string text, float distance)
+        {
+            return distance >= TalkClearRange ? text.Muffle(distance, 3, 5) : text;
+        }
+
+        private static string FormatTalkMessage(string name, string accent, string text)
+        {
+            string accentPart = String.IsNullOrEmpty(accent) ? "" : $"[{accent} accent] ";
+            return $"{name} {accentPart}says: {text}";
         }
 
         public void SendTalkMessage(Player player, string text)
@@ -111,7 +88,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
                 string accent = character.GetAccent();
                 Vector3 position = player.Position;
 
-                SendTalkMessage(name, position, text, accent);
+                SendTalkMessage(name, position, text, accent, player.VirtualWorld);
             }
             else
             {
@@ -146,7 +123,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         SendClientRangedMessage(player, Color.LightGray, 20, CHAT_ACTION_LOOC);
                         break;
                     case PlayerChatMessageType.NEWBIE:
-                        string CHAT_ACTION_NEWBIE = String.Format("(( Newbie | {0}[1]: {2} ))", character.GetName(), player.Entity.Handle,text);
+                        string CHAT_ACTION_NEWBIE = String.Format("(( Newbie | {0} [{1}]: {2} ))", character.GetName(), player.Entity.Handle,text);
                         
                         foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
                         {

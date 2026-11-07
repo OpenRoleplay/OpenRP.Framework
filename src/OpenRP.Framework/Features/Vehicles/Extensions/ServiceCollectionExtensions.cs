@@ -14,7 +14,8 @@ namespace OpenRP.Framework.Features.Vehicles.Extensions
         {
             return self
                 .AddSingleton<IVehicleManager, VehicleManager>()
-                .AddSingleton<IVehicleKeyService, VehicleKeyService>();
+                .AddSingleton<IVehicleKeyService, VehicleKeyService>()
+                .AddTransient<IVehicleEngineService, VehicleEngineService>();
         }
     }
 }

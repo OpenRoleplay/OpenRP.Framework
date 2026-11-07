@@ -106,15 +106,30 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
                 }
 
                 Item? item = GetItem(droppedItem);
-                if (item == null || !AddToCharacterInventory(player, item, droppedItem))
+                Inventory? inventory = player.GetPlayerCurrentlyPlayingAsCharacter().GetInventory();
+                uint amount = droppedItem.GetAmount();
+                if (item == null || inventory == null || !inventory.DoesItemFit(item, amount))
                 {
                     player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You don't have enough space in your inventory to pick this up!");
                     return;
                 }
 
-                uint amount = droppedItem.GetAmount();
-                DeleteWorldItem(droppedItem.GetInventoryItemId());
+                // Claim the item before giving it: only one server can delete the row, so it can't be picked up twice.
+                bool claimed = DeleteWorldItem(droppedItem.GetInventoryItemId());
+                ItemAdditionalData? additionalData = droppedItem.GetAdditionalData();
                 droppedItem.DestroyEntity();
+                if (!claimed)
+                {
+                    player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "Someone else already picked this up.");
+                    return;
+                }
+
+                if (!inventory.AddItem(item, amount, additionalData))
+                {
+                    _logger.LogError("Picked up {Amount}x {ItemName}, but it didn't fit in the inventory, so it was lost.", amount, item.GetName());
+                    player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You don't have enough space in your inventory to pick this up!");
+                    return;
+                }
 
                 player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"You have picked up {amount}x {item.GetName()}.");
                 await PublishCashUpdateIfCurrency(player, item);
@@ -133,12 +148,6 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
         private Item? GetItem(DroppedItem droppedItem)
         {
             return _entityManager.GetComponent<Item>(ItemEntities.GetItemId((int)droppedItem.GetItemId()));
-        }
-
-        private static bool AddToCharacterInventory(Player player, Item item, DroppedItem droppedItem)
-        {
-            Inventory? inventory = player.GetPlayerCurrentlyPlayingAsCharacter().GetInventory();
-            return inventory != null && inventory.AddItem(item, droppedItem.GetAmount(), droppedItem.GetAdditionalData());
         }
 
         /// <summary>
@@ -232,16 +241,18 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
 
         /// <summary>
         /// Removes the world item from the database (its dropped row is deleted with it) and from memory.
+        /// Returns false when the row was already gone, because another server picked the item up.
         /// </summary>
-        private void DeleteWorldItem(ulong worldItemId)
+        private bool DeleteWorldItem(ulong worldItemId)
         {
-            _dataContext.InventoryItems.Where(inventoryItem => inventoryItem.Id == worldItemId).ExecuteDelete();
+            int deletedRows = _dataContext.InventoryItems.Where(inventoryItem => inventoryItem.Id == worldItemId).ExecuteDelete();
 
             EntityId worldItemEntityId = InventoryEntities.GetInventoryItemId((int)worldItemId);
             if (_entityManager.Exists(worldItemEntityId))
             {
                 _entityManager.Destroy(worldItemEntityId);
             }
+            return deletedRows > 0;
         }
 
         private void CreateDroppedItemEntity(DroppedInventoryItemModel droppedItemModel, ItemModel itemModel)

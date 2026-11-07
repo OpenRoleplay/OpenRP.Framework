@@ -84,7 +84,7 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
         public void ReloadGraphicPreset(Player player, AccountSettings accountSettings)
         {
             AccountGraphicPreset accountGraphicPreset = accountSettings.GetAccountGraphicPreset();
-            switch (accountGraphicPreset) // SetVisibleItems and SetRadiusMultiplier are commented out until they get added to SampSharp-streamer
+            switch (accountGraphicPreset)
             {
                 case AccountGraphicPreset.Low:
                     _streamerService.SetVisibleItems(StreamerType.Object, 500, player);
