@@ -2,7 +2,7 @@ using OpenRP.Framework.Features.Properties.Components;
 using OpenRP.Framework.Features.VirtualWorlds.Services;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System.Collections.Generic;
@@ -82,15 +82,14 @@ namespace OpenRP.Framework.Features.Properties.Services
                 door.GetPosition(),
                 LabelDrawDistance,
                 virtualWorld: GetDoorVirtualWorld(door),
-                interior: door.GetInterior(),
-                parent: door.Entity);
+                interior: door.GetInterior(), parent: door.Entity);
         }
 
         public void DestroyDoorLabel(PropertyDoor door)
         {
             foreach (DynamicTextLabel label in door.GetComponentsInChildren<DynamicTextLabel>().ToList())
             {
-                _entityManager.Destroy(label.Entity);
+                label.DestroyEntity();
             }
         }
 

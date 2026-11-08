@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Database.Services;
 using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Features.DroppedItems.Services;
@@ -230,7 +230,7 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
                     BetterMessageDialog messageDialog = new BetterMessageDialog("Close");
                     messageDialog.SetTitle(TitleType.Children, inventoryOpened.OpenedInventory.GetName(), inventoryOpened.SelectedInventoryItem.GetName(), "Description");
                     messageDialog.SetContent(description);
-                    _dialogService.Show(player, messageDialog);
+                    _dialogService.Show(player, messageDialog, _ => { });
                 };
 
                 if (item.IsDestroyable())

@@ -11,7 +11,7 @@ namespace OpenRP.Framework.Features.Commands.Attributes
     /// An attribute which indicates the method is invokable as a player command.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class ServerCommandAttribute : PlayerCommandAttribute, ICommandMethodInfo
+    public class ServerCommandAttribute : PlayerCommandAttribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerCommandAttribute"/> class.

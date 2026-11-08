@@ -37,7 +37,7 @@ A command picks its groups in code, for example `[ServerCommand(PermissionGroups
 
 ## Deep dive
 
-- **How a command is checked:** `PlayerServerCommandService` checks that the player plays a character, that the command exists, and that the character has `cmd.<name>`. Each failure has its own message.
+- **How a command is checked:** SampSharp finds the command, then `ServerCommandPermissionChecker` checks that the player plays a character with `cmd.<name>`. Each failure has its own message.
 - **Where the permissions live:** a character's permissions are loaded into the `CharacterPermissions` component on character selection, and on [`OnFactionPermissionsChanged`](server-events.md#onfactionpermissionschanged). Changes made straight in the database apply after the next selection.
 - **Gamemode-managed links:** links made from attributes are marked `GamemodeManaged`. Only those are added or removed automatically.
 - **Permission sources:** `ICharacterPermissionSource.GetPermissions(characterId)` lets a feature add permissions. Factions is one. Register your own as `ICharacterPermissionSource`.

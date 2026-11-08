@@ -1,11 +1,11 @@
-﻿using OpenRP.Framework.Features.ActorConversations.Services;
+using OpenRP.Framework.Features.ActorConversations.Services;
 using OpenRP.Framework.Features.CDN.Services;
 using OpenRP.Framework.Features.MainMenu.Entities;
 using OpenRP.Framework.Features.MainMenu.Services.Dialogs;
 using OpenRP.Framework.Features.VirtualWorlds.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +37,7 @@ namespace OpenRP.Framework.Features.MainMenu.Systems
         [Event]
         public void OnPlayerRequestClass(
             Player player,
-            int classid,
+            Class playerClass,
             IMainMenuDialogService mainMenuService,
             IEnumerable<IMainMenuScene> mainMenuScenes
         ) 

@@ -1,5 +1,5 @@
-﻿using SampSharp.Entities;
-using OpenRP.Streamer;
+using SampSharp.Entities;
+using OpenRP.OpenMp.Streamer;
 using System;
 using System.Collections.Generic;
 using System.Linq;

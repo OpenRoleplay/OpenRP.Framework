@@ -74,7 +74,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 OpenCreateCharacterLastName(player, onGoBack);
             }
 
-            _dialogService.Show(player.Entity, questionDialog, MiddleNameQuestionDialogHandler);
+            _dialogService.Show(player, questionDialog, MiddleNameQuestionDialogHandler);
         }
 
         private void OpenCreateCharacterMiddleName(Player player, Action onGoBack)
@@ -155,7 +155,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 FinishCharacterCreation(player, onGoBack);
             }
 
-            _dialogService.Show(player.Entity, confirmDialog, ConfirmDateOfBirthDialogHandler);
+            _dialogService.Show(player, confirmDialog, ConfirmDateOfBirthDialogHandler);
         }
 
         private void FinishCharacterCreation(Player player, Action onGoBack)
@@ -190,7 +190,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 onPrevious();
             }
 
-            _dialogService.Show(player.Entity, inputDialog, CharacterCreationInputDialogHandler);
+            _dialogService.Show(player, inputDialog, CharacterCreationInputDialogHandler);
         }
 
         private void ShowCharacterCreationError(Player player, string step, string message, Action onRetry)

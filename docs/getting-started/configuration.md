@@ -16,9 +16,13 @@ The features that need settings, and what the Framework does when the server sta
 
 | Service | From | Needed |
 |---|---|---|
-| `IStreamerService` | OpenRP.Streamer | Always |
-| `IColAndreasService` | SampSharp.ColAndreas.Entities | Always |
-| `ITryg3DService`, `IGpsService` | their plugins | Only if your host uses them |
+| `IStreamerService` | `AddStreamer()` from OpenRP.OpenMp.Streamer (our fork of VS-RP's library, with items as ECS components) | Always |
+| `IColAndreasService` | `AddColAndreas()` from SampSharp.OpenMp.ColAndreas | Always |
+| `ITryg3DService`, `IGpsService` | their own projects | Only if your host uses them |
+
+**SampSharp.OpenMp.ColAndreas** is [our fork](https://github.com/KoertLichtendonk/SampSharp.OpenMp.ColAndreas) of VS-RP's bindings (Apache-2.0), packaged for NuGet as `SampSharp.OpenMp.ColAndreas`. It adds `RayCastLineModel`, which returns the model a ray hits, plus two helpers from ColAndreas's Pawn include: `ColAndreasConstants.WaterObject` (the model id of water, 20000) and `IsPlayerFacingWater`.
+
+**Why a fork:** VS-RP's bindings aren't on NuGet, and fishing needs the model id, which their `RayCastLine` doesn't return.
 
 ## What happens at startup
 

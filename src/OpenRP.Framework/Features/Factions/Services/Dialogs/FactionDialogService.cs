@@ -57,7 +57,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
             BetterMessageDialog messageDialog = new BetterMessageDialog("Back");
             messageDialog.SetTitle(TitleType.Children, FactionsTitle, title);
             messageDialog.SetContent(text);
-            _dialogService.Show(player.Entity, messageDialog, _ => onClose());
+            _dialogService.Show(player, messageDialog, _ => onClose());
         }
 
         private void ShowConfirmation(Player player, string title, string question, Action onConfirmed, Action onCancelled)
@@ -65,7 +65,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
             BetterMessageDialog confirmationDialog = new BetterMessageDialog(DialogHelper.Yes, DialogHelper.No);
             confirmationDialog.SetTitle(TitleType.Children, FactionsTitle, title);
             confirmationDialog.SetContent(question);
-            _dialogService.Show(player.Entity, confirmationDialog, response =>
+            _dialogService.Show(player, confirmationDialog, response =>
             {
                 if (response.Response == DialogResponse.LeftButton)
                 {
@@ -81,7 +81,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
             BetterInputDialog inputDialog = new BetterInputDialog("Continue", "Back");
             inputDialog.SetTitle(TitleType.Children, FactionsTitle, title);
             inputDialog.SetContent(prompt);
-            _dialogService.Show(player.Entity, inputDialog, response =>
+            _dialogService.Show(player, inputDialog, response =>
             {
                 if (response.Response != DialogResponse.LeftButton)
                 {
@@ -111,7 +111,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 ranksByRow[rankDialog.AddRow(GetRankLabel(rank, depth))] = rank;
             }
 
-            _dialogService.Show(player.Entity, rankDialog, response =>
+            _dialogService.Show(player, rankDialog, response =>
             {
                 if (response.Response != DialogResponse.LeftButton || !ranksByRow.TryGetValue(response.ItemIndex, out FactionRank? rank))
                 {

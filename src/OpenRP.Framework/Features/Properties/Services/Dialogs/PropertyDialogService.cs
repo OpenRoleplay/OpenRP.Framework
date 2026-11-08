@@ -45,7 +45,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
             BetterMessageDialog messageDialog = new BetterMessageDialog("Back");
             messageDialog.SetTitle(TitleType.Children, PropertiesTitle, title);
             messageDialog.SetContent(text);
-            _dialogService.Show(player.Entity, messageDialog, _ => onClose());
+            _dialogService.Show(player, messageDialog, _ => onClose());
         }
 
         private void ShowConfirmation(Player player, string title, string question, Action onConfirmed, Action onCancelled)
@@ -53,7 +53,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
             BetterMessageDialog confirmationDialog = new BetterMessageDialog(DialogHelper.Yes, DialogHelper.No);
             confirmationDialog.SetTitle(TitleType.Children, PropertiesTitle, title);
             confirmationDialog.SetContent(question);
-            _dialogService.Show(player.Entity, confirmationDialog, response =>
+            _dialogService.Show(player, confirmationDialog, response =>
             {
                 if (response.Response == DialogResponse.LeftButton)
                 {
@@ -69,7 +69,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
             BetterInputDialog inputDialog = new BetterInputDialog("Continue", "Back");
             inputDialog.SetTitle(TitleType.Children, PropertiesTitle, title);
             inputDialog.SetContent(prompt);
-            _dialogService.Show(player.Entity, inputDialog, response =>
+            _dialogService.Show(player, inputDialog, response =>
             {
                 if (response.Response != DialogResponse.LeftButton)
                 {

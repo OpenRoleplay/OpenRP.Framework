@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Database.Services;
 using OpenRP.Framework.Features.Inventories.Entities;
 using OpenRP.Framework.Features.Inventories.Helpers;
@@ -354,10 +354,8 @@ namespace OpenRP.Framework.Features.Inventories.Components
                 AdditionalData = additionalData,
             };
 
-            EntityId newInventoryItemEntityId = UnsavedEntities.GenerateUnsavedId();
-
-            Manager.Create(newInventoryItemEntityId, Entity);
-            Manager.AddComponent<InventoryItem>(newInventoryItemEntityId, inventoryItemModel);
+            // Unsaved until the next sync; the inventory item manager then makes this entity the new row's entity.
+            Manager.AddComponent<InventoryItem>(EntityId.NewEntityId(), Entity, inventoryItemModel);
         }
 
         public bool RemoveItem(Item item, uint amount = 0)

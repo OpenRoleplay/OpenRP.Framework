@@ -39,14 +39,14 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 player.SendPlayerInfoMessage(error == null ? PlayerInfoMessageType.INFO : PlayerInfoMessageType.ERROR, error ?? $"You are now a member of {faction.GetName()}. Use /faction to open its menu.");
             }
 
-            _dialogService.Show(player.Entity, invitationDialog, OnInvitationAnswered);
+            _dialogService.Show(player, invitationDialog, OnInvitationAnswered);
         }
 
         private void OpenInvitePlayer(Player player, Faction faction, Action onBack)
         {
             void FindInvitee(string input)
             {
-                Player? invitee = int.TryParse(input.Trim(), out int playerId) ? _entityManager.GetComponent<Player>(SampEntities.GetPlayerId(playerId)) : null;
+                Player? invitee = int.TryParse(input.Trim(), out int playerId) ? _entityManager.GetComponents<Player>().FirstOrDefault(candidate => candidate.Id == playerId) : null;
                 if (invitee == null)
                 {
                     ShowMessage(player, "Invite a player", $"There is no player with the id '{input}'.", () => OpenInvitePlayer(player, faction, onBack));

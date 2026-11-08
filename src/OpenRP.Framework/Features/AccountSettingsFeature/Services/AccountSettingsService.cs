@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Accounts.Components;
 using OpenRP.Framework.Features.AccountSettingsFeature.Components;
 using OpenRP.Framework.Features.AccountSettingsFeature.Enums;
@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Database;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
 
@@ -83,36 +83,29 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
 
         public void ReloadGraphicPreset(Player player, AccountSettings accountSettings)
         {
-            AccountGraphicPreset accountGraphicPreset = accountSettings.GetAccountGraphicPreset();
-            switch (accountGraphicPreset)
-            {
-                case AccountGraphicPreset.Low:
-                    _streamerService.SetVisibleItems(StreamerType.Object, 500, player);
-                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 1.0f, player);
-                    _streamerService.Update(player, StreamerType.Object);
-                    break;
-                case AccountGraphicPreset.Medium:
-                    _streamerService.SetVisibleItems(StreamerType.Object, 1000, player);
-                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 1.0f, player);
-                    _streamerService.Update(player, StreamerType.Object);
-                    break;
-                case AccountGraphicPreset.High:
-                    _streamerService.SetVisibleItems(StreamerType.Object, 2000, player);
-                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 1.0f, player);
-                    _streamerService.Update(player, StreamerType.Object);
-                    break;
-                case AccountGraphicPreset.VeryHigh:
-                    _streamerService.SetVisibleItems(StreamerType.Object, 2000, player);
-                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 1.5f, player);
-                    _streamerService.Update(player, StreamerType.Object);
-                    break;
-                case AccountGraphicPreset.Ultra:
-                    _streamerService.SetVisibleItems(StreamerType.Object, 2000, player);
-                    _streamerService.SetRadiusMultiplier(StreamerType.Object, 2.0f, player);
-                    _streamerService.Update(player, StreamerType.Object);
-                    break;
-            }
+            (int visibleObjects, float radiusMultiplier) = GetStreamerSettings(accountSettings.GetAccountGraphicPreset());
+            ApplyStreamerSettings(player, visibleObjects, radiusMultiplier);
         }
+
+        private static (int VisibleObjects, float RadiusMultiplier) GetStreamerSettings(AccountGraphicPreset preset)
+        {
+            return preset switch
+            {
+                AccountGraphicPreset.Low => (500, 1.0f),
+                AccountGraphicPreset.Medium => (1000, 1.0f),
+                AccountGraphicPreset.High => (2000, 1.0f),
+                AccountGraphicPreset.VeryHigh => (2000, 1.5f),
+                _ => (2000, 2.0f),
+            };
+        }
+
+        private void ApplyStreamerSettings(Player player, int visibleObjects, float radiusMultiplier)
+        {
+            _streamerService.SetVisibleItems(StreamerType.Object, visibleObjects, player);
+            _streamerService.SetRadiusMultiplier(StreamerType.Object, radiusMultiplier, player);
+            _streamerService.Update(player, StreamerType.Object);
+        }
+
         public void SwitchGraphicPreset(Player player, AccountSettings accountSettings)
         {
             ulong databaseId = accountSettings.GetDatabaseId();

@@ -41,7 +41,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 OpenMemberActions(player, faction, member, GetMemberName(names, member), () => OpenMembers(player, faction, onBack));
             }
 
-            _dialogService.Show(player.Entity, membersDialog, OnMemberChosen);
+            _dialogService.Show(player, membersDialog, OnMemberChosen);
         }
 
         private void OpenMemberActions(Player player, Faction faction, FactionMember member, string memberName, Action onBack)
@@ -71,7 +71,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                     OpenRemoveMember(player, member, memberName, onBack);
             }
 
-            _dialogService.Show(player.Entity, actionsDialog, OnActionChosen);
+            _dialogService.Show(player, actionsDialog, OnActionChosen);
         }
 
         private void OpenChangeMemberRank(Player player, Faction faction, FactionMember member, string memberName, Action onBack)

@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Commands.Attributes;
 using OpenRP.Framework.Shared.Chat.Enums;
 using SampSharp.Entities.SAMP;
@@ -31,7 +31,7 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
 
                     // Get the current position and rotation of the vehicle
                     Vector3 vehiclePosition = vehiclePlayerIsIn.Position;
-                    Vector3 vehicleRotation = vehiclePlayerIsIn.Rotation;
+                    float vehicleAngle = vehiclePlayerIsIn.Angle;
 
                     // Retrieve the VehicleDataComponent to get vehicle's ID
                     VehicleDataComponent vehicleDataComponent = vehiclePlayerIsIn.GetComponent<VehicleDataComponent>();
@@ -48,7 +48,7 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
                             vehicleData.Y = vehiclePosition.Y;
                             vehicleData.Z = vehiclePosition.Z;
 
-                            vehicleData.Rotation = vehicleRotation.Z;
+                            vehicleData.Rotation = vehicleAngle;
 
                             vehicleDataComponent.VehicleData = vehicleData;
 

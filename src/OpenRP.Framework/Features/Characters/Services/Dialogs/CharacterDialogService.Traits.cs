@@ -50,7 +50,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 ShowBlessedByMisfortuneDetails(player);
             }
 
-            _dialogService.Show(player.Entity, traitsDialog, CharacterTraitsDialogHandler);
+            _dialogService.Show(player, traitsDialog, CharacterTraitsDialogHandler);
         }
 
         private void ShowBlessedByMisfortuneDetails(Player player)
@@ -66,7 +66,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
             noTraitsDialog.SetTitle(TitleType.Parents, CharacterTraitsTitle);
             noTraitsDialog.SetContent("Your character has no traits at this moment!");
 
-            _dialogService.Show(player.Entity, noTraitsDialog, (MessageDialogResponse response) => { });
+            _dialogService.Show(player, noTraitsDialog, (MessageDialogResponse response) => { });
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Animations.Services;
 using OpenRP.Framework.Shared.ServerEvents.Entities;
 using OpenRP.Framework.Shared.ServerEvents.Helpers;
 using OpenRP.Framework.Shared.ServerEvents.Services;
-using SampSharp.Entities.Utilities;
+using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace OpenRP.Framework.Shared.ServerEvents.Extensions
             return self
                 .AddSingleton<IServerEventAggregator, ServerEventAggregator>()
                 .AddSingleton<IServerEventDispatcher, ServerEventDispatcher>()
-                .AddServerSystemsInAssembly();
+                .AddServerSystemsInAssembly(typeof(ServiceCollectionExtensions).Assembly);
         }
 
         public static IServiceCollection AddServerSystemsInAssembly(this IServiceCollection services, Assembly assembly)
@@ -28,7 +28,7 @@ namespace OpenRP.Framework.Shared.ServerEvents.Extensions
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
-            var types = new AssemblyScanner().IncludeAssembly(assembly)
+            var types = ClassScanner.Create().IncludeAssembly(assembly)
                 .Implements<IServerSystem>()
                 .ScanTypes();
 

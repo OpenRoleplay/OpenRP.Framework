@@ -1,5 +1,5 @@
 using OpenRP.Framework.Shared;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -107,7 +107,7 @@ namespace OpenRP.Framework.Features.ChickenCoops.Components
 
         private void UpdateLabel()
         {
-            DynamicTextLabel? label = GetComponentInChildren<DynamicTextLabel>();
+            DynamicTextLabel? label = this.GetComponentInChildren<DynamicTextLabel>();
             if (label != null)
             {
                 label.Text = GetLabelText();

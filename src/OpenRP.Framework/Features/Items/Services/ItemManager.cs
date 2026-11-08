@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Database;
 using OpenRP.Framework.Database.Models;
@@ -56,8 +56,6 @@ namespace OpenRP.Framework.Features.Items.Services
             foreach (ItemModel itemModel in itemModels)
             {
                 EntityId itemEntityId = ItemEntities.GetItemId((int)itemModel.Id);
-                _entityManager.Create(itemEntityId);
-
                 Item item = _entityManager.AddComponent<Item>(itemEntityId, itemModel);
 
                 amountLoaded++;
@@ -85,8 +83,6 @@ namespace OpenRP.Framework.Features.Items.Services
                     continue;
                 }
 
-                _entityManager.Create(itemEntityId);
-
                 Item item = _entityManager.AddComponent<Item>(itemEntityId, itemModel);
 
                 amountLoaded++;
@@ -106,14 +102,14 @@ namespace OpenRP.Framework.Features.Items.Services
             foreach (ItemModel itemModel in itemModels)
             {
                 EntityId itemEntityId = ItemEntities.GetItemId((int)itemModel.Id);
-                if (!_entityManager.Exists(itemEntityId))
-                {
-                    _entityManager.Create(itemEntityId);
-                }
 
-                // Replace only the component: destroying the entity would make AddComponent fail.
-                _entityManager.Destroy<Item>(itemEntityId);
+                // Replace only the component, adding the new one first: an entity without components stops existing.
+                Item? oldItem = _entityManager.GetComponent<Item>(itemEntityId);
                 Item item = _entityManager.AddComponent<Item>(itemEntityId, itemModel);
+                if (oldItem != null)
+                {
+                    _entityManager.Destroy(oldItem);
+                }
 
                 amountLoaded++;
             }

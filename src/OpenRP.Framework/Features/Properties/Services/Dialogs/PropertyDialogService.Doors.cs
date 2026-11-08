@@ -47,7 +47,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                     OpenDeleteDoor(player, door, onBack, reopenActions);
             }
 
-            _dialogService.Show(player.Entity, actionsDialog, OnActionChosen);
+            _dialogService.Show(player, actionsDialog, OnActionChosen);
         }
 
         private string GetLinkRowText(PropertyDoor door)
@@ -114,7 +114,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                 doorsByRow[doorsDialog.AddRow(GetDoorNameWithProperty(otherDoor))] = otherDoor;
             }
 
-            _dialogService.Show(player.Entity, doorsDialog, response =>
+            _dialogService.Show(player, doorsDialog, response =>
             {
                 if (response.Response != DialogResponse.LeftButton || !doorsByRow.TryGetValue(response.ItemIndex, out PropertyDoor? otherDoor))
                 {

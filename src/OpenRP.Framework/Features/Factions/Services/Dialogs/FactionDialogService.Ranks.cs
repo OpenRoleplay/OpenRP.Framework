@@ -42,7 +42,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                     OpenRankActions(player, faction, rank, reopenRanks);
             }
 
-            _dialogService.Show(player.Entity, ranksDialog, OnRankChosen);
+            _dialogService.Show(player, ranksDialog, OnRankChosen);
         }
 
         private void OpenRankActions(Player player, Faction faction, FactionRank rank, Action onBack)
@@ -79,7 +79,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                     OpenDeleteRank(player, rank, onBack, reopenActions);
             }
 
-            _dialogService.Show(player.Entity, actionsDialog, OnActionChosen);
+            _dialogService.Show(player, actionsDialog, OnActionChosen);
         }
 
         private void OpenRenameRank(Player player, FactionRank rank, Action onBack)

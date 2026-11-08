@@ -6,6 +6,7 @@ using OpenRP.Framework.Features.Factions.Components;
 using OpenRP.Framework.Features.Factions.Entities;
 using OpenRP.Framework.Shared.BaseManager.Helpers;
 using SampSharp.Entities;
+using System;
 
 namespace OpenRP.Framework.Features.Factions.Services
 {
@@ -20,10 +21,7 @@ namespace OpenRP.Framework.Features.Factions.Services
 
         protected override DbSet<FactionRankModel> GetDbSet() => _dataContext.FactionRanks;
 
-        protected override EntityId GetEntityId(FactionRankModel model)
-        {
-            return FactionEntities.GetFactionRankId((int)model.Id);
-        }
+        protected override Guid EntityTypeKey => FactionEntities.FactionRankType;
 
         protected override EntityId? GetParentEntityId(FactionRankModel model)
         {

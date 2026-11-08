@@ -1,5 +1,5 @@
 using OpenRP.Framework.Features.Harvestables.Entities;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 
@@ -67,7 +67,7 @@ namespace OpenRP.Framework.Features.Harvestables.Components
 
         private void UpdateLabel()
         {
-            DynamicTextLabel? label = GetComponentInChildren<DynamicTextLabel>();
+            DynamicTextLabel? label = this.GetComponentInChildren<DynamicTextLabel>();
             if (label != null)
             {
                 label.Text = GetLabelText();

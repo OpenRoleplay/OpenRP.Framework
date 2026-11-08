@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Features.HotwireFeature.Components;
+using OpenRP.Framework.Features.HotwireFeature.Components;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Services;
 using SampSharp.Entities.SAMP;
@@ -98,7 +98,7 @@ namespace OpenRP.Framework.Features.HotwireFeature.Systems
         }
 
         [Event]
-        public void OnVehicleDeath(Vehicle vehicle, Player killerid)
+        public void OnVehicleDeath(Vehicle vehicle)
         {
             vehicle.DestroyComponents<HotwiredVehicle>();
         }

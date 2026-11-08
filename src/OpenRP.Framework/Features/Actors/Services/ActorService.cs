@@ -1,4 +1,4 @@
-﻿using EFCoreSecondLevelCacheInterceptor;
+using EFCoreSecondLevelCacheInterceptor;
 using Microsoft.EntityFrameworkCore;
 using OpenRP.Framework.Database;
 using OpenRP.Framework.Database.Models;
@@ -7,7 +7,7 @@ using OpenRP.Framework.Features.Actors.Entities;
 using OpenRP.Framework.Features.VirtualWorlds.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 
 namespace OpenRP.Framework.Features.Actors.Services
 {
@@ -49,8 +49,6 @@ namespace OpenRP.Framework.Features.Actors.Services
             foreach (ActorModel actorModel in actorModels)
             {
                 EntityId serverActorEntityId = ActorEntities.GetServerActorId((int)actorModel.Id);
-                _entityManager.Create(serverActorEntityId);
-
                 ServerActor serverActor = _entityManager.AddComponent<ServerActor>(serverActorEntityId, actorModel);
 
                 Actor gameActor = _worldService.CreateActor(actorModel.Skin, new Vector3(actorModel.X, actorModel.Y, actorModel.Z), actorModel.Angle, serverActorEntityId);

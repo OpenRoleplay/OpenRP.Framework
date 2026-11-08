@@ -6,6 +6,7 @@ using OpenRP.Framework.Features.Properties.Components;
 using OpenRP.Framework.Features.Properties.Entities;
 using OpenRP.Framework.Shared.BaseManager.Helpers;
 using SampSharp.Entities;
+using System;
 
 namespace OpenRP.Framework.Features.Properties.Services
 {
@@ -21,10 +22,7 @@ namespace OpenRP.Framework.Features.Properties.Services
 
         protected override DbSet<PropertyModel> GetDbSet() => _dataContext.Properties;
 
-        protected override EntityId GetEntityId(PropertyModel model)
-        {
-            return PropertyEntities.GetPropertyId((int)model.Id);
-        }
+        protected override Guid EntityTypeKey => PropertyEntities.PropertyType;
 
         protected override PropertyModel GetModelFromComponent(Property component)
         {

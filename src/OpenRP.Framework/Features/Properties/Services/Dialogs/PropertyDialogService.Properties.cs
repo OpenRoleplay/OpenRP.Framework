@@ -36,7 +36,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                     OpenPropertyActions(player, property, reopenEditor);
             }
 
-            _dialogService.Show(player.Entity, propertiesDialog, OnPropertyChosen);
+            _dialogService.Show(player, propertiesDialog, OnPropertyChosen);
         }
 
         private void OpenPropertyActions(Player player, Property property, Action onBack)
@@ -77,7 +77,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                     OpenDoorActions(player, door, reopenActions);
             }
 
-            _dialogService.Show(player.Entity, actionsDialog, OnActionChosen);
+            _dialogService.Show(player, actionsDialog, OnActionChosen);
         }
 
         private void OpenCreateProperty(Player player, Action onBack)

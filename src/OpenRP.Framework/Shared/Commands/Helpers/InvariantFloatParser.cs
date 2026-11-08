@@ -1,4 +1,4 @@
-using SampSharp.Entities.SAMP.Commands.Parsers;
+using SampSharp.Entities.SAMP.Commands;
 using System;
 using System.Globalization;
 
@@ -12,7 +12,7 @@ namespace OpenRP.Framework.Shared.Commands.Helpers
     {
         private readonly WordParser _wordParser = new WordParser();
 
-        public bool TryParse(IServiceProvider services, ref string inputText, out object? result)
+        public bool TryParse(IServiceProvider services, ref StringSpan inputText, out object? result)
         {
             result = null;
             if (!_wordParser.TryParse(services, ref inputText, out object? word) || word is not string text)

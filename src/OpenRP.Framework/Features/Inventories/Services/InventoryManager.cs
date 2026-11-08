@@ -34,10 +34,7 @@ namespace OpenRP.Framework.Features.Inventories.Services
 
         protected override DbSet<InventoryModel> GetDbSet() => _dataContext.Inventories;
 
-        protected override EntityId GetEntityId(InventoryModel model)
-        {
-            return InventoryEntities.GetInventoryId((int)model.Id);
-        }
+        protected override Guid EntityTypeKey => InventoryEntities.InventoryType;
 
         protected override InventoryModel GetModelFromComponent(Inventory component)
         {

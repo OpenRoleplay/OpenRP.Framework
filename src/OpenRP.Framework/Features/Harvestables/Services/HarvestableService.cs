@@ -5,7 +5,7 @@ using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using OpenRP.Framework.Shared.ServerEvents.Services;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -67,7 +67,6 @@ namespace OpenRP.Framework.Features.Harvestables.Services
             }
 
             EntityId entityId = HarvestableEntities.GenerateHarvestablePlantId();
-            _entityManager.Create(entityId);
             _streamerService.CreateDynamicObject(modelId, position, rotation, parent: entityId);
             return AddHarvestable(entityId, modelId, position);
         }

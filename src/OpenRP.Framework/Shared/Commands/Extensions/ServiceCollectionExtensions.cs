@@ -15,8 +15,11 @@ namespace OpenRP.Framework.Shared.Commands.Extensions
     {
         public static IServiceCollection AddCommands(this IServiceCollection self)
         {
+            // Added (not TryAdded) so these replace SampSharp's defaults, whichever is registered first.
             return self
-                .AddSingleton<IPlayerCommandService, PlayerServerCommandService>()
+                .AddSingleton<IPermissionChecker, ServerCommandPermissionChecker>()
+                .AddSingleton<IPlayerCommandMessageService, ServerCommandMessageService>()
+                .AddSingleton<ICommandParameterParserFactory, ServerCommandParameterParserFactory>()
                 .AddSingleton<IHelpDialogService, HelpDialogService>();
         }
     }

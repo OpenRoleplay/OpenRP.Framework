@@ -37,7 +37,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 _ = _characterService.SelectCharacterAsync(player, characters[response.ItemIndex].Id);
             }
 
-            _dialogService.Show(player.Entity, selectionDialog, CharacterSelectionDialogHandler);
+            _dialogService.Show(player, selectionDialog, CharacterSelectionDialogHandler);
         }
 
         private static BetterListDialog CreateCharacterSelectionDialog(List<CharacterModel> characters, out int createCharacterRowIndex)

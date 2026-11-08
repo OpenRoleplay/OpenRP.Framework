@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.ActorConversations.Components;
 using OpenRP.Framework.Shared.Chat.Enums;
 using SampSharp.Entities.SAMP;
@@ -167,11 +167,7 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
                         List<ActorConversationWithPlayerState> currentlyAttachedPlayers = GetCurrentlyAttachedPlayerStates();
                         foreach (var playerState in currentlyAttachedPlayers)
                         {
-                            Player player = null;
-                            if (playerState.Entity.IsOfType(SampEntities.PlayerType))
-                            {
-                                player = _entityManager.GetComponent<Player>(playerState.Entity);
-                            }
+                            Player player = _entityManager.GetComponent<Player>(playerState.Entity);
 
                             player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "We think you've seen enough of this conversation. Perhaps it's time to create an account or login now? ;)");
                         }
@@ -205,11 +201,13 @@ namespace OpenRP.Framework.Features.ActorConversations.Helpers
                                 List<ActorConversationWithPlayerState> currentlyAttachedPlayers = GetCurrentlyAttachedPlayerStates();
                                 foreach (var playerState in currentlyAttachedPlayers)
                                 {
-                                    Player player = null;
-                                    if (playerState.Entity.IsOfType(SampEntities.PlayerType))
+                                    // The typing delay below lets players leave mid-loop; a destroyed component throws when used.
+                                    if (!playerState.IsComponentAlive)
                                     {
-                                        player = _entityManager.GetComponent<Player>(playerState.Entity);
+                                        continue;
                                     }
+
+                                    Player player = _entityManager.GetComponent<Player>(playerState.Entity);
 
                                     if (player != null)
                                     {

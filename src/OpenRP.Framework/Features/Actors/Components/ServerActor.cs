@@ -1,7 +1,7 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using System;
 using System.Collections.Generic;
 using System.Linq;

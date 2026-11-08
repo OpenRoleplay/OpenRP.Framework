@@ -1,8 +1,8 @@
-﻿using OpenRP.Framework.Features.ActorConversations.Services;
+using OpenRP.Framework.Features.ActorConversations.Services;
 using OpenRP.Framework.Features.CDN.Services;
 using OpenRP.Framework.Features.VirtualWorlds.Services;
 using SampSharp.Entities.SAMP;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,11 +59,11 @@ namespace OpenRP.Framework.Features.MainMenu.Entities.Scenes
             player.ToggleSpectating(true);
             player.ToggleControllable(false);
 
-            player.Position = new Vector3(2113.49, 186.657, -1);
-            player.CameraPosition = new Vector3(2132.886962, 202.465911, 6.284189);
-            player.SetCameraLookAt(new Vector3(2110.900634, 185.995895, 3.264186));
-            player.InterpolateCameraPosition(new Vector3(2132.886962, 202.465911, 6.284189), new Vector3(2117.288330, 175.030685, 0.654188), 60000, CameraCut.Move);
-            player.InterpolateCameraLookAt(new Vector3(2110.900634, 185.995895, 3.264186), new Vector3(2111.591064, 185.435897, 0.804188), 60000, CameraCut.Move); // Did +0,75 x
+            player.Position = new Vector3(2113.49f, 186.657f, -1);
+            player.CameraPosition = new Vector3(2132.886962f, 202.465911f, 6.284189f);
+            player.SetCameraLookAt(new Vector3(2110.900634f, 185.995895f, 3.264186f));
+            player.InterpolateCameraPosition(new Vector3(2132.886962f, 202.465911f, 6.284189f), new Vector3(2117.288330f, 175.030685f, 0.654188f), 60000, CameraCut.Move);
+            player.InterpolateCameraLookAt(new Vector3(2110.900634f, 185.995895f, 3.264186f), new Vector3(2111.591064f, 185.435897f, 0.804188f), 60000, CameraCut.Move); // Did +0,75 x
             player.VirtualWorld = _virtualWorldService.GetMainMenuSceneVirtualWorld(1);
 
             _openCdnService.PlayBase64(player, "music", "VGhlIEJlYWNoIEJveXMgLSBGdW4sIEZ1biwgRnVuICgxOTY0KS5tcDM=");

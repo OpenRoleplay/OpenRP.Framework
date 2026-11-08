@@ -1,4 +1,4 @@
-﻿using SampSharp.Entities.SAMP;
+using SampSharp.Entities.SAMP;
 using SampSharp.Entities;
 using System;
 using System.Collections.Generic;
@@ -44,7 +44,7 @@ namespace OpenRP.Framework.Features.Characters.Components
 
         public Player? GetPlayer()
         {
-            if (_player == null && this.Entity.IsOfType(SampEntities.PlayerType))
+            if (_player == null)
             {
                 _player = this.GetComponent<Player>();
             }

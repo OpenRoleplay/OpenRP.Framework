@@ -28,7 +28,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
             messageDialog.SetTitle(TitleType.Children, title);
             messageDialog.SetContent(content);
 
-            _dialogService.Show(player.Entity, messageDialog, (MessageDialogResponse response) => onClose());
+            _dialogService.Show(player, messageDialog, (MessageDialogResponse response) => onClose());
         }
     }
 }

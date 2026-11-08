@@ -37,7 +37,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 OnCharacterPreferenceChosen(player, preferences, rows, response.ItemIndex);
             }
 
-            _dialogService.Show(player.Entity, preferencesDialog, CharacterPreferencesDialogHandler);
+            _dialogService.Show(player, preferencesDialog, CharacterPreferencesDialogHandler);
         }
 
         private static BetterTablistDialog CreateCharacterPreferencesDialog(CharacterPreferences preferences, out PreferencesDialogRows rows)
@@ -159,7 +159,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 onTurnOn();
             }
 
-            _dialogService.Show(player.Entity, questionDialog, HardcoreModeQuestionDialogHandler);
+            _dialogService.Show(player, questionDialog, HardcoreModeQuestionDialogHandler);
         }
 
         private void ActivateHardcoreMode(Player player, CharacterPreferences preferences)

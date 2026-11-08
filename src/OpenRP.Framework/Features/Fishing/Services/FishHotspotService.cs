@@ -1,11 +1,11 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Fishing.Components;
 using OpenRP.Framework.Features.Fishing.Entities;
-using SampSharp.ColAndreas.Entities.Definitions;
+using SampSharp.ColAndreas.Entities;
 using SampSharp.ColAndreas.Entities.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +50,7 @@ namespace OpenRP.Framework.Features.Fishing.Services
                 var endPos = new Vector3(x, y, -10);     // Extend below water level
 
                 // Cast vertical ray to find water surface
-                if (_colAndreasService.RayCastLine(startPos, endPos, out Vector3 waterSurface) == ColAndreasVars.WATER_MODEL)
+                if (_colAndreasService.RayCastLineModel(startPos, endPos, out Vector3 waterSurface) == ColAndreasConstants.WaterObject)
                 {
                     // Return position at known water height
                     return new Vector3(x, y, -1.5f);
@@ -66,7 +66,6 @@ namespace OpenRP.Framework.Features.Fishing.Services
             Vector3 hotspotPosition = await GetRandomHotspotPosition();
 
             EntityId fishHotspotEntityId = FishHotspotEntities.GenerateFishHotspotId();
-            _entityManager.Create(fishHotspotEntityId);
             _entityManager.AddComponent<FishHotspot>(fishHotspotEntityId);
 
             DynamicObject hotspotObject = _streamerService.CreateDynamicObject(18741, hotspotPosition, Vector3.Zero, parent: fishHotspotEntityId);

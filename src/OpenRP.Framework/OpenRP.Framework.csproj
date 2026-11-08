@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageIcon>OpenRoleplay.png</PackageIcon>
@@ -20,18 +20,18 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="ChatGPT.Net" Version="2.0.0" />
     <PackageReference Include="DSharpPlus" Version="4.5.0" />
-    <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="4.9.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.20" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2" />
-    <PackageReference Include="OpenRP.Streamer" Version="0.1.0" />
-    <PackageReference Include="SampSharp.ColAndreas.Entities" Version="0.1.1" />
-    <PackageReference Include="SampSharp.Core" Version="0.11.1" />
-    <PackageReference Include="SampSharp.Entities" Version="0.11.1" />
+    <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="5.3.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.22" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.22" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.8" />
+    <PackageReference Include="OpenRP.OpenMp.Streamer" Version="1.0.0-preview.2026.44.2" />
+    <PackageReference Include="SampSharp.OpenMp.ColAndreas" Version="1.0.0-preview.2026.44.2" />
+    <PackageReference Include="SampSharp.OpenMp.Entities" Version="1.0.0-prerelease2" />
+    <PackageReference Include="SampSharp.OpenMp.Entities.Commands" Version="1.0.0-prerelease2" />
     <PackageReference Include="Serilog" Version="4.2.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />

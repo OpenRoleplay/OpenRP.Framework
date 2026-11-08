@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.AccountSettingsFeature.Components;
 using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Features.Players.Extensions;
@@ -123,7 +123,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         SendClientRangedMessage(player, Color.LightGray, 20, CHAT_ACTION_LOOC);
                         break;
                     case PlayerChatMessageType.NEWBIE:
-                        string CHAT_ACTION_NEWBIE = String.Format("(( Newbie | {0} [{1}]: {2} ))", character.GetName(), player.Entity.Handle,text);
+                        string CHAT_ACTION_NEWBIE = String.Format("(( Newbie | {0} [{1}]: {2} ))", character.GetName(), player.Id, text);
                         
                         foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
                         {

@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Database.Services;
 using OpenRP.Framework.Features.Vehicles.Components;
 using OpenRP.Framework.Features.Vehicles.Helpers;
@@ -152,7 +152,7 @@ namespace OpenRP.Framework.Features.Vehicles.Services
 
             // Update the vehicle based on the provided data
             vehicle.Position = new Vector3(vehicleData.X, vehicleData.Y, vehicleData.Z);
-            vehicle.Rotation = new Vector3(0, 0, vehicleData.Rotation);
+            vehicle.Angle = vehicleData.Rotation;
             vehicle.ChangeColor(vehicleData.Color1, vehicleData.Color2);
             vehicle.SetNumberPlate(_vehicleHelper.GenerateCarPlate(vehicleData.Id, "SA"));
             vehicle.Engine = vehicleData.IsEngineOn;

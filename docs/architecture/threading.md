@@ -13,6 +13,10 @@ Only the [main thread](../glossary.md#main-thread) may touch players, objects, n
 | Do something later or repeatedly | A `[Timer]` system |
 | Anything else on another thread | Don't. No `Task.Run`, `System.Timers` or threads that touch the game. |
 
+## After an await
+
+A player may leave while you wait, and a destroyed component **throws** when used (SampSharp 1.0). After an `await`, check `component.IsComponentAlive` before you use a component you got earlier.
+
 ## async void
 
 An `async void` method can't be awaited, so its errors are lost.

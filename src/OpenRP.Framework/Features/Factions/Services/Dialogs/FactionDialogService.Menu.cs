@@ -58,7 +58,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 OpenFactionMenu(player, faction, () => OpenFactionChoice(player, factions, title, onBack));
             }
 
-            _dialogService.Show(player.Entity, factionDialog, OnFactionChosen);
+            _dialogService.Show(player, factionDialog, OnFactionChosen);
         }
 
         private void OpenFactionMenu(Player player, Faction faction, Action onBack)
@@ -99,7 +99,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                     OpenLeaveFaction(player, faction, reopenMenu);
             }
 
-            _dialogService.Show(player.Entity, menuDialog, OnMenuItemChosen);
+            _dialogService.Show(player, menuDialog, OnMenuItemChosen);
         }
 
         private void SetActiveFaction(Player player, Faction faction, Action onDone)

@@ -10,7 +10,7 @@ using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.Chat.Services;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -50,7 +50,6 @@ namespace OpenRP.Framework.Features.ChickenCoops.Services
         public ChickenCoop CreateChickenCoop(Vector3 position)
         {
             EntityId entityId = ChickenCoopEntities.GenerateChickenCoopId();
-            _entityManager.Create(entityId);
             ChickenCoop coop = _entityManager.AddComponent<ChickenCoop>(entityId, position);
             _streamerService.CreateDynamicTextLabel(coop.GetLabelText(), LabelColor, position, LabelDrawDistance, parent: entityId);
             return coop;

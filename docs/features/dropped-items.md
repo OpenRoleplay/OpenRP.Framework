@@ -27,7 +27,7 @@ Items are dropped from the [inventory](inventories.md) dialog.
 ## Deep dive
 
 - **Code:** `Features/DroppedItems/`.
-- **Component:** `DroppedItem`, on its own entity type, numbered by row id.
+- **Component:** `DroppedItem`, on the entity of its row (`DroppedItemEntities`). Its object and label are child entities of it.
 - **Service:** `IDroppedItemService`: `LoadDroppedItems`, `DropItem` and `PickupNearbyItem`.
 - **Money:** picking up money publishes [`OnPlayerCashUpdate`](../server-events.md).
 - **Tables:** [`DroppedInventoryItems`](../database.md#droppedinventoryitems-droppedinventoryitemmodel), with the item itself kept in the world inventory.

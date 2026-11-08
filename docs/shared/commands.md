@@ -37,6 +37,12 @@ public class CreateFactionCommand : ISystem
 
 ## Deep dive
 
+- **Built on SampSharp's command system.** The Framework replaces three of its services:
+  - `ServerCommandPermissionChecker` (`IPermissionChecker`): a character, with `cmd.<name>`;
+  - `ServerCommandMessageService` (`IPlayerCommandMessageService`): the error and syntax messages;
+  - `ServerCommandParameterParserFactory` (`ICommandParameterParserFactory`): the float parser below.
+
+  `[ServerCommand]` inherits SampSharp's `[PlayerCommand]`, so SampSharp finds the commands.
 - **Decimal numbers.** `float` arguments accept `.` and `,` (`InvariantFloatParser`). **Why:** the server runs in Dutch, where SampSharp's own parser reads `1234.56` as `123456`.
 - **The command cache.** `ServerCommandCache` finds commands in the Framework, and in assemblies the host registers with `RegisterApplicationAssembly`.
 - **`/help`** lists the commands you may use, grouped by `CommandGroups` (built by `ServerCommandGroupCache`).

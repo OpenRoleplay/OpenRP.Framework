@@ -28,10 +28,10 @@ If the batch fails, rows are saved one by one, so one bad row doesn't block the 
 
 ## New and deleted rows
 
-- **Created unsaved:** a new component has id 0 and a temporary entity id. It moves to its real id on the first save, so don't keep its `EntityId`.
+- **Created unsaved:** a new component has id 0 and a new entity (`EntityId.NewEntityId()`). On the first save it gets its id, and its entity becomes that row's entity. The entity stays the same, so its children and any references to it stay valid.
 - **`CreateAndLoad(model)`** inserts right away and returns the component. Use it when you need the id now, for example to link a new door.
 - **`LoadById(id)`** loads one row now, instead of at the next sync.
-- **Deleting:** mark it with `ProcessDeletion()`. It's deleted at the next save. Until then, lookups must skip it.
+- **Deleting:** mark it with `ProcessDeletion()`. It's deleted at the next save. Until then, lookups must skip it. Once the row is gone (deleted here or elsewhere), its entity is destroyed and its entity id forgotten, so a later row with the same id gets a fresh entity.
 
 ## Writing a manager
 
@@ -39,7 +39,7 @@ If the batch fails, rows are saved one by one, so one bad row doesn't block the 
 public class PropertyDoorManager : BaseManager<PropertyDoorModel, PropertyDoor>, IPropertyDoorManager
 {
     protected override DbSet<PropertyDoorModel> GetDbSet() => _dataContext.PropertyDoors;
-    protected override EntityId GetEntityId(PropertyDoorModel model) => PropertyEntities.GetPropertyDoorId((int)model.Id);
+    protected override Guid EntityTypeKey => PropertyEntities.PropertyDoorType;
     protected override EntityId? GetParentEntityId(PropertyDoorModel model) => /* the property, if any */;
     protected override PropertyDoorModel GetModelFromComponent(PropertyDoor component) => component.GetRawPropertyDoorModel();
     protected override void OnComponentLoaded(PropertyDoor component) { /* labels, objects */ }
@@ -51,7 +51,9 @@ public class PropertyDoorManager : BaseManager<PropertyDoorModel, PropertyDoor>,
 - `IChangeable` (its `Set…` methods call `ProcessChanges()`);
 - `IDeletable`, when rows can be deleted.
 
-**`OnComponentLoaded`** runs after every load or reload, for example to redraw a door's label after a rename on another server.
+**`EntityTypeKey`** is the table's type key; the manager finds a row's entity with `RowEntityIds.Get(EntityTypeKey, id)`.
+
+**`OnComponentLoaded`** runs after every load or reload, and after a new component's first save. For example, it redraws a door's label after a rename on another server.
 
 **Wiring:**
 - call `LoadAll()` in `OnGameModeInit` (parents first);

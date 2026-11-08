@@ -81,6 +81,12 @@ namespace OpenRP.Framework.Features.Currencies.Services
         {
             foreach (PendingPayment payment in GetAcceptedPayments())
             {
+                // An earlier payment's events may have let a player leave, which destroys their payment.
+                if (!payment.IsComponentAlive)
+                {
+                    continue;
+                }
+
                 try
                 {
                     await ContinuePayment(payment);

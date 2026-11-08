@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Database.Extensions;
 using OpenRP.Framework.Features.Accounts.Extensions;
 using OpenRP.Framework.Features.AccountSettingsFeature.Extensions;
@@ -67,7 +67,8 @@ namespace OpenRP.Framework.Extensions
                 .AddBiomeGenerator()
                 .AddCommands()
                 .AddServerSystemEvents()
-                .AddSystemsInAssembly();
+                // Named explicitly: the calling assembly isn't reliable once methods get inlined.
+                .AddSystemsInAssembly(typeof(ServiceCollectionExtensions).Assembly);
         }
     }
 }

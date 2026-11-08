@@ -15,7 +15,7 @@ using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using OpenRP.Framework.Shared.ServerEvents.Services;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 using SampSharp.ColAndreas.Entities.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
@@ -157,11 +157,12 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
         {
             Vector3 start = player.Position;
             Vector3 end = new Vector3(start.XY, GroundRayCastEndZ);
-            if (_colAndreasService.RayCastLineAngle(start, end, out Vector3 hitPosition, out Vector3 hitRotation) != 0)
+            if (_colAndreasService.RayCastLineAngle(start, end, out Vector3 hitPosition, out Vector3 hitRotation))
             {
                 return (hitPosition, hitRotation);
             }
-            return (_colAndreasService.FindZ_For2DCoord(start), Vector3.Zero);
+            float groundZ = _colAndreasService.FindZ_For2DCoord(start.XY, out float z) ? z : start.Z;
+            return (new Vector3(start.XY, groundZ), Vector3.Zero);
         }
 
         /// <summary>
@@ -225,8 +226,7 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
                 return;
             }
 
-            _entityManager.Create(worldItemEntityId, worldInventoryEntityId);
-            _entityManager.AddComponent<InventoryItem>(worldItemEntityId, worldItemModel);
+            _entityManager.AddComponent<InventoryItem>(worldItemEntityId, worldInventoryEntityId, worldItemModel);
         }
 
         private static void RemoveFromInventory(InventoryItem inventoryItem, uint amount)
@@ -258,7 +258,6 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
         private void CreateDroppedItemEntity(DroppedInventoryItemModel droppedItemModel, ItemModel itemModel)
         {
             EntityId droppedItemEntityId = DroppedItemEntities.GetDroppedItemId((int)droppedItemModel.Id);
-            _entityManager.Create(droppedItemEntityId);
             DroppedItem droppedItem = _entityManager.AddComponent<DroppedItem>(droppedItemEntityId, droppedItemModel);
 
             Vector3 position = droppedItem.GetPosition();
@@ -268,8 +267,7 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
                 Color.WhiteSmoke,
                 new Vector3(position.XY, position.Z + LabelHeightAboveItem),
                 LabelDrawDistance,
-                testLos: true,
-                parent: droppedItemEntityId);
+                testLos: true, parent: droppedItemEntityId);
         }
 
         /// <summary>

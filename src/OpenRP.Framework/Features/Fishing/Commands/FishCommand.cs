@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Commands.Attributes;
 using OpenRP.Framework.Features.Fishing.Enums;
 using OpenRP.Framework.Shared.Chat.Enums;

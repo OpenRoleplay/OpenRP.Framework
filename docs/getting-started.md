@@ -4,41 +4,54 @@ To run a server on the Framework, you make a [host](glossary.md#host): a SampSha
 
 ## You need
 
-- open.mp with the SampSharp, Streamer and ColAndreas plugins
+- open.mp **x64**, with these components in `components/`:
+  - SampSharp 1.0;
+  - the streamer: `streamer` from [KoertLichtendonk/omp-streamer-component](https://github.com/KoertLichtendonk/omp-streamer-component) plus `OpenRP.OpenMp.Streamer.Native` from [OpenRP.OpenMp.Streamer](https://github.com/OpenRoleplay/OpenRP.OpenMp.Streamer);
+  - ColAndreas for open.mp (`colandreas`), with `ColAndreas.cadb`.
 - MySQL or MariaDB
-- .NET 6
-- the `OpenRP.Framework` NuGet package (each push to its `main` branch publishes a version)
+- .NET 10
+- the `OpenRP.Framework` package
+
+**Why x64:** SampSharp 1.0 runs .NET 10, which only runs 64-bit. 32-bit SA-MP plugins can't load in a 64-bit server, so the plugins are open.mp components.
 
 ## Checklist
 
 1. **A database context** that inherits `BaseDataContext` and calls `modelBuilder.ApplyOpenRoleplayFrameworkModelConfigurations()` in `OnModelCreating`.
    - Register it as **transient**, plus `BaseDataContext` as an alias for it.
    - **Why transient:** a [singleton](glossary.md#singleton) context would keep one connection and change tracker for the whole run.
-2. **The plugin services:** `IStreamerService` and `IColAndreasService`. The Framework uses them, but leaves registering them to the host.
+2. **The plugin services:** `AddStreamer()` and `AddColAndreas()`. The Framework uses them, but leaves registering them to the host.
 3. **`AddOpenRoleplayFramework()`.**
 4. **The five features with settings:** `AddActorConversations`, `AddWorldWeather`, `AddWorldTime`, `AddCDN` and `AddDiscord`.
    - Call them all, even with empty options (`options => { }`).
    - **Why:** other systems depend on their services.
-5. **Your own code:** `AddSystemsInAssembly()` and `AddServerSystemsInAssembly()`.
+5. **Your own code:** `AddServerSystemsInAssembly(typeof(Startup).Assembly)`. SampSharp loads the host's own systems itself.
 6. **Your own commands:** if you have any, call `ServerCommandCache.RegisterApplicationAssembly(Assembly.GetExecutingAssembly())`.
-7. **ECS events:** `EnableSampEvents()`, `EnablePlayerCommands()`, `EnableRconCommands()` and `EnableStreamerEvents()`.
+7. **Startup:** `Startup` implements `IEcsStartup`: `UseEntities().UseCommands()` in `Initialize`, and `EnableStreamerEvents()` in `Configure`. There's no `Program.cs`: SampSharp generates the entry point.
 8. **Migrations:** make them in the host. See [Seed data and migrations](persistence/seed-data-and-migrations.md).
 
 ```csharp
-services
-    .AddDbContext<DataContext>(o => o.UseMySql(connectionString, serverVersion), ServiceLifetime.Transient)
-    .AddTransient<BaseDataContext>(p => p.GetService<DataContext>())
-    .AddSingleton<IStreamerService, StreamerService>()
-    .AddSingleton<IColAndreasService, ColAndreasService>()
-    .AddOpenRoleplayFramework()
-    .AddActorConversations(o => { })
-    .AddWorldWeather(o => { })
-    .AddWorldTime(o => { })
-    .AddCDN(o => { })
-    .AddDiscord(o => { })
-    .AddSystemsInAssembly()
-    .AddServerSystemsInAssembly();
+public class Startup : IEcsStartup
+{
+    public void Initialize(IStartupContext context) => context.UseEntities().UseCommands();
+
+    public void ConfigureServices(IServiceCollection services, IConfiguration configuration) => services
+        .AddDbContext<DataContext>(o => o.UseMySql(connectionString, serverVersion), ServiceLifetime.Transient)
+        .AddTransient<BaseDataContext>(p => p.GetService<DataContext>())
+        .AddStreamer()
+        .AddColAndreas()
+        .AddOpenRoleplayFramework()
+        .AddActorConversations(o => { })
+        .AddWorldWeather(o => { })
+        .AddWorldTime(o => { })
+        .AddCDN(o => { })
+        .AddDiscord(o => { })
+        .AddServerSystemsInAssembly(typeof(Startup).Assembly);
+
+    public void Configure(IEcsBuilder builder) => builder.EnableStreamerEvents();
+}
 ```
+
+Building needs a .NET 10 SDK new enough for SampSharp's source generator (C# compiler 5.3 or later). With an older SDK the build fails with "no static Main method".
 
 Keep secrets (the Discord token, the CDN password, API keys) out of source control.
 

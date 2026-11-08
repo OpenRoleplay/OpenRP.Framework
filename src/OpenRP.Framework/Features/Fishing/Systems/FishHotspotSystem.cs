@@ -1,4 +1,4 @@
-﻿using OpenRP.Framework.Features.Fishing.Components;
+using OpenRP.Framework.Features.Fishing.Components;
 using OpenRP.Framework.Features.Fishing.Services;
 using SampSharp.Entities.SAMP;
 using SampSharp.Entities;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenRP.Streamer;
+using OpenRP.OpenMp.Streamer;
 
 namespace OpenRP.Framework.Features.Fishing.Systems
 {
@@ -30,7 +30,7 @@ namespace OpenRP.Framework.Features.Fishing.Systems
             foreach (FishHotspot fishHotspot in entityManager.GetComponents<FishHotspot>())
             {
                 DynamicObject fishHotspotObject = fishHotspot.GetDynamicObject();
-                player.SetMapIcon(iconId, fishHotspotObject.Position, MapIcon.BoatYard, 0, MapIconType.Global);
+                player.SetMapIcon(iconId, fishHotspotObject.Position, MapIcon.BoatYard, 0, SampSharp.Entities.SAMP.MapIconType.Global);
                 iconId++;
             }
         }

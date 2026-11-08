@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using OpenRP.Framework.Database.Entities;
 using OpenRP.Framework.Database;
 using SampSharp.Entities;
@@ -42,7 +42,12 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
         }
 
         protected abstract DbSet<TModel> GetDbSet();
-        protected abstract EntityId GetEntityId(TModel model);
+
+        /// <summary>
+        /// The table's type key in <see cref="RowEntityIds"/>, for example <c>InventoryEntities.InventoryType</c>.
+        /// </summary>
+        protected abstract Guid EntityTypeKey { get; }
+
         protected abstract TModel GetModelFromComponent(TComponent component);
         protected virtual EntityId? GetParentEntityId(TModel model) => null;
 
@@ -163,7 +168,7 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
 
             foreach (TComponent component in SaveComponents(newComponents))
             {
-                RecreateEntityWithNewId(component);
+                KeepEntityForNewRow(component);
             }
         }
 
@@ -177,7 +182,7 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
 
             foreach (TComponent component in DeleteComponents(markedComponents.Where(component => !IsUnsaved(component)).ToList()))
             {
-                component.DestroyEntity();
+                DestroyEntityOfDeletedRow(component);
             }
         }
 
@@ -327,8 +332,24 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
                 {
                     _logger.LogWarning("{ModelName} {Id} was deleted elsewhere while it had unsaved changes here; the changes are dropped.", typeof(TModel).Name, component.GetId());
                 }
-                component.DestroyEntity();
+                DestroyEntityOfDeletedRow(component);
             }
+        }
+
+        /// <summary>
+        /// Destroys the entity of a row that no longer exists, and forgets the row's entity id, so a row that
+        /// later gets the same id (MySQL can reuse ids after a restart) gets a fresh entity.
+        /// </summary>
+        private void DestroyEntityOfDeletedRow(TComponent component)
+        {
+            ulong rowId = component.GetId();
+            component.DestroyEntity();
+            RowEntityIds.Remove(EntityTypeKey, (long)rowId);
+        }
+
+        private EntityId GetEntityId(TModel model)
+        {
+            return RowEntityIds.Get(EntityTypeKey, (long)model.Id);
         }
 
         private bool IsEntityLoaded(EntityId entityId)
@@ -370,36 +391,44 @@ namespace OpenRP.Framework.Shared.BaseManager.Helpers
                 return;
             }
 
-            _entityManager.Destroy<TComponent>(entityId);
-            OnComponentLoaded(_entityManager.AddComponent<TComponent>(entityId, model));
+            // The new component goes on first: an entity without components or children stops existing, and it
+            // would come back without its parent.
+            TComponent? oldComponent = _entityManager.GetComponent<TComponent>(entityId);
+            TComponent newComponent = AddComponentToEntity(entityId, model);
+            if (oldComponent != null)
+            {
+                _entityManager.Destroy(oldComponent);
+            }
+            OnComponentLoaded(newComponent);
         }
 
         private TComponent CreateEntityWithComponent(TModel model)
         {
-            EntityId entityId = GetEntityId(model);
-            EntityId? parentId = GetParentEntityId(model);
-            if (parentId.HasValue)
-            {
-                _entityManager.Create(entityId, parentId.Value);
-            }
-            else
-            {
-                _entityManager.Create(entityId);
-            }
-            TComponent component = _entityManager.AddComponent<TComponent>(entityId, model);
+            TComponent component = AddComponentToEntity(GetEntityId(model), model);
             OnComponentLoaded(component);
             return component;
         }
 
         /// <summary>
-        /// A new component gets its database id on its first save, so it moves to the entity matching that id.
+        /// Adds the component, which creates the entity (under its parent) when it doesn't exist yet.
         /// </summary>
-        private void RecreateEntityWithNewId(TComponent component)
+        private TComponent AddComponentToEntity(EntityId entityId, TModel model)
         {
-            TModel savedModel = GetModelFromComponent(component);
+            EntityId? parentId = GetParentEntityId(model);
+            return parentId.HasValue
+                ? _entityManager.AddComponent<TComponent>(entityId, parentId.Value, model)
+                : _entityManager.AddComponent<TComponent>(entityId, new object[] { model });
+        }
+
+        /// <summary>
+        /// A new component gets its database id on its first save. Its entity becomes that row's entity, so its
+        /// children and any references to it stay valid.
+        /// </summary>
+        private void KeepEntityForNewRow(TComponent component)
+        {
             component.ProcessChanges(false);
-            component.DestroyEntity();
-            CreateEntityWithComponent(savedModel);
+            RowEntityIds.Register(EntityTypeKey, (long)component.GetId(), component.Entity);
+            OnComponentLoaded(component);
         }
     }
 }

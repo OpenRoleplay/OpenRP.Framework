@@ -38,6 +38,13 @@ namespace OpenRP.Framework.Features.Admins.Commands
             SendCurrencyAmountMessage(player, currencyService, character, currency.Id, "before the update");
 
             CurrencyChangeResult result = await ChangeCharacterCurrency(currencyService, character, currency.Id, amount);
+
+            // Either player may have left during the update; a destroyed component throws when used.
+            if (!player.IsComponentAlive || !character.IsComponentAlive)
+            {
+                return;
+            }
+
             SendCurrencyChangeResultMessage(player, currencyService, character, currency, amount, result);
 
             SendCurrencyAmountMessage(player, currencyService, character, currency.Id, "after the update");

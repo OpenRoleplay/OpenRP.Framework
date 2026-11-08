@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Accounts.Components;
 using OpenRP.Framework.Shared.Dialogs.Enums;
@@ -67,7 +67,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                             OpenLoginAskUsernameDialog(player, onGoBack);
                         };
 
-                        _dialogService.Show(player.Entity, accountDoesNotExist, RetryUsernameDialogHandler);
+                        _dialogService.Show(player, accountDoesNotExist, RetryUsernameDialogHandler);
                     }
                 }
                 else
@@ -76,7 +76,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                 }
             }
 
-            _dialogService.Show(player.Entity, loginDialog, StepOneDialogHandler);
+            _dialogService.Show(player, loginDialog, StepOneDialogHandler);
         }
 
         /// <summary>
@@ -95,12 +95,18 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                 error = "Logging in failed. Please try again.";
             }
 
+            // The player may have left while the database answered; a destroyed component throws when used.
+            if (!player.IsComponentAlive)
+            {
+                return;
+            }
+
             if (error != null)
             {
                 BetterMessageDialog loginFailedDialog = new BetterMessageDialog("Back");
                 loginFailedDialog.SetTitle(TitleType.Children, "Login", "Not possible");
                 loginFailedDialog.SetContent(error);
-                _dialogService.Show(player.Entity, loginFailedDialog, _ => onGoBack?.Invoke());
+                _dialogService.Show(player, loginFailedDialog, _ => onGoBack?.Invoke());
             }
         }
 
@@ -131,7 +137,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                 }
             }
 
-            _dialogService.Show(player.Entity, loginDialog, StepTwoDialogHandler);
+            _dialogService.Show(player, loginDialog, StepTwoDialogHandler);
         }
 
         public void OpenRegistrationAskUsernameDialog(Player player, Action onGoBack)
@@ -172,7 +178,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                             OpenRegistrationAskUsernameDialog(player, onGoBack);
                         };
 
-                        _dialogService.Show(player.Entity, usernameNoLongerThanTwentyFourCharactersDialog, UsernameNoLongerThanTwentyFourCharactersDialogHandler);
+                        _dialogService.Show(player, usernameNoLongerThanTwentyFourCharactersDialog, UsernameNoLongerThanTwentyFourCharactersDialogHandler);
                     }
 
                     if (_accountService.DoesAccountExist(r.InputText))
@@ -198,7 +204,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                             OpenRegistrationAskPasswordDialog(player, onGoBack);
                         };
 
-                        _dialogService.Show(player.Entity, usernameSet, GoToStepTwoDialogHandler);
+                        _dialogService.Show(player, usernameSet, GoToStepTwoDialogHandler);
                     }
                 }
                 else
@@ -207,7 +213,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                 }
             }
 
-            _dialogService.Show(player.Entity, registerDialog, StepOneDialogHandler);
+            _dialogService.Show(player, registerDialog, StepOneDialogHandler);
         }
 
         public void OpenRegistrationUsernameAlreadyExistsDialog(Player player, Action onGoBack)
@@ -222,7 +228,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                 OpenRegistrationAskUsernameDialog(player, onGoBack);
             }
 
-            _dialogService.Show(player.Entity, usernameExistsDialog, UsernameAlreadyExistsDialogHandler);
+            _dialogService.Show(player, usernameExistsDialog, UsernameAlreadyExistsDialogHandler);
         }
 
         public void OpenRegistrationAskPasswordDialog(Player player, Action onGoBack)
@@ -249,7 +255,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                             OpenRegistrationAskPasswordDialog(player, onGoBack);
                         };
 
-                        _dialogService.Show(player.Entity, passwordMustBeLongerThanEightCharactersDialog, PasswordMustBeLongerThanEightCharactersDialogHandler);
+                        _dialogService.Show(player, passwordMustBeLongerThanEightCharactersDialog, PasswordMustBeLongerThanEightCharactersDialogHandler);
                         return;
                     }
 
@@ -267,7 +273,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                         OpenRegistrationAskPasswordConfirmationDialog(player, onGoBack);
                     };
 
-                    _dialogService.Show(player.Entity, passwordSet, PasswordSetHandler);
+                    _dialogService.Show(player, passwordSet, PasswordSetHandler);
                     return;
                 }
                 else
@@ -276,7 +282,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                 }
             }
 
-            _dialogService.Show(player.Entity, registerDialog, StepTwoDialogHandler);
+            _dialogService.Show(player, registerDialog, StepTwoDialogHandler);
         }
 
         public void OpenRegistrationAskPasswordConfirmationDialog(Player player, Action onGoBack)
@@ -308,7 +314,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                             }
                         };
 
-                        _dialogService.Show(player.Entity, passwordSetDialog, PasswordSetDialogHandler);
+                        _dialogService.Show(player, passwordSetDialog, PasswordSetDialogHandler);
                     }
                     else
                     {
@@ -322,7 +328,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                             OpenRegistrationAskPasswordDialog(player, onGoBack);
                         };
 
-                        _dialogService.Show(player.Entity, passwordsDoNotMatchDialog, PasswordsDoNotMatchDialogHandler);
+                        _dialogService.Show(player, passwordsDoNotMatchDialog, PasswordsDoNotMatchDialogHandler);
                     }
                 }
                 else
@@ -331,7 +337,7 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
                 }
             }
 
-            _dialogService.Show(player.Entity, registerDialog, StepTwoDialogHandler);
+            _dialogService.Show(player, registerDialog, StepTwoDialogHandler);
         }
     }
 }

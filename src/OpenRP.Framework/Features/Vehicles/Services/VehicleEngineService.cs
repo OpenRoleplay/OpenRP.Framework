@@ -35,7 +35,8 @@ namespace OpenRP.Framework.Features.Vehicles.Services
         public void BeginEngineStart(Player player, Vehicle vehicle)
         {
             _chatService.SendPlayerChatMessage(player, PlayerChatMessageType.ME, $"twists the key of the {vehicle.Model}...");
-            _entityManager.AddComponent<EngineStarting>(vehicle.Entity, player.Entity, DateTime.UtcNow + EngineStartDelay);
+            // An array, so the driver's EntityId isn't taken as the parent entity.
+            _entityManager.AddComponent<EngineStarting>(vehicle.Entity, new object[] { player.Entity, DateTime.UtcNow + EngineStartDelay });
         }
 
         public void FinishEngineStart(EngineStarting engineStarting)
