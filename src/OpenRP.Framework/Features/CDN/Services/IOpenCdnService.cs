@@ -1,14 +1,12 @@
 ﻿using SampSharp.Entities.SAMP;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.CDN.Services
 {
     public interface IOpenCdnService
     {
+        /// <summary>
+        /// A signed link to a CDN file that works for a few minutes, or null when the CDN isn't configured.
+        /// </summary>
         string? GetLink(string subDir, string filePath);
 
         /// <summary>
@@ -21,7 +19,14 @@ namespace OpenRP.Framework.Features.CDN.Services
         /// </summary>
         void Play(Player player, string subDir, string path, Vector3 position, float range);
 
+        /// <summary>
+        /// Plays a CDN audio file for the player, with its path given as base64.
+        /// </summary>
         void PlayBase64(Player player, string subDir, string path);
+
+        /// <summary>
+        /// Plays a CDN audio file for the player from a position, with its path given as base64.
+        /// </summary>
         void PlayBase64(Player player, string subDir, string path, Vector3 position, float range);
     }
 }
