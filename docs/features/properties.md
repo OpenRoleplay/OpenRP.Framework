@@ -30,6 +30,8 @@ See [The property editor](properties/editor.md).
    - **Leading back:** an exit without a link of its own leads back to the lowest-numbered door that links to it. Give it a link of its own to choose another.
 5. **On every startup,** the properties are exported as seed-data code. See [Default data export](properties/default-data.md).
 6. **[Actors](actors.md) can be inside a property too,** in its virtual world. Deleting a property publishes `OnPropertyDeleted`, and the actors inside it move outside.
+7. **A property can lie in one [jurisdiction](jurisdictions.md),** where it would pay property tax. Pick the most specific one, for example the city. Deleting the jurisdiction leaves the property without one.
+   - **Why not the owner's:** property tax goes to where the building stands, not to where its owner is registered.
 
 ## Known limitations
 

@@ -1,4 +1,4 @@
-using OpenRP.Framework.Database.Models;
+﻿using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Database.Services;
 using OpenRP.Framework.Features.Vehicles.Components;
 using OpenRP.Framework.Features.Vehicles.Helpers;
@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Database;
+using OpenRP.Framework.Features.Jurisdictions.Services;
 
 namespace OpenRP.Framework.Features.Vehicles.Services
 {
@@ -20,9 +21,11 @@ namespace OpenRP.Framework.Features.Vehicles.Services
         private readonly VehicleHelper _vehicleHelper;
         private readonly BaseDataContext _DataContext;
         private readonly IDataMemoryService _dataMemoryService;
+        private readonly IJurisdictionService _jurisdictionService;
 
-        public VehicleManager(IWorldService worldService, IEntityManager entityManager, BaseDataContext dataContext, IDataMemoryService dataMemoryService)
+        public VehicleManager(IWorldService worldService, IEntityManager entityManager, BaseDataContext dataContext, IDataMemoryService dataMemoryService, IJurisdictionService jurisdictionService)
         {
+            _jurisdictionService = jurisdictionService;
             _worldService = worldService;
             _entityManager = entityManager;
             _vehicleHelper = new VehicleHelper();
@@ -154,7 +157,7 @@ namespace OpenRP.Framework.Features.Vehicles.Services
             vehicle.Position = new Vector3(vehicleData.X, vehicleData.Y, vehicleData.Z);
             vehicle.Angle = vehicleData.Rotation;
             vehicle.ChangeColor(vehicleData.Color1, vehicleData.Color2);
-            vehicle.SetNumberPlate(_vehicleHelper.GenerateCarPlate(vehicleData.Id, "SA"));
+            SetNumberPlate(vehicle, vehicleData);
             vehicle.Engine = vehicleData.IsEngineOn;
             vehicle.Lights = vehicleData.AreLightsOn;
             vehicle.Alarm = vehicleData.IsAlarmOn;
@@ -166,6 +169,38 @@ namespace OpenRP.Framework.Features.Vehicles.Services
             vehicle.IsBackLeftDoorOpen = vehicleData.IsBackLeftDoorOpen;
             vehicle.IsBackRightDoorOpen = vehicleData.IsBackRightDoorOpen;
             vehicle.Health = vehicleData.CurrentHealth;
+        }
+
+        public void RefreshNumberPlates()
+        {
+            foreach (VehicleDataComponent vehicleDataComponent in _entityManager.GetComponents<VehicleDataComponent>())
+            {
+                SetNumberPlate(vehicleDataComponent.GetComponent<Vehicle>(), vehicleDataComponent.VehicleData);
+            }
+        }
+
+        /// <summary>
+        /// The database clears the link too, but loaded vehicles would save the old jurisdiction back when edited.
+        /// </summary>
+        public void RemoveVehiclesFromJurisdiction(ulong jurisdictionId)
+        {
+            foreach (VehicleDataComponent vehicleDataComponent in _entityManager.GetComponents<VehicleDataComponent>())
+            {
+                if (vehicleDataComponent.VehicleData.JurisdictionId != jurisdictionId)
+                {
+                    continue;
+                }
+                vehicleDataComponent.VehicleData.JurisdictionId = null;
+                SetNumberPlate(vehicleDataComponent.GetComponent<Vehicle>(), vehicleDataComponent.VehicleData);
+            }
+        }
+
+        /// <summary>
+        /// The plate starts with the tag of the country the vehicle is registered in, or SA when it isn't registered.
+        /// </summary>
+        private void SetNumberPlate(Vehicle? vehicle, VehicleModel vehicleData)
+        {
+            vehicle?.SetNumberPlate(_vehicleHelper.GenerateCarPlate(vehicleData.Id, _jurisdictionService.GetPlateTag(vehicleData.JurisdictionId)));
         }
 
         public async Task<bool> SetVehicleLockAsync(Vehicle vehicle, bool isLocked)

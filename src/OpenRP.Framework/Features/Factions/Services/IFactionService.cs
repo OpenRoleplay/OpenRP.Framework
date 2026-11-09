@@ -26,12 +26,6 @@ namespace OpenRP.Framework.Features.Factions.Services
         Faction GetTopFaction(Faction faction);
 
         /// <summary>
-        /// The government this faction falls under: the highest government among the faction and the factions above
-        /// it. Null when it isn't under a government, for example a mafia or a corporation.
-        /// </summary>
-        Faction? GetGovernment(Faction faction);
-
-        /// <summary>
         /// True when the controller is this faction itself or one of the factions above it.
         /// </summary>
         bool IsControlledBy(Faction faction, Faction controller);

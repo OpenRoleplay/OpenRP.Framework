@@ -11,6 +11,7 @@
 
 **Property menu**
 - **Rename.**
+- **Jurisdiction:** the [jurisdiction](../jurisdictions.md) it lies in, picked from the tree, or none.
 - **Add a door here:** where you stand, facing your way. It's inside the property whose virtual world you're in; otherwise, in an interior, inside its own property; otherwise outside. It puts you on the door, so you see its label.
 - **Go to:** the first door.
 - **Delete:** asks first, and deletes its doors too.

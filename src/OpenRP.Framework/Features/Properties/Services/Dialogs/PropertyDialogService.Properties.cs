@@ -1,3 +1,4 @@
+using OpenRP.Framework.Features.Jurisdictions.Components;
 using OpenRP.Framework.Features.Properties.Components;
 using OpenRP.Framework.Shared;
 using OpenRP.Framework.Shared.Dialogs;
@@ -51,6 +52,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
             BetterListDialog actionsDialog = new BetterListDialog("Choose", "Back");
             actionsDialog.SetTitle(TitleType.Children, PropertiesTitle, property.GetName());
             int renameRow = actionsDialog.AddRow("Rename");
+            int jurisdictionRow = actionsDialog.AddRow($"Jurisdiction: {ChatColor.Highlight}{GetJurisdictionName(property)}");
             int addDoorRow = actionsDialog.AddRow("Add a door here");
             int? goToRow = AddRowIf(actionsDialog, doors.Count > 0, "Go to");
             int deleteRow = actionsDialog.AddRow("Delete");
@@ -67,6 +69,8 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                     onBack();
                 else if (response.ItemIndex == renameRow)
                     OpenRenameProperty(player, property, reopenActions);
+                else if (response.ItemIndex == jurisdictionRow)
+                    OpenSetPropertyJurisdiction(player, property, reopenActions);
                 else if (response.ItemIndex == addDoorRow)
                     OpenAddDoor(player, property, reopenActions);
                 else if (response.ItemIndex == goToRow)
@@ -100,6 +104,24 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
             }
 
             OpenNameInput(player, $"Rename {property.GetName()}", $"Enter the new name for {ChatColor.Highlight}{property.GetName()}{ChatColor.White}:", Rename, onBack);
+        }
+
+        private void OpenSetPropertyJurisdiction(Player player, Property property, Action onBack)
+        {
+            void SetJurisdiction(Jurisdiction? jurisdiction)
+            {
+                _propertyEditorService.SetPropertyJurisdiction(property, jurisdiction?.GetId());
+                onBack();
+            }
+
+            _jurisdictionDialogService.OpenJurisdictionPicker(player, $"Jurisdiction of {property.GetName()}", "None", SetJurisdiction, onBack);
+        }
+
+        private string GetJurisdictionName(Property property)
+        {
+            ulong? jurisdictionId = property.GetJurisdictionId();
+            Jurisdiction? jurisdiction = jurisdictionId.HasValue ? _jurisdictionService.GetJurisdiction(jurisdictionId.Value) : null;
+            return jurisdiction?.GetName() ?? "None";
         }
 
         /// <summary>

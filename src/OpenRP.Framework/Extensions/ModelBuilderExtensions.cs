@@ -12,6 +12,7 @@ using OpenRP.Framework.Features.Inventories.Models.Configurations;
 using OpenRP.Framework.Features.Inventories.Models.DefaultData;
 using OpenRP.Framework.Features.Items.Models.Configurations;
 using OpenRP.Framework.Features.Items.Models.DefaultData;
+using OpenRP.Framework.Features.Jurisdictions.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.DefaultData;
 using OpenRP.Framework.Features.Properties.Models.Configurations;
@@ -62,6 +63,10 @@ namespace OpenRP.Framework.Extensions
 
             modelBuilder.ApplyConfiguration(new PermissionGroupModelDefaultData());
 
+            modelBuilder.ApplyConfiguration(new JurisdictionModelConfiguration());
+            modelBuilder.ApplyConfiguration(new FactionTaxRegistrationModelConfiguration());
+
+            modelBuilder.ApplyConfiguration(new PropertyModelConfiguration());
             modelBuilder.ApplyConfiguration(new PropertyDoorModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new VehicleModelConfiguration());

@@ -12,12 +12,14 @@ using System.Threading.Tasks;
 using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Features.Vehicles.Services;
 using OpenRP.Framework.Database;
+using OpenRP.Framework.Features.Jurisdictions.Services;
+using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
 
 namespace OpenRP.Framework.Features.Vehicles.Dialogs
 {
-    public class CreateOrUpdateVehicleDialog
+    public partial class CreateOrUpdateVehicleDialog
     {
-        public static void Open(Player player, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, BaseDataContext context, CreateOrUpdateVehicleDataComponent createOrUpdateVehicleDataComponent)
+        public static void Open(Player player, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, BaseDataContext context, CreateOrUpdateVehicleDataComponent createOrUpdateVehicleDataComponent)
         {
             if (createOrUpdateVehicleDataComponent != null)
             {
@@ -75,6 +77,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                 AddRow("Back Right Window Closed", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackRightWindowClosed);
                 AddRow("Current Health", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.CurrentHealth);
                 AddRow("Max Health", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.MaxHealth);
+                AddRow("Registered in", GetRegisteredInLabel(jurisdictionService, createOrUpdateVehicleDataComponent));
                 AddRow("Save", string.Empty);
 
                 // Create the dialog
@@ -111,7 +114,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                     {
                                         //createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.ModelId = result;
 
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     }
                                     else
                                     {
@@ -128,11 +131,11 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                     OpenMessageDialog(player, dialogService, "Invalid Id", "You have entered an invalid id. Make sure the id is valid and between 400 and 611.",
                                     () => // Left button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     },
                                     () => // Right button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     });
                                 }
                             });
@@ -162,11 +165,11 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Z = newPosition.Z;
                                 createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Rotation = newRotation;
 
-                                Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                             },
                             () => // Right button
                             {
-                                Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                             });
                             break;
 
@@ -183,7 +186,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                         vehicleManager.UpdateVehicle(createOrUpdateVehicleDataComponent.EditedVehicle, createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData);
                                     }
 
-                                    Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                    Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                 }
                                 else
                                 {
@@ -195,11 +198,11 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                     OpenMessageDialog(player, dialogService, "Invalid Color", "You have entered an invalid Color.",
                                     () => // Left button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     },
                                     () => // Right button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     });
                                 }
                             });
@@ -218,7 +221,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                         vehicleManager.UpdateVehicle(createOrUpdateVehicleDataComponent.EditedVehicle, createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData);
                                     }
 
-                                    Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                    Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                 }
                                 else
                                 {
@@ -230,11 +233,11 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                     OpenMessageDialog(player, dialogService, "Invalid Color", "You have entered an invalid Color.",
                                     () => // Left button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     },
                                     () => // Right button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     });
                                 }
                             });
@@ -249,7 +252,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                             player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"Vehicle engine turned {engineStatus}.");
 
                             // Re-open the main dialog after the change
-                            Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                            Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                             break;
 
                         case 5: // Lights On/Off
@@ -261,7 +264,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                             player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"Vehicle lights turned {lightStatus}.");
 
                             // Re-open the main dialog after the change
-                            Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                            Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                             break;
 
                         case 6: // Alarm On/Off
@@ -271,6 +274,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Alarm On",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsAlarmOn,
@@ -285,6 +290,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Are Doors Locked",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.AreDoorsLocked,
@@ -299,6 +306,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Bonnet Open",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBonnetOpen,
@@ -313,6 +322,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Boot Open",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBootOpen,
@@ -327,6 +338,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Driver Door Open",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsDriverDoorOpen,
@@ -341,6 +354,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Passenger Door Open",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsPassengerDoorOpen,
@@ -355,6 +370,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Back Left Door Open",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackLeftDoorOpen,
@@ -369,6 +386,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Back Right Door Open",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackRightDoorOpen,
@@ -383,6 +402,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Driver Window Closed",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsDriverWindowClosed,
@@ -397,6 +418,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Passenger Window Closed",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsPassengerWindowClosed,
@@ -411,6 +434,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Back Left Window Closed",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackLeftWindowClosed,
@@ -425,6 +450,8 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 dialogService,
                                 entityManager,
                                 vehicleManager,
+                                jurisdictionService,
+                                jurisdictionDialogService,
                                 context,
                                 "Is Back Right Window Closed",
                                 () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackRightWindowClosed,
@@ -440,7 +467,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 {
                                     createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.CurrentHealth = result;
 
-                                    Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                    Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                 }
                                 else
                                 {
@@ -452,11 +479,11 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                     OpenMessageDialog(player, dialogService, "Invalid Vehicle Health", "You have entered an invalid Vehicle Health.",
                                     () => // Left button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     },
                                     () => // Right button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     });
                                 }
                             });
@@ -470,7 +497,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                 {
                                     createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.MaxHealth = result;
 
-                                    Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                    Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                 }
                                 else
                                 {
@@ -482,17 +509,21 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                                     OpenMessageDialog(player, dialogService, "Invalid Vehicle Health", "You have entered an invalid Vehicle Health.",
                                     () => // Left button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     },
                                     () => // Right button
                                     {
-                                        Open(player, dialogService, entityManager, vehicleManager, context, createOrUpdateVehicleDataComponent);
+                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
                                     });
                                 }
                             });
                             break;
 
-                        case 20: // Save Vehicle Data
+                        case 20: // Registered in
+                            OpenRegisteredIn(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, createOrUpdateVehicleDataComponent);
+                            break;
+
+                        case 21: // Save Vehicle Data
                             SaveVehicleData(createOrUpdateVehicleDataComponent, vehicleManager, context);
                             player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "Vehicle data has been saved successfully.");
                             break;
@@ -559,7 +590,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
             dialogService.Show(player, messageDialog, DialogHandler);
         }
 
-        private static void ToggleProperty(Player player, CreateOrUpdateVehicleDataComponent component, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, BaseDataContext context, string propertyName, Func<bool> getProperty, Action<bool> setProperty)
+        private static void ToggleProperty(Player player, CreateOrUpdateVehicleDataComponent component, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, BaseDataContext context, string propertyName, Func<bool> getProperty, Action<bool> setProperty)
         {
             // Get the current value of the property
             bool currentValue = getProperty();
@@ -579,7 +610,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
             }
 
             // Re-open the main dialog after the change
-            Open(player, dialogService, entityManager, vehicleManager, context, component);
+            Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, component);
         }
 
         private static void SaveVehicleData(CreateOrUpdateVehicleDataComponent component, IVehicleManager vehicleManager, BaseDataContext context)

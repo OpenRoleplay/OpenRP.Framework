@@ -43,6 +43,8 @@ namespace OpenRP.Framework.Database
         public DbSet<VehicleModelSpawnTypeModelModel> VehicleModelSpawnTypeModels { get; set; }
         public DbSet<FishLootModel> FishSpecies { get; set; }
         public DbSet<AccountSettingsModel> AccountSettings { get; set; }
+        public DbSet<JurisdictionModel> Jurisdictions { get; set; }
+        public DbSet<FactionTaxRegistrationModel> FactionTaxRegistrations { get; set; }
 
         // Parameterless Constructor
         public BaseDataContext() : base() { }

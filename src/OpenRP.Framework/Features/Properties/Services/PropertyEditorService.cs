@@ -92,6 +92,22 @@ namespace OpenRP.Framework.Features.Properties.Services
             _ = _serverEventAggregator.PublishAsync(new OnPropertyDeletedEventArgs { PropertyId = property.GetId() });
         }
 
+        public void SetPropertyJurisdiction(Property property, ulong? jurisdictionId)
+        {
+            property.SetJurisdictionId(jurisdictionId);
+        }
+
+        /// <summary>
+        /// The database clears the link too, but loaded properties would save the old jurisdiction back over it.
+        /// </summary>
+        public void RemovePropertiesFromJurisdiction(ulong jurisdictionId)
+        {
+            foreach (Property property in GetProperties().Where(property => property.GetJurisdictionId() == jurisdictionId))
+            {
+                property.SetJurisdictionId(null);
+            }
+        }
+
         public (PropertyDoor? Door, string? Error) CreateDoor(Property property, string name, Player player)
         {
             string? error = GetNameError("door", name);

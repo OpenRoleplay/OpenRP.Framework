@@ -42,6 +42,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [Hotwire](features/hotwire.md): start a vehicle without a key
 - [Inventories](features/inventories.md): weight-based inventories
 - [Items](features/items.md): item types
+- [Jurisdictions](features/jurisdictions.md): countries and cities with tags, currency, government and tax registrations; `/editjurisdictions`
 - [MainMenu](features/main-menu.md): what you see after connecting
 - [Maps](features/maps.md): placeholder, not working yet
 - [Permissions](features/permissions.md): see the Permissions guide

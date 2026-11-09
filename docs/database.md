@@ -90,6 +90,15 @@ See [Permissions](permissions.md).
 
 See [Factions](features/factions.md).
 
+## Jurisdictions
+
+| Table | Columns | Notes |
+|---|---|---|
+| `Jurisdictions` (`JurisdictionModel`) | `Name` (64), `TwoLetterTag` (2), `ThreeLetterTag` (3), `FourLetterTag` (4), `ParentJurisdictionId` → `Jurisdictions` (restrict), `CurrencyId` → `Currencies` (set null), `GovernmentFactionId` → `Factions` (set null) | A tree; no parent = a country. Each tag is required and unique. Null currency or government = the parent's |
+| `FactionTaxRegistrations` (`FactionTaxRegistrationModel`) | `FactionId` → factions (cascade), `JurisdictionId` → jurisdictions (cascade) | Where a faction pays taxes. Unique per faction + jurisdiction |
+
+See [Jurisdictions](features/jurisdictions.md).
+
 ## Items, inventories and money
 
 ### `Items` (`ItemModel`)
@@ -155,7 +164,7 @@ Table `PropertyDoors` (`PropertyDoorModel`).
 | `InsidePropertyId` | ulong? | → `Properties` (set null). The property whose virtual world the door is in; null = outside, in the shared world |
 
 ### `Properties`
-Table `Properties` (`PropertyModel`): `Name`.
+Table `Properties` (`PropertyModel`): `Name`, `JurisdictionId` → `Jurisdictions` (set null; null = none).
 
 ### `Vehicles` (`VehicleModel`)
 Persistent vehicles.
@@ -171,6 +180,7 @@ Persistent vehicles.
 | `CurrentHealth`, `MaxHealth` | float | |
 | `ServerVehicle` | bool | Belongs to the server, not a player |
 | `OwnerCharacterId` | ulong? | → `Characters` |
+| `JurisdictionId` | ulong? | → `Jurisdictions` (set null). Where it's registered; its plate starts with that country's tag. Null = none, an `SA` plate |
 | `LoadedAs` | int? | |
 
 ### Vehicle model lookups

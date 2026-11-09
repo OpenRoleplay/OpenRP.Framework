@@ -31,7 +31,7 @@ All five are loaded by [BaseManagers](../../persistence/base-manager.md) and syn
 
 | Service | Responsibility |
 |---|---|
-| `IFactionService` | The faction tree: `GetParentFaction`, `GetChildFactions`, `GetGovernment`, `IsControlledBy` |
+| `IFactionService` | The faction tree: `GetParentFaction`, `GetChildFactions`, `GetTopFaction`, `IsControlledBy` |
 | `IFactionRankService` | The rank tree: create, rename, move, delete |
 | `IFactionMembershipService` | Members, leaders, invitations, active faction, granting |
 | `IFactionPermissionService` | What factions and ranks have. Also an `ICharacterPermissionSource` |

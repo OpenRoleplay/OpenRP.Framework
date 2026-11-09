@@ -16,7 +16,7 @@ Player organisations, such as police, gangs, companies and governments. Each fac
 
 ## How it works
 
-1. **The faction tree.** A faction can have a parent faction. Leaders of a faction above can manage the ones below. A faction of type `Government` is the government of everything under it.
+1. **The faction tree.** A faction can have a parent faction. Leaders of a faction above can manage the ones below. The type `Government` is only a label; which faction governs a place is set on the [jurisdiction](jurisdictions.md).
 2. **Ranks** form a tree inside each faction.
    - The rank at the top is the leader rank.
    - You manage ranks below your own, if you have `faction.manageranks`.
@@ -35,4 +35,4 @@ Player organisations, such as police, gangs, companies and governments. Each fac
 - **Database-only changes.** Factions can't be renamed, deleted, retyped or moved in-game.
 - **No faction gameplay yet:** no vehicles, properties, duty, radio or police tools.
 
-Want more? → [How it's built](factions/internals.md) · [Permissions](../permissions.md)
+Want more? → [How it's built](factions/internals.md) · [Permissions](../permissions.md) · [Jurisdictions](jurisdictions.md)

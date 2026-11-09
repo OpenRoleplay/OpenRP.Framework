@@ -31,8 +31,11 @@ namespace OpenRP.Framework.Database.Models
         public bool ServerVehicle { get; set; }
         public ulong? OwnerCharacterId { get; set; }
         public int? LoadedAs { get; set; }
+        // Where the vehicle is registered; its plate starts with that country's tag. Null for none (an SA plate).
+        public ulong? JurisdictionId { get; set; }
 
         // Navigational Properties
+        public JurisdictionModel? Jurisdiction { get; set; }
         public CharacterModel? OwnerCharacter { get; set; }
         public VehicleModelSpawnTypeModel? ModelSpawnType { get; set; }
         public VehicleModelModel? Model { get; set; }

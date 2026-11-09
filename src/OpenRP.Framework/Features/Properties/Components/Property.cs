@@ -62,6 +62,20 @@ namespace OpenRP.Framework.Features.Properties.Components
         }
 
         /// <summary>
+        /// The jurisdiction the property lies in, where it would pay property tax, or null for none.
+        /// </summary>
+        public ulong? GetJurisdictionId()
+        {
+            return _propertyModel.JurisdictionId;
+        }
+
+        public void SetJurisdictionId(ulong? jurisdictionId)
+        {
+            _propertyModel.JurisdictionId = jurisdictionId;
+            ProcessChanges();
+        }
+
+        /// <summary>
         /// The doors of this property that are loaded and not deleted.
         /// </summary>
         public List<PropertyDoor> GetDoors()

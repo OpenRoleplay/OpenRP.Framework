@@ -10,7 +10,7 @@ They're written to `scriptfiles/DefaultData/`, and overwritten on every start.
 
 | File | Contains |
 |---|---|
-| `PropertyDefaultData.cs` | The properties (`HasDefaultData` rows) |
+| `PropertyDefaultData.cs` | The properties (`HasDefaultData` rows), with their jurisdiction |
 | `PropertyDoorDefaultData.cs` | The doors, with the property each is inside and their links |
 
 The namespace is `<host>.Features.Properties.Models.DefaultData`, so the files fit the host as they are.
@@ -20,6 +20,7 @@ The namespace is `<host>.Features.Properties.Models.DefaultData`, so the files f
 ## Shipping properties with a server
 
 1. Copy the two DefaultData classes into the host, and apply them in its `DataContext`.
+   - **Jurisdictions:** a property's `JurisdictionId` must point at a jurisdiction the host seeds too. Set it to `null` for jurisdictions created in-game, or seed those as well.
 2. Run `migrations add`. The links are in the doors' rows, so there's nothing to add by hand.
 3. On the database you exported from, mark the migration as applied instead of running it, because the rows are already there.
 

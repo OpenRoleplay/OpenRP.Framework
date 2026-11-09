@@ -12,6 +12,8 @@ using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Features.Vehicles.Components;
 using OpenRP.Framework.Features.Vehicles.Services;
 using OpenRP.Framework.Database;
+using OpenRP.Framework.Features.Jurisdictions.Services;
+using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
 using OpenRP.Framework.Features.Vehicles.Dialogs;
 
 namespace OpenRP.Framework.Features.Vehicles.Commands
@@ -21,9 +23,14 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
         private readonly IDialogService _dialogService;
         private readonly IEntityManager _entityManager;
         private readonly IVehicleManager _vehicleManager;
+        private readonly IJurisdictionService _jurisdictionService;
+        private readonly IJurisdictionDialogService _jurisdictionDialogService;
 
-        public EditVehicleCommand(IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager)
+        public EditVehicleCommand(IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager,
+            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService)
         {
+            _jurisdictionService = jurisdictionService;
+            _jurisdictionDialogService = jurisdictionDialogService;
             _dialogService = dialogService;
             _entityManager = entityManager;
             _vehicleManager = vehicleManager;
@@ -68,7 +75,7 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
                 };
 
                 // Open the vehicle editing dialog
-                CreateOrUpdateVehicleDialog.Open(player, _dialogService, _entityManager, _vehicleManager, dataContext, createOrUpdateVehicleDataComponent);
+                CreateOrUpdateVehicleDialog.Open(player, _dialogService, _entityManager, _vehicleManager, _jurisdictionService, _jurisdictionDialogService, dataContext, createOrUpdateVehicleDataComponent);
             }
         }
     }

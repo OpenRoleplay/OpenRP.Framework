@@ -59,6 +59,7 @@ namespace OpenRP.Framework.Features.Properties.Helpers
             {
                 (nameof(PropertyModel.Id), CSharpLiterals.GetULong(property.Id)),
                 (nameof(PropertyModel.Name), CSharpLiterals.GetString(property.Name)),
+                (nameof(PropertyModel.JurisdictionId), CSharpLiterals.GetULong(property.JurisdictionId)),
             });
         }
 

@@ -97,6 +97,12 @@ namespace OpenRP.Framework.Features.Vehicles.Models.Configurations
                    .WithMany(v => v.Vehicles) // adjust if CharacterModel has a collection property
                    .HasForeignKey(v => v.OwnerCharacterId)
                    .OnDelete(DeleteBehavior.SetNull); // or choose DeleteBehavior.Restrict
+
+            // Deleting a jurisdiction leaves its vehicles unregistered, with an SA plate.
+            builder.HasOne(v => v.Jurisdiction)
+                   .WithMany()
+                   .HasForeignKey(v => v.JurisdictionId)
+                   .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

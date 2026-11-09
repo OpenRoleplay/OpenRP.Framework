@@ -38,6 +38,16 @@ namespace OpenRP.Framework.Features.Properties.Services
         void DeleteProperty(Property property);
 
         /// <summary>
+        /// Puts the property in a jurisdiction, where it would pay property tax, or in none when it's null.
+        /// </summary>
+        void SetPropertyJurisdiction(Property property, ulong? jurisdictionId);
+
+        /// <summary>
+        /// Takes the properties out of a jurisdiction that was deleted, so they have none.
+        /// </summary>
+        void RemovePropertiesFromJurisdiction(ulong jurisdictionId);
+
+        /// <summary>
         /// Creates a door of the property where the player stands, facing the way they face. It's inside the property
         /// whose virtual world the player is in; otherwise inside its own property when the player is in an interior,
         /// otherwise outside. The door is null when the name isn't valid.

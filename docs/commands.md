@@ -28,6 +28,12 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 | `/factionpermission [faction id] [permission]` | Admin | Give a faction a permission, or take it away again. This is how top-level factions get their permissions. | [Factions](features/factions.md) |
 | `/setfactionleader [target] [faction id]` | Admin | Make a player a leader of a faction, with its top rank. | [Factions](features/factions.md) |
 
+## Admin > Jurisdictions
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/editjurisdictions` | Admin | Create countries and the places in them, and set their tags, currency, government and tax registrations. | [Jurisdictions](features/jurisdictions.md) |
+
 ## Admin > Permissions
 
 | Command | Groups | Description | Feature |

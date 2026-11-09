@@ -17,6 +17,7 @@ using OpenRP.Framework.Features.DebugSettingsFeature.Extensions;
 using OpenRP.Framework.Features.Fishing.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
 using OpenRP.Framework.Features.Items.Extensions;
+using OpenRP.Framework.Features.Jurisdictions.Extensions;
 using OpenRP.Framework.Features.MainMenu.Extensions;
 using OpenRP.Framework.Features.Permissions.Extensions;
 using OpenRP.Framework.Features.Properties.Extensions;
@@ -63,6 +64,7 @@ namespace OpenRP.Framework.Extensions
                 .AddProperties()
                 .AddChickenCoops()
                 .AddFactions()
+                .AddJurisdictions()
                 .AddDebugSettings()
                 .AddBiomeGenerator()
                 .AddCommands()

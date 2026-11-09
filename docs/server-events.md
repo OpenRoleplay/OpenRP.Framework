@@ -25,6 +25,10 @@ public void OnCharacterSelected(OnCharacterSelectedEventArgs args, ISkillService
 | <a id="onfactionpermissionschanged"></a>`OnFactionPermissionsChanged` | faction permissions may have changed | [Factions](features/factions.md) | [Permissions](permissions.md) (reload those online) |
 | <a id="onresourceharvested"></a>`OnResourceHarvested` | a player harvested a resource | [Harvestables](features/harvestables.md) | nothing yet: for gamemodes to give rewards |
 | <a id="onpropertydeleted"></a>`OnPropertyDeleted` | an admin deleted a property | [Properties](features/properties.md) | [Actors](features/actors.md) (actors inside it move outside) |
+| <a id="onjurisdictionsloaded"></a>`OnJurisdictionsLoaded` | the jurisdictions were loaded at startup | [Jurisdictions](features/jurisdictions.md) | [Vehicles](features/vehicles.md) (set plates again) |
+| <a id="onjurisdictionplatetagchanged"></a>`OnJurisdictionPlateTagChanged` | a jurisdiction's tags changed, or it moved to another country | [Jurisdictions](features/jurisdictions.md) | [Vehicles](features/vehicles.md) (set plates again) |
+| <a id="onjurisdictiongovernmentchanged"></a>`OnJurisdictionGovernmentChanged` | a jurisdiction got another government of its own (old and new faction id, null = none) | [Jurisdictions](features/jurisdictions.md) | nothing yet: for police, laws and taxes later |
+| <a id="onjurisdictiondeleted"></a>`OnJurisdictionDeleted` | an admin deleted a jurisdiction | [Jurisdictions](features/jurisdictions.md) | [Properties](features/properties.md) and [Vehicles](features/vehicles.md) (have no jurisdiction) |
 | <a id="onplayerchatmessagesent"></a>`OnPlayerChatMessageSent` | a character's nearby chat was sent: /me, /do, /my, /say, /low or /shout | [Chat](shared/chat.md) | [ActorRoleplay](features/actor-roleplay.md) (actors hear it) |
 | `OnPlayerInventoryItemUsed` | (unused) | nobody | nobody |
 

@@ -41,11 +41,6 @@ namespace OpenRP.Framework.Features.Factions.Services
             return GetFactionAndAncestors(faction).Last();
         }
 
-        public Faction? GetGovernment(Faction faction)
-        {
-            return GetFactionAndAncestors(faction).LastOrDefault(ancestor => ancestor.IsGovernment());
-        }
-
         public bool IsControlledBy(Faction faction, Faction controller)
         {
             return GetFactionAndAncestors(faction).Any(ancestor => ancestor.GetId() == controller.GetId());

@@ -1,3 +1,5 @@
+using OpenRP.Framework.Features.Jurisdictions.Services;
+using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
 using OpenRP.Framework.Features.Properties.Components;
 using OpenRP.Framework.Shared;
 using OpenRP.Framework.Shared.Dialogs;
@@ -18,12 +20,17 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
         private readonly IDialogService _dialogService;
         private readonly IPropertyService _propertyService;
         private readonly IPropertyEditorService _propertyEditorService;
+        private readonly IJurisdictionService _jurisdictionService;
+        private readonly IJurisdictionDialogService _jurisdictionDialogService;
 
-        public PropertyDialogService(IDialogService dialogService, IPropertyService propertyService, IPropertyEditorService propertyEditorService)
+        public PropertyDialogService(IDialogService dialogService, IPropertyService propertyService, IPropertyEditorService propertyEditorService,
+            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService)
         {
             _dialogService = dialogService;
             _propertyService = propertyService;
             _propertyEditorService = propertyEditorService;
+            _jurisdictionService = jurisdictionService;
+            _jurisdictionDialogService = jurisdictionDialogService;
         }
 
         /// <summary>
