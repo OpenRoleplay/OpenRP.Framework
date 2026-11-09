@@ -19,6 +19,13 @@ namespace OpenRP.Framework.Features.Properties.Models.Configurations
                    .WithMany()
                    .HasForeignKey(door => door.LinkedToPropertyDoorId)
                    .OnDelete(DeleteBehavior.SetNull);
+
+            // A door can stand inside another property, for example an apartment's entrance in a building's hallway.
+            // Deleting that property puts its doors outside instead of deleting them.
+            builder.HasOne(door => door.InsideProperty)
+                   .WithMany()
+                   .HasForeignKey(door => door.InsidePropertyId)
+                   .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

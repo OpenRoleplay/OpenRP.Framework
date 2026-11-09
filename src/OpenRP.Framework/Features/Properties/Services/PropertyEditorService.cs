@@ -1,5 +1,6 @@
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Properties.Components;
+using OpenRP.Framework.Features.VirtualWorlds.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -11,18 +12,22 @@ namespace OpenRP.Framework.Features.Properties.Services
     public class PropertyEditorService : IPropertyEditorService
     {
         private const int NameMaxLength = 64;
+        private const int OutsideInterior = 0;
 
         private readonly IEntityManager _entityManager;
         private readonly IPropertyManager _propertyManager;
         private readonly IPropertyDoorManager _propertyDoorManager;
         private readonly IPropertyService _propertyService;
+        private readonly IVirtualWorldManager _virtualWorldManager;
 
-        public PropertyEditorService(IEntityManager entityManager, IPropertyManager propertyManager, IPropertyDoorManager propertyDoorManager, IPropertyService propertyService)
+        public PropertyEditorService(IEntityManager entityManager, IPropertyManager propertyManager, IPropertyDoorManager propertyDoorManager,
+            IPropertyService propertyService, IVirtualWorldManager virtualWorldManager)
         {
             _entityManager = entityManager;
             _propertyManager = propertyManager;
             _propertyDoorManager = propertyDoorManager;
             _propertyService = propertyService;
+            _virtualWorldManager = virtualWorldManager;
         }
 
         public List<Property> GetProperties()
@@ -75,6 +80,7 @@ namespace OpenRP.Framework.Features.Properties.Services
             {
                 DeleteDoor(door);
             }
+            MoveDoorsOutsideOf(property);
             property.ProcessDeletion();
         }
 
@@ -85,7 +91,15 @@ namespace OpenRP.Framework.Features.Properties.Services
             {
                 return (null, error);
             }
-            return (_propertyDoorManager.CreateAndLoad(CreateDoorModelAtPlayer(property, name.Trim(), player)), null);
+            PropertyDoorModel doorModel = CreateDoorModelAtPlayer(property, name.Trim(), player);
+            doorModel.InsidePropertyId = GetInsidePropertyIdForPlayer(property, player);
+            return (_propertyDoorManager.CreateAndLoad(doorModel), null);
+        }
+
+        public void SetDoorInsideProperty(PropertyDoor door, Property? insideProperty)
+        {
+            door.SetInsidePropertyId(insideProperty?.GetId());
+            _propertyService.CreateDoorLabel(door);
         }
 
         public string? RenameDoor(PropertyDoor door, string name)
@@ -106,6 +120,7 @@ namespace OpenRP.Framework.Features.Properties.Services
             door.SetPosition(player.Position);
             door.SetAngle(player.Angle);
             door.SetInterior(player.Interior);
+            door.SetInsidePropertyId(GetInsidePropertyIdForPlayer(door.GetProperty(), player));
             _propertyService.CreateDoorLabel(door);
         }
 
@@ -163,6 +178,34 @@ namespace OpenRP.Framework.Features.Properties.Services
             foreach (PropertyDoor otherDoor in GetLoadedDoors().Where(otherDoor => otherDoor.IsLinkedTo(door)).ToList())
             {
                 otherDoor.SetLinkedDoorId(null);
+            }
+        }
+
+        /// <summary>
+        /// The property a door placed where the player stands is inside: the property whose virtual world the player
+        /// is in (an apartment's entrance in a building's hallway is inside the building), otherwise the door's own
+        /// property when the player is in an interior, otherwise none, outside. Admins can change it afterwards, for
+        /// example for a room built into the map at interior 0.
+        /// </summary>
+        private ulong? GetInsidePropertyIdForPlayer(Property? doorProperty, Player player)
+        {
+            ulong? propertyOfVirtualWorld = _virtualWorldManager.GetPropertyIdOfVirtualWorld(player.VirtualWorld);
+            if (propertyOfVirtualWorld.HasValue)
+            {
+                return propertyOfVirtualWorld;
+            }
+
+            return player.Interior != OutsideInterior ? doorProperty?.GetId() : null;
+        }
+
+        /// <summary>
+        /// The database puts these doors outside too, but loaded doors would save the old value back over it.
+        /// </summary>
+        private void MoveDoorsOutsideOf(Property property)
+        {
+            foreach (PropertyDoor door in GetLoadedDoors().Where(door => door.GetInsidePropertyId() == property.GetId()).ToList())
+            {
+                SetDoorInsideProperty(door, null);
             }
         }
 

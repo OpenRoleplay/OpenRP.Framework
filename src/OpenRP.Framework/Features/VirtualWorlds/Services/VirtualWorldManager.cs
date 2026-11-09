@@ -10,11 +10,13 @@ namespace OpenRP.Framework.Features.VirtualWorlds.Services
     {
         private int _nextVirtualWorld;
         private Dictionary<string, int> _mappingVirtualWorlds;
+        private Dictionary<int, ulong> _propertyIdsByVirtualWorld;
 
         public VirtualWorldManager()
         {
             _nextVirtualWorld = 1;
             _mappingVirtualWorlds = new Dictionary<string, int>();
+            _propertyIdsByVirtualWorld = new Dictionary<int, ulong>();
         }
 
         private int ClaimNextAvailableVirtualWorld(string key)
@@ -46,7 +48,14 @@ namespace OpenRP.Framework.Features.VirtualWorlds.Services
                 return vw;
             }
 
-            return ClaimNextAvailableVirtualWorld(vwKey);
+            int claimedVirtualWorld = ClaimNextAvailableVirtualWorld(vwKey);
+            _propertyIdsByVirtualWorld[claimedVirtualWorld] = id;
+            return claimedVirtualWorld;
+        }
+
+        public ulong? GetPropertyIdOfVirtualWorld(int virtualWorld)
+        {
+            return _propertyIdsByVirtualWorld.TryGetValue(virtualWorld, out ulong propertyId) ? propertyId : null;
         }
     }
 }

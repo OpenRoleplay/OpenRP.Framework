@@ -10,5 +10,10 @@ namespace OpenRP.Framework.Features.VirtualWorlds.Services
     {
         int GetMainMenuSceneVirtualWorld(ulong id);
         int GetPropertyVirtualWorld(ulong id);
+
+        /// <summary>
+        /// The property that owns this virtual world, or null when it isn't a property's.
+        /// </summary>
+        ulong? GetPropertyIdOfVirtualWorld(int virtualWorld);
     }
 }

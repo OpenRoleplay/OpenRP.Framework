@@ -38,17 +38,24 @@ namespace OpenRP.Framework.Features.Properties.Services
         void DeleteProperty(Property property);
 
         /// <summary>
-        /// Creates a door of the property where the player stands, facing the way they face. The door is null when the
-        /// name isn't valid.
+        /// Creates a door of the property where the player stands, facing the way they face. It's inside the property
+        /// whose virtual world the player is in; otherwise inside its own property when the player is in an interior,
+        /// otherwise outside. The door is null when the name isn't valid.
         /// </summary>
         (PropertyDoor? Door, string? Error) CreateDoor(Property property, string name, Player player);
 
         string? RenameDoor(PropertyDoor door, string name);
 
         /// <summary>
-        /// Moves the door to where the player stands, facing the way they face, in their interior.
+        /// Moves the door to where the player stands, facing the way they face, in their interior. Which property
+        /// it's inside is picked again, the same way as for a new door.
         /// </summary>
         void MoveDoorToPlayer(PropertyDoor door, Player player);
+
+        /// <summary>
+        /// Puts the door inside the property, in its virtual world, or outside in the shared world when it's null.
+        /// </summary>
+        void SetDoorInsideProperty(PropertyDoor door, Property? insideProperty);
 
         /// <summary>
         /// Makes the two doors lead to each other. Doors that led back to either of them no longer do.

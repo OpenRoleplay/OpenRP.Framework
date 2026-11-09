@@ -10,6 +10,7 @@ The first time a key asks, it gets the next free number, from 1 up. After that, 
 |---|---|
 | `GetMainMenuSceneVirtualWorld(sceneId)` | [MainMenu](main-menu.md) scenes |
 | `GetPropertyVirtualWorld(propertyId)` | [Properties](properties.md): doors inside |
+| `GetPropertyIdOfVirtualWorld(virtualWorld)` | The other way round: which property a virtual world belongs to, or null. The property editor uses it to place doors inside the property an admin stands in |
 
 World 0 is the normal world, and is never handed out.
 

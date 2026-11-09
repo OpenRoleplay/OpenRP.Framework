@@ -88,6 +88,7 @@ namespace OpenRP.Framework.Features.Properties.Helpers
                 (nameof(PropertyDoorModel.Z), CSharpLiterals.GetFloat(door.Z)),
                 (nameof(PropertyDoorModel.Angle), CSharpLiterals.GetFloat(door.Angle)),
                 (nameof(PropertyDoorModel.Interior), CSharpLiterals.GetInt(door.Interior)),
+                (nameof(PropertyDoorModel.InsidePropertyId), CSharpLiterals.GetULong(door.InsidePropertyId)),
             });
         }
 

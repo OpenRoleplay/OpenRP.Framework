@@ -7,7 +7,7 @@ How properties are built (`Features/Properties/`). For what they do, see [Proper
 | Component | Holds |
 |---|---|
 | `Property` | name. `GetDoors()` skips deleted doors. Can be deleted (`IDeletable`) |
-| `PropertyDoor` | name, property, linked door, position, angle, interior. `GetLabelText()`, `IsInside()`, `IsPlayerNearby()`, `IsLinkedTo()` |
+| `PropertyDoor` | name, property, linked door, position, angle, interior, and the property it's inside. `GetLabelText()`, `IsInside()`, `IsPlayerNearby()`, `IsLinkedTo()` |
 
 A door is a child entity of its property, and its label is a child of the door.
 
@@ -29,6 +29,12 @@ A door is a child entity of its property, and its label is a child of the door.
   3. it's marked deleted.
 
   **Why unlink in memory:** the database clears those links too, but a loaded door would save its old link back over the cleared one.
+- **A door's virtual world:** `PropertyService.GetDoorVirtualWorld` returns the virtual world of the property the door is inside (`InsidePropertyId`), or 0 when it's outside. The interior number plays no part.
+- **The default for a new or moved door** (`PropertyEditorService.GetInsidePropertyIdForPlayer`):
+  1. the property whose virtual world the admin stands in, found with `IVirtualWorldManager.GetPropertyIdOfVirtualWorld`;
+  2. otherwise, in a non-zero interior, the door's own property;
+  3. otherwise outside.
+- **Deleting a property:** loaded doors inside it are put outside in memory. **Why:** the same reason as unlinking: a loaded door would save the old value back.
 - **Creating with `CreateAndLoad`:** new properties and doors are created this way. **Why:** so they have an id at once, and can be linked straight away.
 - **`OnComponentLoaded`** redraws labels. **Why:** a rename on another server shows up after the sync.
 

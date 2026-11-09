@@ -11,7 +11,7 @@ They're written to `scriptfiles/DefaultData/`, and overwritten on every start.
 | File | Contains |
 |---|---|
 | `PropertyDefaultData.cs` | The properties (`HasDefaultData` rows) |
-| `PropertyDoorDefaultData.cs` | The doors, **without** their links |
+| `PropertyDoorDefaultData.cs` | The doors, with the property each is inside, but **without** their links |
 | `PropertyDoorLinks.cs` | `SetLinks(MigrationBuilder)`: one `UpdateData` call per linked door |
 
 The namespace is `<host>.Features.Properties.Models.DefaultData`, so the files fit the host as they are.

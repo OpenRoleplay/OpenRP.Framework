@@ -17,9 +17,12 @@ namespace OpenRP.Framework.Database.Models
         public float Z { get; set; }
         public float Angle { get; set; }
         public int? Interior { get; set; }
+        // The property whose virtual world the door is in; null when the door is outside, in the shared world.
+        public ulong? InsidePropertyId { get; set; }
 
         // Navigational Properties
         public PropertyModel? Property { get; set; }
+        public PropertyModel? InsideProperty { get; set; }
         public PropertyDoorModel? LinkedToPropertyDoor { get; set; }
     }
 }

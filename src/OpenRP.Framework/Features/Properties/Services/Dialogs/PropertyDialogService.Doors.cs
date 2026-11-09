@@ -24,6 +24,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
             int goToRow = actionsDialog.AddRow("Go to");
             int moveRow = actionsDialog.AddRow("Move here");
             int renameRow = actionsDialog.AddRow("Rename");
+            int insidePropertyRow = actionsDialog.AddRow(GetInsidePropertyRowText(door));
             int linkRow = actionsDialog.AddRow(GetLinkRowText(door));
             int? unlinkRow = AddRowIf(actionsDialog, door.GetLinkedDoorId().HasValue, "Unlink");
             int deleteRow = actionsDialog.AddRow("Delete");
@@ -39,6 +40,8 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                     MoveDoorToPlayer(player, door, reopenActions);
                 else if (response.ItemIndex == renameRow)
                     OpenRenameDoor(player, door, reopenActions);
+                else if (response.ItemIndex == insidePropertyRow)
+                    OpenChooseInsideProperty(player, door, reopenActions);
                 else if (response.ItemIndex == linkRow)
                     OpenLinkDoor(player, door, reopenActions);
                 else if (response.ItemIndex == unlinkRow)
@@ -48,6 +51,62 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
             }
 
             _dialogService.Show(player, actionsDialog, OnActionChosen);
+        }
+
+        private string GetInsidePropertyRowText(PropertyDoor door)
+        {
+            return $"Virtual world {ChatColor.LightGray}({GetInsidePropertyText(door)}{ChatColor.LightGray})";
+        }
+
+        private string GetInsidePropertyText(PropertyDoor door)
+        {
+            ulong? insidePropertyId = door.GetInsidePropertyId();
+            Property? insideProperty = insidePropertyId.HasValue ? _propertyEditorService.GetProperty(insidePropertyId.Value) : null;
+            return insideProperty == null ? "outside, shared world" : $"inside {insideProperty.GetName()}";
+        }
+
+        /// <summary>
+        /// Lets the admin pick whose virtual world the door is in: outside, its own property's (usual for an
+        /// interior), or another property's (a door inside another property, such as an apartment in a building).
+        /// </summary>
+        private void OpenChooseInsideProperty(Player player, PropertyDoor door, Action onBack)
+        {
+            BetterListDialog worldsDialog = new BetterListDialog("Choose", "Back");
+            worldsDialog.SetTitle(TitleType.Children, PropertiesTitle, door.GetName(), "Virtual world");
+            Dictionary<int, Property?> propertiesByRow = new Dictionary<int, Property?>
+            {
+                [worldsDialog.AddRow("Outside (shared world)")] = null
+            };
+            foreach (Property property in GetInsidePropertyChoices(door))
+            {
+                propertiesByRow[worldsDialog.AddRow($"Inside {property.GetName()}")] = property;
+            }
+
+            _dialogService.Show(player, worldsDialog, response =>
+            {
+                if (response.Response == DialogResponse.LeftButton && propertiesByRow.TryGetValue(response.ItemIndex, out Property? insideProperty))
+                {
+                    SetDoorInsideProperty(player, door, insideProperty);
+                }
+                onBack();
+            });
+        }
+
+        /// <summary>
+        /// The door's own property first, then every other property.
+        /// </summary>
+        private List<Property> GetInsidePropertyChoices(PropertyDoor door)
+        {
+            Property? ownProperty = door.GetProperty();
+            List<Property> otherProperties = _propertyEditorService.GetProperties().Where(property => property.GetId() != ownProperty?.GetId()).ToList();
+            return ownProperty == null ? otherProperties : otherProperties.Prepend(ownProperty).ToList();
+        }
+
+        private void SetDoorInsideProperty(Player player, PropertyDoor door, Property? insideProperty)
+        {
+            _propertyEditorService.SetDoorInsideProperty(door, insideProperty);
+            // The door's label is now in another virtual world; put the admin there so they still see it.
+            _propertyService.MovePlayerToDoor(player, door);
         }
 
         private string GetLinkRowText(PropertyDoor door)

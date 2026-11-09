@@ -20,8 +20,9 @@ See [The property editor](properties/editor.md).
 
 1. **Doors.** A door has a position, a facing angle, an [interior](../glossary.md#interior) and a name. Its label reads, for example, "Entrance of Little Lady".
 2. **Going through** puts you at the linked door: its spot, its angle, its interior and its virtual world.
-3. **Inside doors** use their property's own [virtual world](../glossary.md#virtual-world).
-   - **Why:** two properties can use the same GTA interior without their visitors meeting.
+3. **Each door is outside or inside a property.** Outside doors are in the shared world (virtual world 0); a door inside a property is in that property's own [virtual world](../glossary.md#virtual-world).
+   - **Why own virtual worlds:** two properties can use the same GTA interior without their visitors meeting.
+   - **Why a setting instead of the interior number:** rooms built into the map at interior 0 (Palomino Bank) can be reused for another property, and a property can be inside another (an apartment off a building's hallway). The editor picks a sensible default, see [The property editor](properties/editor.md).
 4. **Several doors can lead to the same door.**
    - **Why:** a building can have a front and a back entrance into one interior.
 5. **On every startup,** the properties are exported as seed-data code. See [Default data export](properties/default-data.md).

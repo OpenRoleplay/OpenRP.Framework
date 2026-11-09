@@ -126,11 +126,25 @@ namespace OpenRP.Framework.Features.Properties.Components
         }
 
         /// <summary>
-        /// True when the door is inside an interior rather than in the open world.
+        /// The id of the property whose virtual world the door is in, or null when it's outside, in the shared world.
+        /// </summary>
+        public ulong? GetInsidePropertyId()
+        {
+            return _propertyDoorModel.InsidePropertyId;
+        }
+
+        public void SetInsidePropertyId(ulong? insidePropertyId)
+        {
+            _propertyDoorModel.InsidePropertyId = insidePropertyId;
+            ProcessChanges();
+        }
+
+        /// <summary>
+        /// True when the door is inside a property, in its virtual world, rather than in the shared world.
         /// </summary>
         public bool IsInside()
         {
-            return GetInterior() != OutsideInterior;
+            return GetInsidePropertyId() != null;
         }
 
         public bool IsPlayerNearby(Player player)

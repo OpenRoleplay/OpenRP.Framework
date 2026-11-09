@@ -57,12 +57,8 @@ namespace OpenRP.Framework.Features.Properties.Services
 
         public int GetDoorVirtualWorld(PropertyDoor door)
         {
-            Property? property = door.GetProperty();
-            if (!door.IsInside() || property == null)
-            {
-                return OutsideVirtualWorld;
-            }
-            return _virtualWorldManager.GetPropertyVirtualWorld(property.GetId());
+            ulong? insidePropertyId = door.GetInsidePropertyId();
+            return insidePropertyId.HasValue ? _virtualWorldManager.GetPropertyVirtualWorld(insidePropertyId.Value) : OutsideVirtualWorld;
         }
 
         public void MovePlayerToDoor(Player player, PropertyDoor door)

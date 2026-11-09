@@ -151,7 +151,8 @@ Table `PropertyDoors` (`PropertyDoorModel`).
 | `PropertyId` | ulong? | → `Properties` (cascade) |
 | `LinkedToPropertyDoorId` | ulong? | → `PropertyDoors` (set null). The door this one leads to. Not unique: several doors may lead to one door |
 | `X`, `Y`, `Z`, `Angle` | float | Position and facing |
-| `Interior` | int? | null or 0 = outside |
+| `Interior` | int? | The GTA interior; null or 0 = the open world's |
+| `InsidePropertyId` | ulong? | → `Properties` (set null). The property whose virtual world the door is in; null = outside, in the shared world |
 
 ### `Properties`
 Table `Properties` (`PropertyModel`): `Name`.
