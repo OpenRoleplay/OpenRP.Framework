@@ -3,7 +3,8 @@ using OpenRP.Framework.Shared;
 using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Shared.Dialogs.Helpers;
-using SampSharp.Entities.SAMP;
+using SampSharp.Entities.SAMP;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Characters.Services.Dialogs
 {
@@ -37,7 +38,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 OnCharacterPreferenceChosen(player, preferences, rows, response.ItemIndex);
             }
 
-            _dialogService.Show(player, preferencesDialog, CharacterPreferencesDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, preferencesDialog, CharacterPreferencesDialogHandler);
         }
 
         private static BetterTablistDialog CreateCharacterPreferencesDialog(CharacterPreferences preferences, out PreferencesDialogRows rows)
@@ -159,7 +160,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 onTurnOn();
             }
 
-            _dialogService.Show(player, questionDialog, HardcoreModeQuestionDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, questionDialog, HardcoreModeQuestionDialogHandler);
         }
 
         private void ActivateHardcoreMode(Player player, CharacterPreferences preferences)

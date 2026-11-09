@@ -9,7 +9,8 @@ using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Shared.Commands.Services.Dialogs
 {
@@ -77,7 +78,7 @@ namespace OpenRP.Framework.Shared.Commands.Services.Dialogs
                 commandsByRow.Add(dialog.AddRow($"{ChatColor.White}/{command.Name.ToLower()}"), command);
             }
 
-            _dialogService.Show(player, dialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, dialog, response =>
             {
                 if (response.Response != DialogResponse.LeftButton)
                 {
@@ -114,7 +115,7 @@ namespace OpenRP.Framework.Shared.Commands.Services.Dialogs
             dialog.SetTitle(TitleType.Parents, $"Command: {command.Name}");
             dialog.SetContent(GetCommandDetailsText(command));
 
-            _dialogService.Show(player, dialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, dialog, response =>
             {
                 if (response.Response == DialogResponse.LeftButton)
                 {

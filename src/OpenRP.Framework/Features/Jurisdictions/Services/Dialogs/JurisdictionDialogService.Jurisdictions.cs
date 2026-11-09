@@ -8,6 +8,7 @@ using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
 {
@@ -35,7 +36,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                     OpenJurisdictionActions(player, jurisdiction, reopenEditor);
             }
 
-            _dialogService.Show(player, jurisdictionsDialog, OnJurisdictionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, jurisdictionsDialog, OnJurisdictionChosen);
         }
 
         private void OpenJurisdictionActions(Player player, Jurisdiction jurisdiction, Action onBack)
@@ -80,7 +81,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                     OpenDeleteJurisdiction(player, jurisdiction, onBack, reopenActions);
             }
 
-            _dialogService.Show(player, actionsDialog, OnActionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, actionsDialog, OnActionChosen);
         }
 
         /// <summary>

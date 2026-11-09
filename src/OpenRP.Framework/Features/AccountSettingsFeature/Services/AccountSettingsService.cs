@@ -14,7 +14,8 @@ using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Database;
 using OpenRP.OpenMp.Streamer;
 using OpenRP.Framework.Shared.Chat.Enums;
-using OpenRP.Framework.Shared.Chat.Extensions;
+using OpenRP.Framework.Shared.Chat.Extensions;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
 {
@@ -236,7 +237,7 @@ namespace OpenRP.Framework.Features.AccountSettingsFeature.Services
                 }
             }
 
-            _dialogService.Show(player, tablistDialog, DialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, tablistDialog, DialogHandler);
         }
     }
 }

@@ -2,7 +2,8 @@ using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Shared;
 using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
-using SampSharp.Entities.SAMP;
+using SampSharp.Entities.SAMP;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Characters.Services.Dialogs
 {
@@ -50,7 +51,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 ShowBlessedByMisfortuneDetails(player);
             }
 
-            _dialogService.Show(player, traitsDialog, CharacterTraitsDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, traitsDialog, CharacterTraitsDialogHandler);
         }
 
         private void ShowBlessedByMisfortuneDetails(Player player)
@@ -66,7 +67,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
             noTraitsDialog.SetTitle(TitleType.Parents, CharacterTraitsTitle);
             noTraitsDialog.SetContent("Your character has no traits at this moment!");
 
-            _dialogService.Show(player, noTraitsDialog, (MessageDialogResponse response) => { });
+            _dialogService.ShowIgnoringDisconnect(player, noTraitsDialog, (MessageDialogResponse response) => { });
         }
     }
 }

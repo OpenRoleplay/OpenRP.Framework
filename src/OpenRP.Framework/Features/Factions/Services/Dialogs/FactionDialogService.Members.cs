@@ -8,7 +8,8 @@ using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Factions.Services.Dialogs
 {
@@ -41,7 +42,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 OpenMemberActions(player, faction, member, GetMemberName(names, member), () => OpenMembers(player, faction, onBack));
             }
 
-            _dialogService.Show(player, membersDialog, OnMemberChosen);
+            _dialogService.ShowIgnoringDisconnect(player, membersDialog, OnMemberChosen);
         }
 
         private void OpenMemberActions(Player player, Faction faction, FactionMember member, string memberName, Action onBack)
@@ -71,7 +72,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                     OpenRemoveMember(player, member, memberName, onBack);
             }
 
-            _dialogService.Show(player, actionsDialog, OnActionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, actionsDialog, OnActionChosen);
         }
 
         private void OpenChangeMemberRank(Player player, Faction faction, FactionMember member, string memberName, Action onBack)

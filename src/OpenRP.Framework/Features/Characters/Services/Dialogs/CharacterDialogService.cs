@@ -1,6 +1,7 @@
 ﻿using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
-using SampSharp.Entities.SAMP;
+using SampSharp.Entities.SAMP;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Characters.Services.Dialogs
 {
@@ -28,7 +29,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
             messageDialog.SetTitle(TitleType.Children, title);
             messageDialog.SetContent(content);
 
-            _dialogService.Show(player, messageDialog, (MessageDialogResponse response) => onClose());
+            _dialogService.ShowIgnoringDisconnect(player, messageDialog, (MessageDialogResponse response) => onClose());
         }
     }
 }

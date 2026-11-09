@@ -5,7 +5,8 @@ using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Properties.Services.Dialogs
 {
@@ -50,7 +51,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                     OpenDeleteDoor(player, door, onBack, reopenActions);
             }
 
-            _dialogService.Show(player, actionsDialog, OnActionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, actionsDialog, OnActionChosen);
         }
 
         private string GetInsidePropertyRowText(PropertyDoor door)
@@ -82,7 +83,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                 propertiesByRow[worldsDialog.AddRow($"Inside {property.GetName()}")] = property;
             }
 
-            _dialogService.Show(player, worldsDialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, worldsDialog, response =>
             {
                 if (response.Response == DialogResponse.LeftButton && propertiesByRow.TryGetValue(response.ItemIndex, out Property? insideProperty))
                 {
@@ -175,7 +176,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                 doorsByRow[doorsDialog.AddRow(GetDoorNameWithProperty(otherDoor))] = otherDoor;
             }
 
-            _dialogService.Show(player, doorsDialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, doorsDialog, response =>
             {
                 if (response.Response != DialogResponse.LeftButton || !doorsByRow.TryGetValue(response.ItemIndex, out PropertyDoor? otherDoor))
                 {

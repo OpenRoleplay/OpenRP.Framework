@@ -13,7 +13,8 @@ using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Features.Vehicles.Services;
 using OpenRP.Framework.Database;
 using OpenRP.Framework.Features.Jurisdictions.Services;
-using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
+using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Vehicles.Dialogs
 {
@@ -535,7 +536,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                 };
 
                 // Show the dialog to the player
-                dialogService.Show(player, dialog, DialogHandler);
+                dialogService.ShowIgnoringDisconnect(player, dialog, DialogHandler);
             }
         }
 
@@ -568,7 +569,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                 }
             };
 
-            dialogService.Show(player, inputDialog, DialogHandler);
+            dialogService.ShowIgnoringDisconnect(player, inputDialog, DialogHandler);
         }
 
         private static void OpenMessageDialog(Player player, IDialogService dialogService, string title, string content, Action onInput, Action onReturn)
@@ -587,7 +588,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
                 }
             };
 
-            dialogService.Show(player, messageDialog, DialogHandler);
+            dialogService.ShowIgnoringDisconnect(player, messageDialog, DialogHandler);
         }
 
         private static void ToggleProperty(Player player, CreateOrUpdateVehicleDataComponent component, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, BaseDataContext context, string propertyName, Func<bool> getProperty, Action<bool> setProperty)

@@ -3,7 +3,8 @@ using OpenRP.Framework.Features.Accounts.Components;
 using OpenRP.Framework.Shared;
 using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
-using SampSharp.Entities.SAMP;
+using SampSharp.Entities.SAMP;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Characters.Services.Dialogs
 {
@@ -37,7 +38,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 _ = _characterService.SelectCharacterAsync(player, characters[response.ItemIndex].Id);
             }
 
-            _dialogService.Show(player, selectionDialog, CharacterSelectionDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, selectionDialog, CharacterSelectionDialogHandler);
         }
 
         private static BetterListDialog CreateCharacterSelectionDialog(List<CharacterModel> characters, out int createCharacterRowIndex)

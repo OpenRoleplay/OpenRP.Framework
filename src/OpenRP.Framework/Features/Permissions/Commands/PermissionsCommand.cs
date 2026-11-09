@@ -13,7 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Features.Players.Extensions;
-using OpenRP.Framework.Shared.Chat.Extensions;
+using OpenRP.Framework.Shared.Chat.Extensions;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Permissions.Commands
 {
@@ -66,7 +67,7 @@ namespace OpenRP.Framework.Features.Permissions.Commands
             }
 
             // Show the dialog
-            dialogService.Show(viewer, dialog, response => HandleDialogResponse(response, viewer));
+            dialogService.ShowIgnoringDisconnect(viewer, dialog, response => HandleDialogResponse(response, viewer));
         }
 
         private void HandleDialogResponse(TablistDialogResponse response, Player player)

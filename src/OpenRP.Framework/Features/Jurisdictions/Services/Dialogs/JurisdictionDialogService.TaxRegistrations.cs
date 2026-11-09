@@ -6,6 +6,7 @@ using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
 {
@@ -33,7 +34,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                     OpenRemoveTaxRegistration(player, jurisdiction, registration, reopenRegistrations);
             }
 
-            _dialogService.Show(player, registrationsDialog, OnRegistrationChosen);
+            _dialogService.ShowIgnoringDisconnect(player, registrationsDialog, OnRegistrationChosen);
         }
 
         private void OpenAddTaxRegistration(Player player, Jurisdiction jurisdiction, Action onBack)

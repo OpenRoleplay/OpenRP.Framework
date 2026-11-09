@@ -5,7 +5,8 @@ using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Properties.Services.Dialogs
 {
@@ -37,7 +38,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                     OpenPropertyActions(player, property, reopenEditor);
             }
 
-            _dialogService.Show(player, propertiesDialog, OnPropertyChosen);
+            _dialogService.ShowIgnoringDisconnect(player, propertiesDialog, OnPropertyChosen);
         }
 
         private void OpenPropertyActions(Player player, Property property, Action onBack)
@@ -81,7 +82,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                     OpenDoorActions(player, door, reopenActions);
             }
 
-            _dialogService.Show(player, actionsDialog, OnActionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, actionsDialog, OnActionChosen);
         }
 
         private void OpenCreateProperty(Player player, Action onBack)

@@ -4,7 +4,8 @@ using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Features.DebugSettingsFeature.Enums;
 using SampSharp.Entities.SAMP;
 using OpenRP.Framework.Shared.Chat.Extensions;
-using OpenRP.Framework.Shared.Chat.Enums;
+using OpenRP.Framework.Shared.Chat.Enums;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.DebugSettingsFeature.Services
 {
@@ -97,7 +98,7 @@ namespace OpenRP.Framework.Features.DebugSettingsFeature.Services
                 }   
             }
 
-            _dialogService.Show(player, tablistDialog, DialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, tablistDialog, DialogHandler);
         }
     }
 }

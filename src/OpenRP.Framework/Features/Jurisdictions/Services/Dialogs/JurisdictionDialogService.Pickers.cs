@@ -9,6 +9,7 @@ using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
 {
@@ -35,7 +36,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                     onPicked(jurisdiction);
             }
 
-            _dialogService.Show(player, pickerDialog, OnPicked);
+            _dialogService.ShowIgnoringDisconnect(player, pickerDialog, OnPicked);
         }
 
         private void OpenMoveJurisdiction(Player player, Jurisdiction jurisdiction, Action onBack)
@@ -69,7 +70,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                 onBack();
             }
 
-            _dialogService.Show(player, currencyDialog, OnCurrencyChosen);
+            _dialogService.ShowIgnoringDisconnect(player, currencyDialog, OnCurrencyChosen);
         }
 
         private void OpenSetGovernment(Player player, Jurisdiction jurisdiction, Action onBack)
@@ -107,7 +108,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                     onPicked(faction);
             }
 
-            _dialogService.Show(player, factionDialog, OnFactionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, factionDialog, OnFactionChosen);
         }
 
         private List<Faction> GetFactions()

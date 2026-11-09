@@ -8,7 +8,8 @@ using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Factions.Services.Dialogs
 {
@@ -58,7 +59,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 OpenFactionMenu(player, faction, () => OpenFactionChoice(player, factions, title, onBack));
             }
 
-            _dialogService.Show(player, factionDialog, OnFactionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, factionDialog, OnFactionChosen);
         }
 
         private void OpenFactionMenu(Player player, Faction faction, Action onBack)
@@ -99,7 +100,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                     OpenLeaveFaction(player, faction, reopenMenu);
             }
 
-            _dialogService.Show(player, menuDialog, OnMenuItemChosen);
+            _dialogService.ShowIgnoringDisconnect(player, menuDialog, OnMenuItemChosen);
         }
 
         private void SetActiveFaction(Player player, Faction faction, Action onDone)

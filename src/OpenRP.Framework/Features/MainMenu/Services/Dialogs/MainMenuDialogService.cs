@@ -12,7 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Features.Accounts.Services.Dialogs;
-using OpenRP.Framework.Shared.Chat.Extensions;
+using OpenRP.Framework.Shared.Chat.Extensions;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.MainMenu.Services.Dialogs
 {
@@ -40,7 +41,7 @@ namespace OpenRP.Framework.Features.MainMenu.Services.Dialogs
                 OpenMainMenuChoiceMenu(player);
             }
 
-            _dialogService.Show(player, betterMessageDialog, MainMenuDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, betterMessageDialog, MainMenuDialogHandler);
         }
 
         public void OpenMainMenuChoiceMenu(Player player)
@@ -109,7 +110,7 @@ namespace OpenRP.Framework.Features.MainMenu.Services.Dialogs
                 }
             }
 
-            _dialogService.Show(player, betterListDialog, MainMenuChoiceDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, betterListDialog, MainMenuChoiceDialogHandler);
         }
     }
 

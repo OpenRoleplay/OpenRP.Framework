@@ -8,7 +8,8 @@ using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Factions.Services.Dialogs
 {
@@ -42,7 +43,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                     OpenRankActions(player, faction, rank, reopenRanks);
             }
 
-            _dialogService.Show(player, ranksDialog, OnRankChosen);
+            _dialogService.ShowIgnoringDisconnect(player, ranksDialog, OnRankChosen);
         }
 
         private void OpenRankActions(Player player, Faction faction, FactionRank rank, Action onBack)
@@ -79,7 +80,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                     OpenDeleteRank(player, rank, onBack, reopenActions);
             }
 
-            _dialogService.Show(player, actionsDialog, OnActionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, actionsDialog, OnActionChosen);
         }
 
         private void OpenRenameRank(Player player, FactionRank rank, Action onBack)

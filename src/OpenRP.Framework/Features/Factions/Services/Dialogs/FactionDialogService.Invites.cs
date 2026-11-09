@@ -6,7 +6,8 @@ using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
-using System;
+using System;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Factions.Services.Dialogs
 {
@@ -39,7 +40,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 player.SendPlayerInfoMessage(error == null ? PlayerInfoMessageType.INFO : PlayerInfoMessageType.ERROR, error ?? $"You are now a member of {faction.GetName()}. Use /faction to open its menu.");
             }
 
-            _dialogService.Show(player, invitationDialog, OnInvitationAnswered);
+            _dialogService.ShowIgnoringDisconnect(player, invitationDialog, OnInvitationAnswered);
         }
 
         private void OpenInvitePlayer(Player player, Faction faction, Action onBack)

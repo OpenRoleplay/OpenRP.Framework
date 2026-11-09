@@ -7,7 +7,8 @@ using OpenRP.Framework.Shared.Dialogs.Helpers;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Factions.Services.Dialogs
 {
@@ -57,7 +58,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
             BetterMessageDialog messageDialog = new BetterMessageDialog("Back");
             messageDialog.SetTitle(TitleType.Children, FactionsTitle, title);
             messageDialog.SetContent(text);
-            _dialogService.Show(player, messageDialog, _ => onClose());
+            _dialogService.ShowIgnoringDisconnect(player, messageDialog, _ => onClose());
         }
 
         private void ShowConfirmation(Player player, string title, string question, Action onConfirmed, Action onCancelled)
@@ -65,7 +66,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
             BetterMessageDialog confirmationDialog = new BetterMessageDialog(DialogHelper.Yes, DialogHelper.No);
             confirmationDialog.SetTitle(TitleType.Children, FactionsTitle, title);
             confirmationDialog.SetContent(question);
-            _dialogService.Show(player, confirmationDialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, confirmationDialog, response =>
             {
                 if (response.Response == DialogResponse.LeftButton)
                 {
@@ -81,7 +82,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
             BetterInputDialog inputDialog = new BetterInputDialog("Continue", "Back");
             inputDialog.SetTitle(TitleType.Children, FactionsTitle, title);
             inputDialog.SetContent(prompt);
-            _dialogService.Show(player, inputDialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, inputDialog, response =>
             {
                 if (response.Response != DialogResponse.LeftButton)
                 {
@@ -111,7 +112,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 ranksByRow[rankDialog.AddRow(GetRankLabel(rank, depth))] = rank;
             }
 
-            _dialogService.Show(player, rankDialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, rankDialog, response =>
             {
                 if (response.Response != DialogResponse.LeftButton || !ranksByRow.TryGetValue(response.ItemIndex, out FactionRank? rank))
                 {

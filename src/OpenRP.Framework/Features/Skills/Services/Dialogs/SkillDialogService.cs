@@ -8,7 +8,8 @@ using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Text;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Skills.Services.Dialogs
 {
@@ -44,7 +45,7 @@ namespace OpenRP.Framework.Features.Skills.Services.Dialogs
                 skillsByRow.Add(row, skill);
             }
 
-            _dialogService.Show(player, dialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, dialog, response =>
             {
                 if (response.Response == DialogResponse.LeftButton && skillsByRow.TryGetValue(response.ItemIndex, out CharacterSkill? selectedSkill))
                 {
@@ -59,7 +60,7 @@ namespace OpenRP.Framework.Features.Skills.Services.Dialogs
             dialog.SetTitle(TitleType.Children, "Skills", skill.Name);
             dialog.SetContent(GetSkillDetailsText(skill));
 
-            _dialogService.Show(player, dialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, dialog, response =>
             {
                 if (response.Response == DialogResponse.LeftButton)
                 {

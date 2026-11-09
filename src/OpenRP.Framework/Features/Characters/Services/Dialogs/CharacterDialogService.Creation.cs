@@ -4,7 +4,8 @@ using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Shared.Dialogs.Helpers;
 using SampSharp.Entities.SAMP;
-using System.Globalization;
+using System.Globalization;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Characters.Services.Dialogs
 {
@@ -74,7 +75,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 OpenCreateCharacterLastName(player, onGoBack);
             }
 
-            _dialogService.Show(player, questionDialog, MiddleNameQuestionDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, questionDialog, MiddleNameQuestionDialogHandler);
         }
 
         private void OpenCreateCharacterMiddleName(Player player, Action onGoBack)
@@ -155,7 +156,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 FinishCharacterCreation(player, onGoBack);
             }
 
-            _dialogService.Show(player, confirmDialog, ConfirmDateOfBirthDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, confirmDialog, ConfirmDateOfBirthDialogHandler);
         }
 
         private void FinishCharacterCreation(Player player, Action onGoBack)
@@ -190,7 +191,7 @@ namespace OpenRP.Framework.Features.Characters.Services.Dialogs
                 onPrevious();
             }
 
-            _dialogService.Show(player, inputDialog, CharacterCreationInputDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, inputDialog, CharacterCreationInputDialogHandler);
         }
 
         private void ShowCharacterCreationError(Player player, string step, string message, Action onRetry)

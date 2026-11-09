@@ -4,7 +4,8 @@ using OpenRP.Framework.Features.Properties.Components;
 using OpenRP.Framework.Shared;
 using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
-using SampSharp.Entities.SAMP;
+using SampSharp.Entities.SAMP;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Actors.Services.Dialogs
 {
@@ -52,7 +53,7 @@ namespace OpenRP.Framework.Features.Actors.Services.Dialogs
                     OpenDeleteActor(player, actor, onBack, reopenActions);
             }
 
-            _dialogService.Show(player, actionsDialog, OnActionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, actionsDialog, OnActionChosen);
         }
 
         private void MoveActorToPlayer(Player player, ServerActor actor, Action onMoved)
@@ -98,7 +99,7 @@ namespace OpenRP.Framework.Features.Actors.Services.Dialogs
                 presetsByRow[animationsDialog.AddRow($"{preset.Description} {ChatColor.LightGray}({preset.Library}/{preset.Name})")] = preset;
             }
 
-            _dialogService.Show(player, animationsDialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, animationsDialog, response =>
             {
                 if (response.Response != DialogResponse.LeftButton)
                     onBack();
@@ -145,7 +146,7 @@ namespace OpenRP.Framework.Features.Actors.Services.Dialogs
                 propertyIdsByRow[worldsDialog.AddRow($"Inside {property.GetName()}")] = property.GetId();
             }
 
-            _dialogService.Show(player, worldsDialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, worldsDialog, response =>
             {
                 if (response.Response == DialogResponse.LeftButton && propertyIdsByRow.TryGetValue(response.ItemIndex, out ulong? propertyId))
                 {
@@ -174,7 +175,7 @@ namespace OpenRP.Framework.Features.Actors.Services.Dialogs
             promptDialog.SetTitle(TitleType.Children, ActorsTitle, actor.GetName(), $"AI prompt ({pageIndex + 1}/{pages.Count})");
             promptDialog.SetContent($"{pages[pageIndex]}\n\n{ChatColor.LightGray}Prompts are changed in the database (Actors.Prompt).");
 
-            _dialogService.Show(player, promptDialog, response =>
+            _dialogService.ShowIgnoringDisconnect(player, promptDialog, response =>
             {
                 if (hasNextPage && response.Response == DialogResponse.LeftButton)
                 {

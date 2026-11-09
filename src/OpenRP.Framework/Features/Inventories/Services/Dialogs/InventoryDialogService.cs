@@ -22,7 +22,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading.Tasks;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
 {
@@ -135,7 +136,7 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
                 }
             }
 
-            _dialogService.Show(player, tablistDialog, InventoryItemsDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, tablistDialog, InventoryItemsDialogHandler);
         }
 
         public void OpenSelectedItemDialog(Player player, InventoryOpened inventoryOpened)
@@ -164,7 +165,7 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
                 player.DestroyComponents<InventoryOpened>();
             }
 
-            _dialogService.Show(player, listDialog, InventoryItemSelectedItemActionsDialogHandler);
+            _dialogService.ShowIgnoringDisconnect(player, listDialog, InventoryItemSelectedItemActionsDialogHandler);
         }
 
         private Dictionary<string, Action> BuildSelectedItemActions(Player player, InventoryOpened inventoryOpened)
@@ -230,7 +231,7 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
                     BetterMessageDialog messageDialog = new BetterMessageDialog("Close");
                     messageDialog.SetTitle(TitleType.Children, inventoryOpened.OpenedInventory.GetName(), inventoryOpened.SelectedInventoryItem.GetName(), "Description");
                     messageDialog.SetContent(description);
-                    _dialogService.Show(player, messageDialog, _ => { });
+                    _dialogService.ShowIgnoringDisconnect(player, messageDialog, _ => { });
                 };
 
                 if (item.IsDestroyable())
@@ -269,13 +270,13 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
 
                             void DropAmountInvalid(MessageDialogResponse r)
                             {
-                                _dialogService.Show(player, dropAmountDialog, DropAmountDialog);
+                                _dialogService.ShowIgnoringDisconnect(player, dropAmountDialog, DropAmountDialog);
                             }
 
-                            _dialogService.Show(player, invalidAmountDialog, DropAmountInvalid);
+                            _dialogService.ShowIgnoringDisconnect(player, invalidAmountDialog, DropAmountInvalid);
                         }
 
-                        _dialogService.Show(player, dropAmountDialog, DropAmountDialog);
+                        _dialogService.ShowIgnoringDisconnect(player, dropAmountDialog, DropAmountDialog);
                     };
                 }
             }

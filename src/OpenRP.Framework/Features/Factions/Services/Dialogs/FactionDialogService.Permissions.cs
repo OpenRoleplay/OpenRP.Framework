@@ -7,7 +7,8 @@ using OpenRP.Framework.Shared.Dialogs.Enums;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq;
+using OpenRP.Framework.Shared.Dialogs.Extensions;
 
 namespace OpenRP.Framework.Features.Factions.Services.Dialogs
 {
@@ -47,7 +48,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 ToggleSubFactionPermission(player, faction, permission, () => OpenFactionPermissions(player, faction, onBack));
             }
 
-            _dialogService.Show(player, permissionsDialog, OnPermissionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, permissionsDialog, OnPermissionChosen);
         }
 
         private void ToggleSubFactionPermission(Player player, Faction faction, string permission, Action onDone)
@@ -97,7 +98,7 @@ namespace OpenRP.Framework.Features.Factions.Services.Dialogs
                 ContinueAfter(player, error, reopenPermissions, reopenPermissions);
             }
 
-            _dialogService.Show(player, permissionsDialog, OnPermissionChosen);
+            _dialogService.ShowIgnoringDisconnect(player, permissionsDialog, OnPermissionChosen);
         }
 
         private string GetFactionPermissionStatus(Faction faction, string permission)
