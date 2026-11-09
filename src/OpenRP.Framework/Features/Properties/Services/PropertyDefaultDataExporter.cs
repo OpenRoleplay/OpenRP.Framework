@@ -16,6 +16,7 @@ namespace OpenRP.Framework.Features.Properties.Services
         // The server runs from its own folder, which holds scriptfiles.
         private static readonly string DefaultDataFolder = Path.Combine("scriptfiles", "DefaultData");
         private const string FallbackHostName = "OpenRP.GameMode";
+        private const string OldLinksClassName = "PropertyDoorLinks";
 
         private readonly IEntityManager _entityManager;
         private readonly ILogger<PropertyDefaultDataExporter> _logger;
@@ -38,9 +39,9 @@ namespace OpenRP.Framework.Features.Properties.Services
                 Directory.CreateDirectory(DefaultDataFolder);
                 WriteDefaultDataFile(PropertyDefaultDataFiles.PropertyClassName, PropertyDefaultDataFiles.CreatePropertyDefaultData(properties, namespaceName, generatedAt));
                 WriteDefaultDataFile(PropertyDefaultDataFiles.PropertyDoorClassName, PropertyDefaultDataFiles.CreatePropertyDoorDefaultData(doors, namespaceName, generatedAt));
-                WriteDefaultDataFile(PropertyDefaultDataFiles.PropertyDoorLinksClassName, PropertyDefaultDataFiles.CreatePropertyDoorLinks(doors, namespaceName, generatedAt));
+                DeleteOldLinksFile();
 
-                int linkCount = doors.Count(door => door.LinkedToPropertyDoorId.HasValue);
+                int linkCount = PropertyDefaultDataFiles.GetExportedLinks(doors).Count(link => link.Value.HasValue);
                 _logger.LogInformation("Exported {PropertyCount} properties, {DoorCount} property doors and {LinkCount} door links as default data to {Folder}.", properties.Count, doors.Count, linkCount, Path.GetFullPath(DefaultDataFolder));
             }
             catch (Exception ex)
@@ -72,6 +73,14 @@ namespace OpenRP.Framework.Features.Properties.Services
         {
             string hostName = Assembly.GetEntryAssembly()?.GetName().Name ?? FallbackHostName;
             return $"{hostName}.Features.Properties.Models.DefaultData";
+        }
+
+        /// <summary>
+        /// Older versions wrote the links to a separate file to paste into a migration; they're in the doors file now.
+        /// </summary>
+        private static void DeleteOldLinksFile()
+        {
+            File.Delete(Path.Combine(DefaultDataFolder, $"{OldLinksClassName}.cs"));
         }
 
         private static void WriteDefaultDataFile(string className, string content)

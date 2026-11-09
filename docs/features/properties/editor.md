@@ -21,8 +21,8 @@
 - **Move here:** to your spot, angle and interior. Which property it's inside is picked again, as for a new door.
 - **Rename.**
 - **Virtual world:** outside (the shared world), inside its own property, or inside another property. Puts you on the door afterwards.
-- **Link to another door:** both ways. Doors that led back to either of the two no longer do.
-- **Unlink:** both ways.
+- **Link to another door:** this door leads there, and the other door leads back unless it has a link of its own. Only this door stores the link. Links that would go around in a loop (A → B → C → A) are refused.
+- **Unlink:** both ways: the door's own link, and the links of doors that lead to it.
 - **Delete:** asks first. Doors that led to it then lead nowhere.
 
 Names are 1–64 characters.

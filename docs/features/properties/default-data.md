@@ -11,20 +11,19 @@ They're written to `scriptfiles/DefaultData/`, and overwritten on every start.
 | File | Contains |
 |---|---|
 | `PropertyDefaultData.cs` | The properties (`HasDefaultData` rows) |
-| `PropertyDoorDefaultData.cs` | The doors, with the property each is inside, but **without** their links |
-| `PropertyDoorLinks.cs` | `SetLinks(MigrationBuilder)`: one `UpdateData` call per linked door |
+| `PropertyDoorDefaultData.cs` | The doors, with the property each is inside and their links |
 
 The namespace is `<host>.Features.Properties.Models.DefaultData`, so the files fit the host as they are.
 
-**Why the links are separate:** linked doors point at each other, and EF Core can't insert rows that point at each other in seed data. So the doors are inserted first, and linked afterwards.
+**Why the links fit in the doors file:** each pair of doors stores one link, so no two rows point at each other. EF Core can't insert seed rows that do: its sort only breaks dependencies within a table or on unique indexes, never foreign keys. Two doors that still link to each other (linked before links went one way) are exported with only the lower id's link; the other door leads back, so they work the same.
 
 ## Shipping properties with a server
 
 1. Copy the two DefaultData classes into the host, and apply them in its `DataContext`.
-2. Run `migrations add`.
-3. Paste the lines inside `SetLinks` at the end of the migration's `Up()`.
-   - Don't call the class itself. **Why:** the file is regenerated, and an applied migration must never change.
-4. On the database you exported from, mark the migration as applied instead of running it, because the rows are already there.
+2. Run `migrations add`. The links are in the doors' rows, so there's nothing to add by hand.
+3. On the database you exported from, mark the migration as applied instead of running it, because the rows are already there.
+
+Changing seeded doors or links later is the same: edit the seed file and run `migrations add`.
 
 ## Deep dive
 

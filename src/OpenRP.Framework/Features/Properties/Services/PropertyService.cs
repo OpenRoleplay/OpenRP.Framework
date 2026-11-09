@@ -35,14 +35,30 @@ namespace OpenRP.Framework.Features.Properties.Services
                 return;
             }
 
-            PropertyDoor? linkedDoor = GetLinkedDoor(door);
-            if (linkedDoor == null)
+            PropertyDoor? destinationDoor = GetDestinationDoor(door);
+            if (destinationDoor == null)
             {
                 player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "This door doesn't lead anywhere.");
                 return;
             }
 
-            MovePlayerToDoor(player, linkedDoor);
+            MovePlayerToDoor(player, destinationDoor);
+        }
+
+        public PropertyDoor? GetDestinationDoor(PropertyDoor door)
+        {
+            ulong? linkedDoorId = door.GetLinkedDoorId();
+            if (linkedDoorId.HasValue)
+            {
+                return GetDoor(linkedDoorId.Value);
+            }
+
+            return GetDoorsLinkingTo(door).FirstOrDefault();
+        }
+
+        public List<PropertyDoor> GetDoorsLinkingTo(PropertyDoor door)
+        {
+            return GetDoors().Where(otherDoor => otherDoor.IsLinkedTo(door)).OrderBy(otherDoor => otherDoor.GetId()).ToList();
         }
 
         public PropertyDoor? GetNearbyDoor(Player player)
@@ -105,12 +121,6 @@ namespace OpenRP.Framework.Features.Properties.Services
             return door.IsPlayerNearby(player)
                 && player.Interior == door.GetInterior()
                 && player.VirtualWorld == GetDoorVirtualWorld(door);
-        }
-
-        private PropertyDoor? GetLinkedDoor(PropertyDoor door)
-        {
-            ulong? linkedDoorId = door.GetLinkedDoorId();
-            return linkedDoorId.HasValue ? GetDoor(linkedDoorId.Value) : null;
         }
     }
 }

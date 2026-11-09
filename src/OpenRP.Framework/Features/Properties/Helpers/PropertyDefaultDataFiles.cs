@@ -8,20 +8,15 @@ namespace OpenRP.Framework.Features.Properties.Helpers
 {
     /// <summary>
     /// Builds the PropertyDefaultData and PropertyDoorDefaultData classes, in the same form as the other DefaultData
-    /// classes, so properties built in-game can be shipped as seed data. The door links go in PropertyDoorLinks
-    /// instead, because linked doors form cycles that EF can't insert as seed data.
+    /// classes, so properties built in-game can be shipped as seed data, door links included.
     /// </summary>
     public static class PropertyDefaultDataFiles
     {
         public const string PropertyClassName = "PropertyDefaultData";
         public const string PropertyDoorClassName = "PropertyDoorDefaultData";
-        public const string PropertyDoorLinksClassName = "PropertyDoorLinks";
-        private const string SetLinksMethodName = "SetLinks";
 
         private const string RowIndentation = "                ";
         private const string FieldIndentation = "                    ";
-        private const string StatementIndentation = "            ";
-        private const string ArgumentIndentation = "                ";
 
         public static string CreatePropertyDefaultData(IEnumerable<PropertyModel> properties, string namespaceName, DateTime generatedAt)
         {
@@ -31,40 +26,31 @@ namespace OpenRP.Framework.Features.Properties.Helpers
 
         public static string CreatePropertyDoorDefaultData(IEnumerable<PropertyDoorModel> doors, string namespaceName, DateTime generatedAt)
         {
-            IEnumerable<string> rows = doors.OrderBy(door => door.Id).Select(CreatePropertyDoorRow);
-            string header = CreateHeader(generatedAt) + $"// The doors start unlinked; {PropertyDoorLinksClassName}.cs sets their links.{Environment.NewLine}";
+            Dictionary<ulong, ulong?> exportedLinks = GetExportedLinks(doors.ToList());
+            IEnumerable<string> rows = doors.OrderBy(door => door.Id).Select(door => CreatePropertyDoorRow(door, exportedLinks[door.Id]));
+            string header = CreateHeader(generatedAt)
+                + $"// Each pair of doors stores one link and the other door leads back, so the links fit in seed data:{Environment.NewLine}"
+                + $"// EF can't insert seed rows that point at each other.{Environment.NewLine}";
             return CreateDefaultDataClass(namespaceName, PropertyDoorClassName, nameof(PropertyDoorModel), rows, header);
         }
 
-        public static string CreatePropertyDoorLinks(IEnumerable<PropertyDoorModel> doors, string namespaceName, DateTime generatedAt)
+        /// <summary>
+        /// Each door's link as exported. Two doors that link to each other (stored before links went one way) keep
+        /// only the lower id's link; the other door leads back to it, so they work the same.
+        /// </summary>
+        public static Dictionary<ulong, ulong?> GetExportedLinks(List<PropertyDoorModel> doors)
         {
-            IEnumerable<string> lines = doors
-                .Where(door => door.LinkedToPropertyDoorId.HasValue)
-                .OrderBy(door => door.Id)
-                .Select(CreateLinkLine);
+            Dictionary<ulong, ulong?> linksByDoorId = doors.ToDictionary(door => door.Id, door => door.LinkedToPropertyDoorId);
+            return doors.ToDictionary(door => door.Id, door => IsLinkedBackFromLowerId(door, linksByDoorId) ? null : door.LinkedToPropertyDoorId);
+        }
 
-            StringBuilder builder = new StringBuilder();
-            builder.Append(CreateHeader(generatedAt));
-            builder.AppendLine("// Seed data can't hold the door links (linked doors form cycles that EF can't insert), so they are set");
-            builder.AppendLine($"// afterwards. Copy the lines of {SetLinksMethodName} into the Up() of the migration that seeds {PropertyDoorClassName},");
-            builder.AppendLine("// after its InsertData calls. Don't call this class from a migration: an applied migration must never change,");
-            builder.AppendLine("// and this file is regenerated.");
-            builder.AppendLine("using Microsoft.EntityFrameworkCore.Migrations;");
-            builder.AppendLine();
-            builder.AppendLine($"namespace {namespaceName}");
-            builder.AppendLine("{");
-            builder.AppendLine($"    public static class {PropertyDoorLinksClassName}");
-            builder.AppendLine("    {");
-            builder.AppendLine($"        public static void {SetLinksMethodName}(MigrationBuilder migrationBuilder)");
-            builder.AppendLine("        {");
-            foreach (string line in lines)
-            {
-                builder.AppendLine(line);
-            }
-            builder.AppendLine("        }");
-            builder.AppendLine("    }");
-            builder.AppendLine("}");
-            return builder.ToString();
+        private static bool IsLinkedBackFromLowerId(PropertyDoorModel door, Dictionary<ulong, ulong?> linksByDoorId)
+        {
+            ulong? linkedDoorId = door.LinkedToPropertyDoorId;
+            return linkedDoorId.HasValue
+                && linkedDoorId.Value < door.Id
+                && linksByDoorId.TryGetValue(linkedDoorId.Value, out ulong? linkBack)
+                && linkBack == door.Id;
         }
 
         private static string CreatePropertyRow(PropertyModel property)
@@ -76,7 +62,7 @@ namespace OpenRP.Framework.Features.Properties.Helpers
             });
         }
 
-        private static string CreatePropertyDoorRow(PropertyDoorModel door)
+        private static string CreatePropertyDoorRow(PropertyDoorModel door, ulong? exportedLinkedDoorId)
         {
             return CreateRow(nameof(PropertyDoorModel), new List<(string, string)>
             {
@@ -89,6 +75,7 @@ namespace OpenRP.Framework.Features.Properties.Helpers
                 (nameof(PropertyDoorModel.Angle), CSharpLiterals.GetFloat(door.Angle)),
                 (nameof(PropertyDoorModel.Interior), CSharpLiterals.GetInt(door.Interior)),
                 (nameof(PropertyDoorModel.InsidePropertyId), CSharpLiterals.GetULong(door.InsidePropertyId)),
+                (nameof(PropertyDoorModel.LinkedToPropertyDoorId), CSharpLiterals.GetULong(exportedLinkedDoorId)),
             });
         }
 
@@ -96,20 +83,6 @@ namespace OpenRP.Framework.Features.Properties.Helpers
         {
             string assignments = string.Join($",{Environment.NewLine}", fields.Select(field => $"{FieldIndentation}{field.Name} = {field.Value}"));
             return $"{RowIndentation}new {modelName}(){Environment.NewLine}{RowIndentation}{{{Environment.NewLine}{assignments}{Environment.NewLine}{RowIndentation}}}";
-        }
-
-        private static string CreateLinkLine(PropertyDoorModel door)
-        {
-            string[] arguments =
-            {
-                "table: \"PropertyDoors\"",
-                "keyColumn: \"Id\"",
-                $"keyValue: {CSharpLiterals.GetULong(door.Id, withSuffix: true)}",
-                $"column: \"{nameof(PropertyDoorModel.LinkedToPropertyDoorId)}\"",
-                $"value: {CSharpLiterals.GetULong(door.LinkedToPropertyDoorId, withSuffix: true)}",
-            };
-            string argumentList = string.Join($",{Environment.NewLine}", arguments.Select(argument => $"{ArgumentIndentation}{argument}"));
-            return $"{StatementIndentation}migrationBuilder.UpdateData({Environment.NewLine}{argumentList});";
         }
 
         private static string CreateHeader(DateTime generatedAt)

@@ -58,12 +58,13 @@ namespace OpenRP.Framework.Features.Properties.Services
         void SetDoorInsideProperty(PropertyDoor door, Property? insideProperty);
 
         /// <summary>
-        /// Makes the two doors lead to each other. Doors that led back to either of them no longer do.
+        /// Makes the door lead to the other door. Only this door stores the link; the other door leads back to it
+        /// unless it has a link of its own. Refused when the links would go around in a loop.
         /// </summary>
         string? LinkDoors(PropertyDoor door, PropertyDoor otherDoor);
 
         /// <summary>
-        /// Makes the door lead nowhere, and the door it led to no longer lead back to it.
+        /// Makes the door lead nowhere, and removes the links of the doors that led to it.
         /// </summary>
         void UnlinkDoor(PropertyDoor door);
 

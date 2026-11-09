@@ -139,25 +139,26 @@ namespace OpenRP.Framework.Features.Properties.Services
                 return "A door can't lead to itself.";
             }
 
-            UnlinkDoor(door);
-            UnlinkDoor(otherDoor);
-            door.SetLinkedDoorId(otherDoor.GetId());
-            otherDoor.SetLinkedDoorId(door.GetId());
+            // The other door already links here, so they're a pair: this door leads back once it has no link of its own.
+            if (otherDoor.IsLinkedTo(door))
+            {
+                SetLinkedDoorId(door, null);
+                return null;
+            }
+
+            if (WouldCreateLoop(door, otherDoor))
+            {
+                return "That would make the doors lead around in a loop. Unlink one of them first.";
+            }
+
+            SetLinkedDoorId(door, otherDoor.GetId());
             return null;
         }
 
         public void UnlinkDoor(PropertyDoor door)
         {
-            PropertyDoor? linkedDoor = GetLinkedDoor(door);
-            if (linkedDoor != null && linkedDoor.IsLinkedTo(door))
-            {
-                linkedDoor.SetLinkedDoorId(null);
-            }
-
-            if (door.GetLinkedDoorId().HasValue)
-            {
-                door.SetLinkedDoorId(null);
-            }
+            SetLinkedDoorId(door, null);
+            RemoveLinksTo(door);
         }
 
         public void DeleteDoor(PropertyDoor door)
@@ -172,14 +173,38 @@ namespace OpenRP.Framework.Features.Properties.Services
             return _entityManager.GetComponents<PropertyDoor>().Where(door => !door.IsDeleted());
         }
 
-        private PropertyDoor? GetLinkedDoor(PropertyDoor door)
+        /// <summary>
+        /// Only marks the door changed when the link really changes.
+        /// </summary>
+        private static void SetLinkedDoorId(PropertyDoor door, ulong? linkedDoorId)
         {
-            ulong? linkedDoorId = door.GetLinkedDoorId();
-            return linkedDoorId.HasValue ? _propertyService.GetDoor(linkedDoorId.Value) : null;
+            if (door.GetLinkedDoorId() != linkedDoorId)
+            {
+                door.SetLinkedDoorId(linkedDoorId);
+            }
         }
 
         /// <summary>
-        /// The database clears these links too, but loaded doors would save the old link back over it.
+        /// Whether following the links from otherDoor comes back to door. Each pair stores one link, so the links must
+        /// never form a loop: seed data can't hold rows that point at each other.
+        /// </summary>
+        private bool WouldCreateLoop(PropertyDoor door, PropertyDoor otherDoor)
+        {
+            HashSet<ulong> visitedDoorIds = new HashSet<ulong> { otherDoor.GetId() };
+            ulong? nextDoorId = otherDoor.GetLinkedDoorId();
+            while (nextDoorId.HasValue && visitedDoorIds.Add(nextDoorId.Value))
+            {
+                if (nextDoorId.Value == door.GetId())
+                {
+                    return true;
+                }
+                nextDoorId = _propertyService.GetDoor(nextDoorId.Value)?.GetLinkedDoorId();
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// The database clears these links too when a door is deleted, but loaded doors would save the old link back.
         /// </summary>
         private void RemoveLinksTo(PropertyDoor door)
         {

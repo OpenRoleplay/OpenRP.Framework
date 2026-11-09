@@ -26,7 +26,7 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
             int renameRow = actionsDialog.AddRow("Rename");
             int insidePropertyRow = actionsDialog.AddRow(GetInsidePropertyRowText(door));
             int linkRow = actionsDialog.AddRow(GetLinkRowText(door));
-            int? unlinkRow = AddRowIf(actionsDialog, door.GetLinkedDoorId().HasValue, "Unlink");
+            int? unlinkRow = AddRowIf(actionsDialog, _propertyService.GetDestinationDoor(door) != null, "Unlink");
             int deleteRow = actionsDialog.AddRow("Delete");
 
             void OnActionChosen(ListDialogResponse response)
@@ -128,10 +128,12 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                 : $"{GetDoorName(door)} -> {GetDoorNameWithProperty(linkedDoor)}";
         }
 
+        /// <summary>
+        /// Where the door leads, including doors that lead back because another door links to them.
+        /// </summary>
         private PropertyDoor? GetLinkedDoor(PropertyDoor door)
         {
-            ulong? linkedDoorId = door.GetLinkedDoorId();
-            return linkedDoorId.HasValue ? _propertyService.GetDoor(linkedDoorId.Value) : null;
+            return _propertyService.GetDestinationDoor(door);
         }
 
         private void MoveDoorToPlayer(Player player, PropertyDoor door, Action onMoved)

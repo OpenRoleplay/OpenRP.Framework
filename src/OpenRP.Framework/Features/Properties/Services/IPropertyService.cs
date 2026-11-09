@@ -21,6 +21,17 @@ namespace OpenRP.Framework.Features.Properties.Services
         PropertyDoor? GetDoor(ulong doorId);
 
         /// <summary>
+        /// The door this one leads to: the door it links to, otherwise the door that links to it (each pair stores one
+        /// link, so the other door leads back), otherwise null.
+        /// </summary>
+        PropertyDoor? GetDestinationDoor(PropertyDoor door);
+
+        /// <summary>
+        /// The doors whose own link points at this door, by id.
+        /// </summary>
+        List<PropertyDoor> GetDoorsLinkingTo(PropertyDoor door);
+
+        /// <summary>
         /// The virtual world the door is in: 0 outside, otherwise the virtual world of its property.
         /// </summary>
         int GetDoorVirtualWorld(PropertyDoor door);

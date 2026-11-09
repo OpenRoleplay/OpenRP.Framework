@@ -35,6 +35,8 @@ A door is a child entity of its property, and its label is a child of the door.
   2. otherwise, in a non-zero interior, the door's own property;
   3. otherwise outside.
 - **Deleting a property:** loaded doors inside it are put outside in memory. **Why:** the same reason as unlinking: a loaded door would save the old value back.
+- **Where a door leads:** `PropertyService.GetDestinationDoor(door)`: its own link, otherwise the lowest-numbered door linking to it (`GetDoorsLinkingTo`), otherwise nowhere. `/enter`, `/exit` and the editor all use it.
+- **Linking** (`PropertyEditorService.LinkDoors`) stores one direction. If the other door already links back, the door's own link is cleared instead, and a link that would close a loop is refused (`WouldCreateLoop`). **Why:** the links must stay cycle-free to fit in seed data.
 - **Creating with `CreateAndLoad`:** new properties and doors are created this way. **Why:** so they have an id at once, and can be linked straight away.
 - **`OnComponentLoaded`** redraws labels. **Why:** a rename on another server shows up after the sync.
 
