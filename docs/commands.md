@@ -18,6 +18,7 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 |---|---|---|---|
 | `/givemoney [receiver] [currency code] [amount]` | Admin | Give money of a currency to a player. Use a negative amount to take money. | [Admins](features/admins.md) |
 | `/gotopos [x] [y] [z] <interior> <virtual world>` | Admin | Teleport to a position, for example into a GTA interior. | [Admins](features/admins.md) |
+| `/tprel [player] [distance] [direction]` | Admin | Move a player a distance forward, back, left, right, up or down, keeping their interior and virtual world. | [Admins](features/admins.md) |
 
 ## Admin > Factions
 
