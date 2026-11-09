@@ -7,6 +7,7 @@ The features that need settings, and what the Framework does when the server sta
 | Call | Options | Page |
 |---|---|---|
 | `AddActorConversations` | `ChatGptApiKey` | [ActorConversations](../features/actor-conversations.md) |
+| `AddActorRoleplay` | `OpenAiApiKey`, `ModelId`, `ReasoningEffort`, `MaxConcurrentReplies` | [ActorRoleplay](../features/actor-roleplay.md) |
 | `AddWorldWeather` | weather ids per climate, temperature ranges, map bounds, seed | [WorldWeather](../features/world-weather.md) |
 | `AddWorldTime` | in-game days per real day, map bounds, time offset, exempt dates | [WorldTime](../features/world-time.md) |
 | `AddCDN` | `BaseUrl`, `Password` | [CDN](../features/cdn.md) |

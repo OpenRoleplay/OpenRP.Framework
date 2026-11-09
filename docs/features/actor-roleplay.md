@@ -1,0 +1,73 @@
+# ActorRoleplay
+
+AI [actors](actors.md) that roleplay back. When a player uses `/me`, `/do` or `/say` near one, the actor answers in character with up to 3 lines of `/me`, `/do` or `/say`, written by an OpenAI model through Semantic Kernel.
+
+## How to use it
+
+The host registers it with an API key (keep the key out of source control):
+
+```csharp
+services.AddActorRoleplay(options =>
+{
+    options.OpenAiApiKey = configuration["OpenAI_API"];
+    options.ModelId = "gpt-5.4-mini";      // optional
+});
+```
+
+| Option | Default | What it does |
+|---|---|---|
+| `OpenAiApiKey` | none | Without it, actors don't reply |
+| `ModelId` | `gpt-5.4-mini` | The OpenAI model |
+| `ReasoningEffort` | `low` | For reasoning models: `minimal`, `low`, `medium` or `high`. Set it to empty for models that don't reason, which reject it |
+| `MaxConcurrentReplies` | 4 | OpenAI requests at once, across all actors |
+
+**Making an actor an AI actor:** give it an `ActorPrompts` row (who they are, how they talk) and a linked character for its name. Actors in a [main menu](main-menu.md) scene never reply.
+
+## How it works
+
+1. **Hearing.** Every `/me`, `/do` and `/say` publishes [`OnPlayerChatMessageSent`](../server-events.md). AI actors within the message's range (20 m for `/me` and `/do`, 7 m for `/say`) in the same virtual world remember the line as it appeared in chat.
+2. **Waiting.** The actor waits until it has heard nothing for 2 seconds, so a `/me` and a `/say` right after each other get one reply.
+3. **Replying.**
+   - The model gets the shared roleplay rules, the actor's prompt, and the last 30 lines it heard and said.
+   - Its reply is split into `/me`, `/do` and `/say` lines and sent from the actor's position, with a short typing pause between lines.
+   - Lines heard during a reply lead to the next reply.
+4. **Forgetting.** An actor that heard nothing for 15 minutes forgets the scene, so the next visitor starts fresh.
+
+**Why wait for a pause:** players often send an action and speech right after each other. Answering each separately gives double replies and costs twice as much.
+
+**Why actors don't hear each other's AI lines:** two actors would otherwise keep a paid conversation going between themselves.
+
+## Many actors
+
+- **Idle actors cost nothing.** Hearing is one distance check per actor per message; memory is only added once an actor hears something.
+- **Request slots.** At most `MaxConcurrentReplies` requests run at once; other actors wait their turn.
+  - **Why:** it stays under OpenAI's rate limits when many players talk to many actors.
+- **One client.** All actors share one Semantic Kernel chat service.
+- **Prompt caching.** The shared rules come first in every prompt, so OpenAI's automatic prompt caching can reuse them across actors.
+
+## Known limitations
+
+- **Paid requests.** Each reply is a paid OpenAI request.
+- **Memory doesn't last.** It's lost on a restart, and shared by everyone near the actor.
+- **Talk only.** Actors can't hand over items or money yet. That would be Semantic Kernel tool calling.
+- **No moving or animating.** A reply is only chat; the actor doesn't move or animate.
+
+## Deep dive
+
+- **Code:** `Features/ActorRoleplay/`. It uses the `Microsoft.SemanticKernel` package.
+- **Services:**
+  - `IActorRoleplayService`: `HearPlayerMessage`, `ReplyToQuietActors` and `ForgetIdleActors`;
+  - `IActorReplyGenerator`: the Semantic Kernel call.
+- **Components on the actor's entity:**
+  - `ActorRoleplayMemory`: the lines, and whether it's replying;
+  - the `ActorAwaitingReply` marker: the reply timer only looks at these.
+- **Systems:**
+  - `ActorRoleplayServerSystem`: hears the event;
+  - `ActorRoleplaySystem`: a 500 ms reply timer and a 1 minute forgetting timer.
+- **Helpers:**
+  - `ActorRoleplayPromptBuilder`: the system prompt;
+  - `ActorReplyParser`: only whole lines starting with a command count, so "24/7" in speech survives;
+  - `ChatLineSplitter`: parts of at most 110 characters, because the SA-MP client drops long messages.
+- **Threading:** replies start from the main-thread timer, and SampSharp brings every `await` back to the main thread. After each `await`, the code checks the actor still exists.
+
+Want more? → [Actors](actors.md) · [ActorConversations](actor-conversations.md)

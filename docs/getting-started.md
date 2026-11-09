@@ -21,12 +21,14 @@ To run a server on the Framework, you make a [host](glossary.md#host): a SampSha
    - **Why transient:** a [singleton](glossary.md#singleton) context would keep one connection and change tracker for the whole run.
 2. **The plugin services:** `AddStreamer()` and `AddColAndreas()`. The Framework uses them, but leaves registering them to the host.
 3. **`AddOpenRoleplayFramework()`.**
-4. **The five features with settings:** `AddActorConversations`, `AddWorldWeather`, `AddWorldTime`, `AddCDN` and `AddDiscord`.
+4. **The six features with settings:** `AddActorConversations`, `AddActorRoleplay`, `AddWorldWeather`, `AddWorldTime`, `AddCDN` and `AddDiscord`.
    - Call them all, even with empty options (`options => { }`).
    - **Why:** other systems depend on their services.
 5. **Your own code:** `AddServerSystemsInAssembly(typeof(Startup).Assembly)`. SampSharp loads the host's own systems itself.
 6. **Your own commands:** if you have any, call `ServerCommandCache.RegisterApplicationAssembly(Assembly.GetExecutingAssembly())`.
 7. **Startup:** `Startup` implements `IEcsStartup`: `UseEntities().UseCommands()` in `Initialize`, and `EnableStreamerEvents()` in `Configure`. There's no `Program.cs`: SampSharp generates the entry point.
+   - **Text encoding:** at the top of `Initialize`, call `Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)` and set `StringViewMarshaller.Encoding = Encoding.GetEncoding(1252)`.
+   - **Why:** SA-MP clients show and send chat as Windows-1252, but SampSharp defaults to UTF-8. Without this, anything outside plain ASCII is garbled, such as the curly quotes in AI replies (’ shows as â€™) or a player's "café". For Cyrillic players, use 1251 instead.
 8. **Migrations:** make them in the host. See [Seed data and migrations](persistence/seed-data-and-migrations.md).
 
 ```csharp

@@ -13,6 +13,10 @@ namespace OpenRP.Framework.Features.Actors.Services
 {
     public class ActorService : IActorService
     {
+        // The streamer creates objects on its own tick (stream_rate: once a second), so the mapping under an actor can
+        // reach a player up to about a second after the actor; this leaves a margin.
+        private static readonly TimeSpan SpawnPoseRefreshDelay = TimeSpan.FromMilliseconds(1500);
+
         // Dependency Injection Properties
         private BaseDataContext _dataContext;
         private IWorldService _worldService;
@@ -27,9 +31,6 @@ namespace OpenRP.Framework.Features.Actors.Services
             _streamerService = streamerService;
             _virtualWorldService = virtualWorldService;
             _entityManager = entityManager;
-
-            // First Time Loading
-            LoadActors();
         }
 
         public List<ActorModel> GetActors()
@@ -52,7 +53,7 @@ namespace OpenRP.Framework.Features.Actors.Services
                 ServerActor serverActor = _entityManager.AddComponent<ServerActor>(serverActorEntityId, actorModel);
 
                 Actor gameActor = _worldService.CreateActor(actorModel.Skin, new Vector3(actorModel.X, actorModel.Y, actorModel.Z), actorModel.Angle, serverActorEntityId);
-                gameActor.ApplyAnimation(actorModel.AnimLibrary, actorModel.AnimName, actorModel.AnimSpeed, true, true, true, true, 0);
+                serverActor.ApplyIdleAnimation();
 
                 if (actorModel.ActorCharacter != null)
                 {
@@ -76,6 +77,38 @@ namespace OpenRP.Framework.Features.Actors.Services
         public List<ServerActor> GetServerActors()
         {
             return _entityManager.GetComponents<ServerActor>().ToList();
+        }
+
+        public void ScheduleSpawnPoseRefresh(Actor actor)
+        {
+            ServerActor? serverActor = actor.GetComponentInParent<ServerActor>();
+            if (serverActor == null)
+            {
+                return;
+            }
+
+            ActorSpawnPoseRefresh? refresh = serverActor.GetComponent<ActorSpawnPoseRefresh>();
+            if (refresh != null)
+            {
+                refresh.Postpone(SpawnPoseRefreshDelay);
+                return;
+            }
+
+            serverActor.AddComponent<ActorSpawnPoseRefresh>(SpawnPoseRefreshDelay);
+        }
+
+        public void RefreshDueSpawnPoses()
+        {
+            foreach (ActorSpawnPoseRefresh refresh in _entityManager.GetComponents<ActorSpawnPoseRefresh>().ToList())
+            {
+                if (!refresh.IsDue())
+                {
+                    continue;
+                }
+
+                refresh.GetComponent<ServerActor>()?.ResetToSpawnPose();
+                refresh.Destroy();
+            }
         }
     }
 }

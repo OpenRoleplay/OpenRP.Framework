@@ -25,6 +25,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [AccountSettings](features/account-settings.md): chat toggles and `/settings`
 - [Actors](features/actors.md): non-player characters in the world
 - [ActorConversations](features/actor-conversations.md): AI conversations between actors
+- [ActorRoleplay](features/actor-roleplay.md): AI actors that answer players' /me, /do and /say
 - [Admins](features/admins.md): admin and tester commands
 - [Animations](features/animations.md): preloads animations
 - [BiomeGenerator](features/biome-generator.md): biomes and objects for generated landscapes

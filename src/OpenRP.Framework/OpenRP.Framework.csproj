@@ -26,6 +26,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.82.0" />
     <PackageReference Include="OpenRP.OpenMp.Streamer" Version="1.0.0-preview.2026.44.2" />
     <PackageReference Include="SampSharp.OpenMp.ColAndreas" Version="1.0.0-preview.2026.44.2" />
     <PackageReference Include="SampSharp.OpenMp.Entities" Version="1.0.0-prerelease2" />

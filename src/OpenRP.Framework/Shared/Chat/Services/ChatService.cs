@@ -5,6 +5,8 @@ using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.Chat.Helpers;
+using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
+using OpenRP.Framework.Shared.ServerEvents.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -19,9 +21,11 @@ namespace OpenRP.Framework.Shared.Chat.Services
     public class ChatService : IChatService
     {
         private IEntityManager _entityManager;
-        public ChatService(IEntityManager entityManager) 
-        { 
+        private IServerEventAggregator _serverEventAggregator;
+        public ChatService(IEntityManager entityManager, IServerEventAggregator serverEventAggregator)
+        {
             _entityManager = entityManager;
+            _serverEventAggregator = serverEventAggregator;
         }
 
         public void SendInfoMessage(PlayerInfoMessageType type, string text)
@@ -36,13 +40,32 @@ namespace OpenRP.Framework.Shared.Chat.Services
 
         private void SendClientRangedMessage(Player player, Color color, float range, string text)
         {
+            SendClientRangedMessage(player.Position, player.VirtualWorld, color, range, text);
+        }
+
+        private void SendClientRangedMessage(Vector3 position, int virtualWorld, Color color, float range, string text)
+        {
             foreach (Player foreachPlayer in _entityManager.GetComponents<Player>())
             {
-                if (foreachPlayer.IsInRangeOfPoint(range, player.Position) && player.VirtualWorld == foreachPlayer.VirtualWorld)
+                if (foreachPlayer.IsInRangeOfPoint(range, position) && foreachPlayer.VirtualWorld == virtualWorld)
                 {
                     foreachPlayer.SendClientMessage(color, text);
                 }
             }
+        }
+
+        private const float RoleplayActionRange = 20.0f;
+        private const float LowRange = 3.0f;
+        private const float ShoutRange = 30.0f;
+
+        public void SendActionMessage(string name, Vector3 position, int virtualWorld, string text)
+        {
+            SendClientRangedMessage(position, virtualWorld, ServerColor.RoleplayActionColor, RoleplayActionRange, String.Format("* {0} {1} *", name, text));
+        }
+
+        public void SendDoMessage(string name, Vector3 position, int virtualWorld, string text)
+        {
+            SendClientRangedMessage(position, virtualWorld, ServerColor.RoleplayActionColor, RoleplayActionRange, String.Format("{0} (( {1} ))", text, name));
         }
 
         private const float TalkRange = 7.0f;
@@ -89,6 +112,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
                 Vector3 position = player.Position;
 
                 SendTalkMessage(name, position, text, accent, player.VirtualWorld);
+                PublishChatMessageSent(player, character, PlayerChatMessageType.TALK, text, TalkRange);
             }
             else
             {
@@ -136,14 +160,12 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         }
                         break;
                     case PlayerChatMessageType.ME:
-                        string CHAT_ACTION_ME = String.Format("* {0} {1} *", character.GetName(), text);
-
-                        SendClientRangedMessage(player, ServerColor.RoleplayActionColor, 20, CHAT_ACTION_ME);
+                        SendActionMessage(character.GetName(), player.Position, player.VirtualWorld, text);
+                        PublishChatMessageSent(player, character, type, text, RoleplayActionRange);
                         break;
                     case PlayerChatMessageType.DO:
-                        string CHAT_ACTION_DO = String.Format("{0} (( {1} ))", text, character.GetName());
-
-                        SendClientRangedMessage(player, ServerColor.RoleplayActionColor, 20, CHAT_ACTION_DO);
+                        SendDoMessage(character.GetName(), player.Position, player.VirtualWorld, text);
+                        PublishChatMessageSent(player, character, type, text, RoleplayActionRange);
                         break;
                     case PlayerChatMessageType.AME:
                         string CHAT_ACTION_AME = String.Format("* {0} {1} *", character.GetName(), text);
@@ -156,7 +178,8 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         string nameSuffix = characterName.EndsWith("s") ? "'" : "'s";
                         string CHAT_ACTION_MY = String.Format("* {0}{1} {2}", characterName, nameSuffix, text);
 
-                        SendClientRangedMessage(player, ServerColor.RoleplayActionColor, 20, CHAT_ACTION_MY);
+                        SendClientRangedMessage(player, ServerColor.RoleplayActionColor, RoleplayActionRange, CHAT_ACTION_MY);
+                        PublishChatMessageSent(player, character, type, text, RoleplayActionRange);
                         break;
                     case PlayerChatMessageType.TALK:
                         SendTalkMessage(player, text);
@@ -164,12 +187,14 @@ namespace OpenRP.Framework.Shared.Chat.Services
                     case PlayerChatMessageType.LOW:
                         string CHAT_ACTION_LOW = String.Format("{0} says quietly: {1}", character.GetName(), text);
 
-                        SendClientRangedMessage(player, Color.LightSlateGray, 3, CHAT_ACTION_LOW);
+                        SendClientRangedMessage(player, Color.LightSlateGray, LowRange, CHAT_ACTION_LOW);
+                        PublishChatMessageSent(player, character, type, text, LowRange);
                         break;
                     case PlayerChatMessageType.SHOUT:
                         string CHAT_ACTION_SHOUT = String.Format("{0} shouts: {1}", character.GetName(), text);
 
-                        SendClientRangedMessage(player, Color.Orange, 30, CHAT_ACTION_SHOUT);
+                        SendClientRangedMessage(player, Color.Orange, ShoutRange, CHAT_ACTION_SHOUT);
+                        PublishChatMessageSent(player, character, type, text, ShoutRange);
                         break;
                 }
             }
@@ -177,6 +202,25 @@ namespace OpenRP.Framework.Shared.Chat.Services
             {
                 player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You must be logged into a character to be able to send a message!");
             }
-}
+        }
+
+        /// <summary>
+        /// Lets other features (such as AI actors) react to what a character said or did nearby. Not awaited: the
+        /// dispatcher logs each handler's errors itself, and the chat message has already been sent.
+        /// </summary>
+        private void PublishChatMessageSent(Player player, Character character, PlayerChatMessageType type, string text, float range)
+        {
+            _ = _serverEventAggregator.PublishAsync(new OnPlayerChatMessageSentEventArgs
+            {
+                Player = player,
+                CharacterName = character.GetName(),
+                Accent = character.HasAccent() ? character.GetAccent() : null,
+                Type = type,
+                Text = text,
+                Position = player.Position,
+                VirtualWorld = player.VirtualWorld,
+                Range = range
+            });
+        }
     }
 }

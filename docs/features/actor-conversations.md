@@ -2,6 +2,8 @@
 
 AI-driven conversations between [actors](actors.md), written live by OpenAI's ChatGPT. Players nearby see the actors talk and act, as if they were real players.
 
+For actors that answer players instead, see [ActorRoleplay](actor-roleplay.md).
+
 ## How to use it
 
 The host registers it with an API key (keep the key out of source control):

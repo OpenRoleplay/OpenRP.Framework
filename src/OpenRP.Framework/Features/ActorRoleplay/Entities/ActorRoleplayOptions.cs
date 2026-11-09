@@ -1,0 +1,27 @@
+namespace OpenRP.Framework.Features.ActorRoleplay.Entities
+{
+    public class ActorRoleplayOptions
+    {
+        /// <summary>
+        /// The OpenAI API key. Without it, actors don't reply.
+        /// </summary>
+        public string? OpenAiApiKey { get; set; }
+
+        /// <summary>
+        /// The OpenAI model actors reply with. A cheap, fast model is enough for short roleplay replies.
+        /// </summary>
+        public string ModelId { get; set; } = "gpt-5.4-mini";
+
+        /// <summary>
+        /// "minimal", "low", "medium" or "high" for reasoning models; null or empty for models that don't reason
+        /// (they reject the setting). Lower is faster and cheaper.
+        /// </summary>
+        public string? ReasoningEffort { get; set; } = "low";
+
+        /// <summary>
+        /// How many OpenAI requests may run at once across all actors. Other actors wait their turn, which keeps a
+        /// crowd under OpenAI's rate limits.
+        /// </summary>
+        public int MaxConcurrentReplies { get; set; } = 4;
+    }
+}

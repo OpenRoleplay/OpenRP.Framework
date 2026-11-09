@@ -24,6 +24,12 @@ player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You are not near any 
 | `SendTalkMessage(player, text)` | The character says something to people nearby |
 | `SendTalkMessage(name, position, text, accent, virtualWorld)` | Someone (for example an actor) talks at a spot. `virtualWorld` defaults to 0 |
 | `SendPlayerChatMessage(player, type, text)` | A roleplay message (`ME`, `DO`, `LOW`, `SHOUT`, `OOC`, …) |
+| `SendActionMessage(name, position, virtualWorld, text)` | `* Name text *` at a spot, like `/me` (for example from an actor) |
+| `SendDoMessage(name, position, virtualWorld, text)` | `text (( Name ))` at a spot, like `/do` |
+
+**Ranges:** `/me`, `/do` and `/my` reach 20 units, `/low` 3 and `/shout` 30, in the sender's virtual world.
+
+**Nearby chat is an event.** Every nearby in-character message from a player (talk, `/me`, `/do`, `/my`, `/low`, `/shout`) also publishes [`OnPlayerChatMessageSent`](../server-events.md#onplayerchatmessagesent), with where it was sent and how far it reached. [AI actors](../features/actor-roleplay.md) use it to hear players.
 
 **Talk** reaches 7 units, in the speaker's virtual world only. From 5 units on it's muffled, with part of the letters turned into dots. Each listener hears their own muffled version. **Why:** far-away speech should be hard to hear, and houses that share an interior must not hear each other.
 
