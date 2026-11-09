@@ -39,8 +39,9 @@ jobs:
           # Calculate Monday of the current week (works on GNU date)
           MONDAY=$(date -d "today - $(($(date +%u)-1)) days" +%Y-%m-%d)
           
-          # Count the number of commits made since Monday
-          BUILD_NUMBER=$(git rev-list --count HEAD --since="$MONDAY")
+          # Count the number of commits made since Monday. The time is needed: git reads a bare date as that day at
+          # the current time, so on Mondays the count was 0 and every release got the same, already published version.
+          BUILD_NUMBER=$(git rev-list --count HEAD --since="$MONDAY 00:00:00")
           
           # Construct the version string with the commit count as the build number
           VERSION="${LATEST_TAG}-preview.${YEAR}.${WEEK}.${BUILD_NUMBER}"
