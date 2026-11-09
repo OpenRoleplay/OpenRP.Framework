@@ -1,31 +1,57 @@
 using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Shared.BaseManager.Entities;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using OpenRP.OpenMp.Streamer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Actors.Components
 {
-    public class ServerActor : Component
+    /// <summary>
+    /// An actor from the Actors table: its game actor and name label are child entities. Changes are saved by the
+    /// ActorManager on its next sync.
+    /// </summary>
+    public class ServerActor : Component, IBaseDataComponent, IChangeable, IDeletable
     {
         private readonly ActorModel _actorModel;
-        public ServerActor(ActorModel actorModel) 
+        private bool _hasChanges;
+        private bool _isDeleted;
+
+        public ServerActor(ActorModel actorModel)
         {
             _actorModel = actorModel;
         }
 
-        public Actor GetActor()
+        public bool HasChanges()
         {
-            return this.GetComponentInChildren<Actor>();
+            return _hasChanges;
         }
 
-        public DynamicTextLabel GetNameTag()
+        public void ProcessChanges(bool processChanges = true)
         {
-            return this.GetComponentInChildren<DynamicTextLabel>();
+            _hasChanges = processChanges;
+        }
+
+        public bool IsDeleted()
+        {
+            return _isDeleted;
+        }
+
+        public void ProcessDeletion(bool processDeletion = true)
+        {
+            _isDeleted = processDeletion;
+        }
+
+        public ActorModel GetRawActorModel()
+        {
+            return _actorModel;
+        }
+
+        /// <summary>
+        /// The game actor, or null when it isn't created (yet).
+        /// </summary>
+        public Actor? GetActor()
+        {
+            return GetComponentInChildren<Actor>();
         }
 
         public ulong GetId()
@@ -35,42 +61,87 @@ namespace OpenRP.Framework.Features.Actors.Components
 
         public string GetName()
         {
-            if (_actorModel.ActorCharacter != null)
-            {
-                return String.Format("{0} {1}", _actorModel.ActorCharacter.FirstName, _actorModel.ActorCharacter.LastName);
-            }
-            return null;
+            return _actorModel.Name;
+        }
+
+        public void SetName(string name)
+        {
+            _actorModel.Name = name;
+            ProcessChanges();
+        }
+
+        public int GetSkin()
+        {
+            return _actorModel.Skin;
+        }
+
+        public void SetSkin(int skin)
+        {
+            _actorModel.Skin = skin;
+            ProcessChanges();
+        }
+
+        public Vector3 GetPosition()
+        {
+            return new Vector3(_actorModel.X, _actorModel.Y, _actorModel.Z);
+        }
+
+        public void SetPosition(Vector3 position)
+        {
+            _actorModel.X = position.X;
+            _actorModel.Y = position.Y;
+            _actorModel.Z = position.Z;
+            ProcessChanges();
+        }
+
+        public float GetAngle()
+        {
+            return _actorModel.Angle;
+        }
+
+        public int GetInterior()
+        {
+            return _actorModel.Interior;
+        }
+
+        public void SetInterior(int interior)
+        {
+            _actorModel.Interior = interior;
+            ProcessChanges();
+        }
+
+        public void SetAngle(float angle)
+        {
+            _actorModel.Angle = angle;
+            ProcessChanges();
+        }
+
+        public bool HasAnimation()
+        {
+            return !String.IsNullOrWhiteSpace(_actorModel.AnimLibrary) && !String.IsNullOrWhiteSpace(_actorModel.AnimName);
+        }
+
+        /// <summary>
+        /// The animation as "LIBRARY/name", or null when the actor just stands.
+        /// </summary>
+        public string? GetAnimationText()
+        {
+            return HasAnimation() ? $"{_actorModel.AnimLibrary}/{_actorModel.AnimName}" : null;
+        }
+
+        /// <summary>
+        /// Sets the looping animation; null for both makes the actor just stand.
+        /// </summary>
+        public void SetAnimation(string? library, string? name)
+        {
+            _actorModel.AnimLibrary = library;
+            _actorModel.AnimName = name;
+            ProcessChanges();
         }
 
         public string GetActorPrompt()
         {
-            if (_actorModel.ActorPrompt != null)
-            {
-                return _actorModel.ActorPrompt.Prompt;
-            }
-            return String.Empty;
-        }
-
-        /// <summary>
-        /// Plays the actor's looping idle animation from its row.
-        /// </summary>
-        public void ApplyIdleAnimation()
-        {
-            GetActor().ApplyAnimation(_actorModel.AnimLibrary, _actorModel.AnimName, _actorModel.AnimSpeed, true, true, true, true, TimeSpan.Zero);
-        }
-
-        /// <summary>
-        /// Puts the actor back on its spot, facing its angle, in its idle animation. Sent again after the actor streams
-        /// in, because the mapping it stands on can reach the player later and the actor would fall through.
-        /// </summary>
-        public void ResetToSpawnPose()
-        {
-            Actor actor = GetActor();
-            actor.Position = new Vector3(_actorModel.X, _actorModel.Y, _actorModel.Z);
-            actor.Angle = _actorModel.Angle;
-
-            // Moving the actor can interrupt its animation.
-            ApplyIdleAnimation();
+            return _actorModel.Prompt ?? String.Empty;
         }
 
         /// <summary>
@@ -78,7 +149,21 @@ namespace OpenRP.Framework.Features.Actors.Components
         /// </summary>
         public bool HasActorPrompt()
         {
-            return !String.IsNullOrWhiteSpace(_actorModel.ActorPrompt?.Prompt);
+            return !String.IsNullOrWhiteSpace(_actorModel.Prompt);
+        }
+
+        /// <summary>
+        /// The id of the property whose virtual world the actor stands in, or null when it's outside.
+        /// </summary>
+        public ulong? GetInsidePropertyId()
+        {
+            return _actorModel.InsidePropertyId;
+        }
+
+        public void SetInsidePropertyId(ulong? insidePropertyId)
+        {
+            _actorModel.InsidePropertyId = insidePropertyId;
+            ProcessChanges();
         }
 
         /// <summary>
@@ -87,6 +172,59 @@ namespace OpenRP.Framework.Features.Actors.Components
         public bool IsInMainMenuScene()
         {
             return _actorModel.ActorLinkedToMainMenuSceneId != null;
+        }
+
+        public ulong? GetMainMenuSceneId()
+        {
+            return _actorModel.ActorLinkedToMainMenuSceneId;
+        }
+
+        /// <summary>
+        /// Plays the actor's looping idle animation, or stops any animation when it has none.
+        /// </summary>
+        public void ApplyIdleAnimation()
+        {
+            Actor? actor = GetActor();
+            if (actor == null)
+            {
+                return;
+            }
+
+            if (HasAnimation())
+            {
+                actor.ApplyAnimation(_actorModel.AnimLibrary!, _actorModel.AnimName!, _actorModel.AnimSpeed, true, true, true, true, TimeSpan.Zero);
+            }
+            else
+            {
+                actor.ClearAnimations();
+            }
+        }
+
+        /// <summary>
+        /// Puts the actor back on its spot, facing its angle, in its idle animation. Sent again after the actor streams
+        /// in, because the mapping it stands on can reach the player later and the actor would fall through.
+        /// </summary>
+        public void ResetToSpawnPose()
+        {
+            Actor? actor = GetActor();
+            if (actor == null)
+            {
+                return;
+            }
+
+            actor.Position = GetPosition();
+            actor.Angle = GetAngle();
+
+            // Moving the actor can interrupt its animation.
+            ApplyIdleAnimation();
+        }
+
+        /// <summary>
+        /// The actor's name label, or null when it has none.
+        /// </summary>
+        public DynamicTextLabel? GetNameTag()
+        {
+            return GetComponentInChildren<DynamicTextLabel>();
         }
     }
 }

@@ -184,8 +184,8 @@ Persistent vehicles.
 ### Actors and the main menu
 | Table | Columns |
 |---|---|
-| `Actors` (`ActorModel`) | `Skin`, `X/Y/Z/Angle`, `AnimLibrary`, `AnimName`, `AnimSpeed` (default 4.1), `ActorCharacterId` → `Characters`, `ActorPromptId` → `ActorPrompts` (cascade), `ActorLinkedToMainMenuSceneId` → `MainMenuScenes` (cascade) |
-| `ActorPrompts` (`ActorPromptModel`) | `Prompt`: the AI prompt that describes the actor |
+| `Actors` (`ActorModel`) | `Name` (64), `Skin`, `X/Y/Z/Angle`, `Interior`, `AnimLibrary` and `AnimName` (null = no animation), `AnimSpeed` (default 4.1), `Prompt` (the AI prompt, null = doesn't talk), `InsidePropertyId` → `Properties` (set null; null = outside), `ActorLinkedToMainMenuSceneId` → `MainMenuScenes` (cascade). No longer read: `ActorCharacterId` → `Characters` and `ActorPromptId` → `ActorPrompts`, to be dropped later |
+| `ActorPrompts` (`ActorPromptModel`) | `Prompt`. No longer read: prompts moved to `Actors.Prompt` |
 | `MainMenuScenes` (`MainMenuSceneModel`) | `Name` |
 
 ### Fishing

@@ -38,6 +38,7 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
 | `/editproperties` | Admin | Create properties, add and link their doors, and manage them. | [Properties](features/properties.md) |
+| `/editactors` | Admin | Create actors, and move and change them: name, skin, animation and which property they're in. | [Actors](features/actors.md) |
 
 ## Character
 

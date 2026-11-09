@@ -1,13 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Actors.Services;
-using OpenRP.Framework.Features.Actors.Systems;
-using OpenRP.Framework.Features.Animations.Services;
-using SampSharp.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenRP.Framework.Features.Actors.Services.Dialogs;
 
 namespace OpenRP.Framework.Features.Actors.Extensions
 {
@@ -16,7 +9,10 @@ namespace OpenRP.Framework.Features.Actors.Extensions
         public static IServiceCollection AddActors(this IServiceCollection self)
         {
             return self
-                .AddSingleton<IActorService, ActorService>();
+                .AddSingleton<IActorService, ActorService>()
+                .AddSingleton<IActorManager, ActorManager>()
+                .AddSingleton<IActorEditorService, ActorEditorService>()
+                .AddSingleton<IActorDialogService, ActorDialogService>();
         }
     }
 }

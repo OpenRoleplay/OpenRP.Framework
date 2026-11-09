@@ -26,6 +26,7 @@ See [The property editor](properties/editor.md).
 4. **Several doors can lead to the same door.**
    - **Why:** a building can have a front and a back entrance into one interior.
 5. **On every startup,** the properties are exported as seed-data code. See [Default data export](properties/default-data.md).
+6. **[Actors](actors.md) can be inside a property too,** in its virtual world. Deleting a property publishes `OnPropertyDeleted`, and the actors inside it move outside.
 
 ## Known limitations
 

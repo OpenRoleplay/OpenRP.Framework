@@ -217,7 +217,12 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
 
         private void SendActorChatMessage(ServerActor serverActor, PlayerChatMessageType type, string text)
         {
-            Actor actor = serverActor.GetActor();
+            // The game actor is briefly missing while an admin's edit recreates it.
+            Actor? actor = serverActor.GetActor();
+            if (actor == null)
+            {
+                return;
+            }
             string name = serverActor.GetName();
 
             switch (type)

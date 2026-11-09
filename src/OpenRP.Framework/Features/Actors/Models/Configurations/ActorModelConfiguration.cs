@@ -20,6 +20,16 @@ namespace OpenRP.Framework.Features.Actors.Models.Configurations
             builder.Property(a => a.AnimSpeed)
                   .HasDefaultValue(4.1f);
 
+            builder.Property(a => a.Name)
+                  .HasMaxLength(64)
+                  .HasDefaultValue(string.Empty);
+
+            // An actor can stand inside a property, in its virtual world. Deleting that property puts it outside.
+            builder.HasOne(a => a.InsideProperty)
+                  .WithMany()
+                  .HasForeignKey(a => a.InsidePropertyId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
             // ActorPromptModel
             builder.Property(e => e.ActorPromptId)
                   .HasColumnName("ActorPromptId");

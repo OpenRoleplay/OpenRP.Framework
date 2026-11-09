@@ -24,6 +24,7 @@ public void OnCharacterSelected(OnCharacterSelectedEventArgs args, ISkillService
 | `OnPlayerCashUpdate` | a player's money changed | [Currencies](features/currencies.md), [DroppedItems](features/dropped-items.md) | Currencies (GTA money, if default currency) |
 | <a id="onfactionpermissionschanged"></a>`OnFactionPermissionsChanged` | faction permissions may have changed | [Factions](features/factions.md) | [Permissions](permissions.md) (reload those online) |
 | <a id="onresourceharvested"></a>`OnResourceHarvested` | a player harvested a resource | [Harvestables](features/harvestables.md) | nothing yet: for gamemodes to give rewards |
+| <a id="onpropertydeleted"></a>`OnPropertyDeleted` | an admin deleted a property | [Properties](features/properties.md) | [Actors](features/actors.md) (actors inside it move outside) |
 | <a id="onplayerchatmessagesent"></a>`OnPlayerChatMessageSent` | a character's nearby chat was sent: /me, /do, /my, /say, /low or /shout | [Chat](shared/chat.md) | [ActorRoleplay](features/actor-roleplay.md) (actors hear it) |
 | `OnPlayerInventoryItemUsed` | (unused) | nobody | nobody |
 

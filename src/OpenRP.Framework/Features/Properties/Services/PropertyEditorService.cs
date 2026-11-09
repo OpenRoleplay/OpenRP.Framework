@@ -1,6 +1,8 @@
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Properties.Components;
 using OpenRP.Framework.Features.VirtualWorlds.Services;
+using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
+using OpenRP.Framework.Shared.ServerEvents.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -19,15 +21,17 @@ namespace OpenRP.Framework.Features.Properties.Services
         private readonly IPropertyDoorManager _propertyDoorManager;
         private readonly IPropertyService _propertyService;
         private readonly IVirtualWorldManager _virtualWorldManager;
+        private readonly IServerEventAggregator _serverEventAggregator;
 
         public PropertyEditorService(IEntityManager entityManager, IPropertyManager propertyManager, IPropertyDoorManager propertyDoorManager,
-            IPropertyService propertyService, IVirtualWorldManager virtualWorldManager)
+            IPropertyService propertyService, IVirtualWorldManager virtualWorldManager, IServerEventAggregator serverEventAggregator)
         {
             _entityManager = entityManager;
             _propertyManager = propertyManager;
             _propertyDoorManager = propertyDoorManager;
             _propertyService = propertyService;
             _virtualWorldManager = virtualWorldManager;
+            _serverEventAggregator = serverEventAggregator;
         }
 
         public List<Property> GetProperties()
@@ -82,6 +86,10 @@ namespace OpenRP.Framework.Features.Properties.Services
             }
             MoveDoorsOutsideOf(property);
             property.ProcessDeletion();
+
+            // Other features with things inside the property (such as actors) move them outside. Not awaited: the
+            // dispatcher logs each handler's errors itself.
+            _ = _serverEventAggregator.PublishAsync(new OnPropertyDeletedEventArgs { PropertyId = property.GetId() });
         }
 
         public (PropertyDoor? Door, string? Error) CreateDoor(Property property, string name, Player player)

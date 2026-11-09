@@ -8,11 +8,24 @@ namespace OpenRP.Framework.Features.Actors.Systems
     {
         // Refreshes wait about 1.5 seconds, so checking twice a second is precise enough.
         private const int SpawnPoseRefreshCheckIntervalInMilliseconds = 500;
+        private const int SyncIntervalInMilliseconds = 60000;
 
         [Event]
-        public void OnGameModeInit(IActorService actorService)
+        public void OnGameModeInit(IActorManager actorManager)
         {
-            actorService.LoadActors();
+            actorManager.LoadAll();
+        }
+
+        [Timer(SyncIntervalInMilliseconds)]
+        public void ProcessChanges(IActorManager actorManager)
+        {
+            actorManager.ProcessChanges();
+        }
+
+        [Event]
+        public void OnGameModeExit(IActorManager actorManager)
+        {
+            actorManager.SaveNow();
         }
 
         [Event]
