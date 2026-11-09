@@ -1,4 +1,5 @@
 using OpenRP.Framework.Shared.Chat.Enums;
+using OpenRP.Framework.Shared.Chat.Helpers;
 
 namespace OpenRP.Framework.Features.ActorRoleplay.Entities
 {
@@ -13,12 +14,7 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Entities
         /// </summary>
         public string GetCommandText()
         {
-            return Type switch
-            {
-                PlayerChatMessageType.ME => $"/me {Text}",
-                PlayerChatMessageType.DO => $"/do {Text}",
-                _ => $"/say {Text}"
-            };
+            return RoleplayCommandLine.ToCommandText(Type, Text);
         }
     }
 }

@@ -60,12 +60,38 @@ namespace OpenRP.Framework.Shared.Chat.Services
 
         public void SendActionMessage(string name, Vector3 position, int virtualWorld, string text)
         {
-            SendClientRangedMessage(position, virtualWorld, ServerColor.RoleplayActionColor, RoleplayActionRange, String.Format("* {0} {1} *", name, text));
+            SendClientRangedMessage(position, virtualWorld, ServerColor.RoleplayActionColor, RoleplayActionRange, FormatActionMessage(name, text));
         }
 
         public void SendDoMessage(string name, Vector3 position, int virtualWorld, string text)
         {
-            SendClientRangedMessage(position, virtualWorld, ServerColor.RoleplayActionColor, RoleplayActionRange, String.Format("{0} (( {1} ))", text, name));
+            SendClientRangedMessage(position, virtualWorld, ServerColor.RoleplayActionColor, RoleplayActionRange, FormatDoMessage(name, text));
+        }
+
+        public void SendRoleplayLineToPlayer(Player player, PlayerChatMessageType type, string name, string text)
+        {
+            switch (type)
+            {
+                case PlayerChatMessageType.ME:
+                    player.SendClientMessage(ServerColor.RoleplayActionColor, FormatActionMessage(name, text));
+                    break;
+                case PlayerChatMessageType.DO:
+                    player.SendClientMessage(ServerColor.RoleplayActionColor, FormatDoMessage(name, text));
+                    break;
+                default:
+                    player.SendClientMessage(TalkColor, FormatTalkMessage(name, null, text));
+                    break;
+            }
+        }
+
+        private static string FormatActionMessage(string name, string text)
+        {
+            return String.Format("* {0} {1} *", name, text);
+        }
+
+        private static string FormatDoMessage(string name, string text)
+        {
+            return String.Format("{0} (( {1} ))", text, name);
         }
 
         private const float TalkRange = 7.0f;

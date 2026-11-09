@@ -26,6 +26,15 @@ player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You are not near any 
 | `SendPlayerChatMessage(player, type, text)` | A roleplay message (`ME`, `DO`, `LOW`, `SHOUT`, `OOC`, …) |
 | `SendActionMessage(name, position, virtualWorld, text)` | `* Name text *` at a spot, like `/me` (for example from an actor) |
 | `SendDoMessage(name, position, virtualWorld, text)` | `text (( Name ))` at a spot, like `/do` |
+| `SendRoleplayLineToPlayer(player, type, name, text)` | A `/me`, `/do` or talk line by someone else to one player only, for example a conversation they watch from a camera |
+
+**Helpers for AI-written lines** (`Shared/Chat/Helpers/`):
+
+| Helper | Does |
+|---|---|
+| `RoleplayCommandLine` | Reads a whole `/me`, `/do` or `/say` line, and removes the name in front of `/me` |
+| `ChatLineSplitter` | Splits text into parts of at most 110 characters, because the SA-MP client drops long messages |
+| `ChatTypingDelay` | How long to pause after a line, as if it was typed |
 
 **Ranges:** `/me`, `/do` and `/my` reach 20 units, `/low` 3 and `/shout` 30, in the sender's virtual world.
 

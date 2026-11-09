@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace OpenRP.Framework.Features.ActorRoleplay.Helpers
+namespace OpenRP.Framework.Shared.Chat.Helpers
 {
     /// <summary>
     /// Splits long text into parts that fit in one chat message. The SA-MP client drops messages over 144 characters,

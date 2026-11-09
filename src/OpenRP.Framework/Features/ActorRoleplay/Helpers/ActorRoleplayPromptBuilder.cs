@@ -10,8 +10,8 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Helpers
 
         private static readonly string SharedRules =
             $"""
-            You are a character on a heavy text-based roleplay server set in GTA San Andreas. Players roleplay with you
-            in chat, and you react to them in character, as a real person standing in that spot would.
+            You are a character on a heavy text-based roleplay server set in GTA San Andreas. The people around you
+            roleplay with you in chat, and you react to them in character, as a real person standing in that spot would.
 
             ### What you see
             The user messages are what happened around you, exactly as it appeared in chat:
@@ -39,17 +39,19 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Helpers
             """;
 
         /// <summary>
-        /// The system prompt for the actor with this name and description.
+        /// The system prompt for the actor with this name and description, and optionally the situation it's in.
         /// </summary>
-        public static string Build(string actorName, string actorPrompt)
+        public static string Build(string actorName, string actorPrompt, string? situation = null)
         {
-            return $"""
+            string prompt = $"""
                 {SharedRules}
 
                 ### Who you are
                 Your name is {actorName}.
                 {actorPrompt}
                 """;
+
+            return String.IsNullOrWhiteSpace(situation) ? prompt : $"{prompt}\n\n### The situation\n{situation}";
         }
     }
 }

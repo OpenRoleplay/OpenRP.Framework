@@ -2,6 +2,10 @@ using OpenRP.Framework.Features.ActorRoleplay.Entities;
 
 namespace OpenRP.Framework.Features.ActorRoleplay.Services
 {
+    /// <summary>
+    /// Writes one character's next lines. Each request only knows that one character, so it can't speak for anyone
+    /// else; actors answering players and actors in scene conversations both use it.
+    /// </summary>
     public interface IActorReplyGenerator
     {
         /// <summary>
@@ -10,8 +14,9 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
         bool IsConfigured();
 
         /// <summary>
-        /// Asks the model for the actor's reply to what it remembers. Returns the raw reply text, or null without one.
+        /// The actor's reply to what it remembers: up to 3 /me, /do and /say lines, or none without an API key.
+        /// <paramref name="situation"/> optionally describes where the actor is and what's expected of it.
         /// </summary>
-        Task<string?> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines);
+        Task<List<ActorRoleplayLine>> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation = null);
     }
 }

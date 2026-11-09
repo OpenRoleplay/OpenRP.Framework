@@ -5,6 +5,7 @@ using OpenRP.Framework.Features.ActorRoleplay.Entities;
 using OpenRP.Framework.Features.ActorRoleplay.Helpers;
 using OpenRP.Framework.Features.Actors.Components;
 using OpenRP.Framework.Shared.Chat.Enums;
+using OpenRP.Framework.Shared.Chat.Helpers;
 using OpenRP.Framework.Shared.Chat.Services;
 using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using SampSharp.Entities;
@@ -21,9 +22,6 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
         // Players often send a /me and a /say right after each other; waiting for a pause answers both at once.
         private static readonly TimeSpan QuietTimeBeforeReply = TimeSpan.FromSeconds(2);
         private static readonly TimeSpan QuietTimeBeforeForgetting = TimeSpan.FromMinutes(15);
-        private const int MinimumTypingDelayInMilliseconds = 1000;
-        private const int TypingDelayPerCharacterInMilliseconds = 40;
-        private const int MaximumTypingDelayInMilliseconds = 5000;
 
         private readonly IEntityManager _entityManager;
         private readonly IChatService _chatService;
@@ -96,14 +94,7 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
         /// </summary>
         private static string FormatHeardLine(OnPlayerChatMessageSentEventArgs args)
         {
-            return args.Type switch
-            {
-                PlayerChatMessageType.ME => $"* {args.CharacterName} {args.Text} *",
-                PlayerChatMessageType.DO => $"{args.Text} (( {args.CharacterName} ))",
-                _ => String.IsNullOrEmpty(args.Accent)
-                    ? $"{args.CharacterName} says: {args.Text}"
-                    : $"{args.CharacterName} [{args.Accent} accent] says: {args.Text}"
-            };
+            return RoleplayCommandLine.FormatAsChat(args.Type, args.CharacterName, args.Text, args.Accent);
         }
 
         /// <summary>
@@ -165,12 +156,12 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
 
             try
             {
-                string? reply = await _replyGenerator.GenerateReplyAsync(actorName, serverActor.GetActorPrompt(), memory.GetLines());
+                List<ActorRoleplayLine> reply = await _replyGenerator.GenerateReplyAsync(actorName, serverActor.GetActorPrompt(), memory.GetLines());
 
                 // The actor or its memory can be gone by the time the model answers.
-                if (reply != null && serverActor.IsComponentAlive && memory.IsComponentAlive)
+                if (serverActor.IsComponentAlive && memory.IsComponentAlive)
                 {
-                    await SendReplyLinesAsync(serverActor, memory, ActorReplyParser.Parse(reply, actorName));
+                    await SendReplyLinesAsync(serverActor, memory, reply);
                 }
             }
             catch (Exception exception)
@@ -219,7 +210,7 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
 
                 if (!isLastLine || index < parts.Count - 1)
                 {
-                    await Task.Delay(GetTypingDelay(parts[index]));
+                    await Task.Delay(ChatTypingDelay.Get(parts[index]));
                 }
             }
         }
@@ -241,12 +232,6 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
                     _chatService.SendTalkMessage(name, actor.Position, text, virtualWorld: actor.VirtualWorld);
                     break;
             }
-        }
-
-        private static TimeSpan GetTypingDelay(string text)
-        {
-            int delay = MinimumTypingDelayInMilliseconds + text.Length * TypingDelayPerCharacterInMilliseconds;
-            return TimeSpan.FromMilliseconds(Math.Min(delay, MaximumTypingDelayInMilliseconds));
         }
     }
 }

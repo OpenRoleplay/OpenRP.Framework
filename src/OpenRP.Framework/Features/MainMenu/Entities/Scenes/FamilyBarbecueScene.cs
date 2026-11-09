@@ -14,19 +14,19 @@ namespace OpenRP.Framework.Features.MainMenu.Entities.Scenes
     public class FamilyBarbecueScene : IMainMenuScene
     {
         private IStreamerService _streamerService;
-        private IActorConversationWithPlayerManager _actorConversationWithPlayerManager;
+        private IActorConversationService _actorConversationService;
         private IVirtualWorldManager _virtualWorldService;
         private IOpenCdnService _openCdnService;
 
         public FamilyBarbecueScene(
             IStreamerService streamerService, 
-            IActorConversationWithPlayerManager actorConversationWithPlayerManager, 
+            IActorConversationService actorConversationService, 
             IVirtualWorldManager virtualWorldService, 
             IOpenCdnService openCdnService
         )
         {
             _streamerService = streamerService;
-            _actorConversationWithPlayerManager = actorConversationWithPlayerManager;
+            _actorConversationService = actorConversationService;
             _virtualWorldService = virtualWorldService;
             _openCdnService = openCdnService;
         }
@@ -49,7 +49,7 @@ namespace OpenRP.Framework.Features.MainMenu.Entities.Scenes
             _streamerService.CreateDynamicObject(19582, new Vector3(2107.6804f, 185.9903f, 1.2227f), new Vector3(0f, 0f, 232.5000f), virtualWorld: _virtualWorldService.GetMainMenuSceneVirtualWorld(1)); // MarcosSteak1
             _streamerService.CreateDynamicObject(2354, new Vector3(2108.9575f, 182.5948f, 1.2621f), new Vector3(334.4f, 22.8999f, 312.5000f), virtualWorld: _virtualWorldService.GetMainMenuSceneVirtualWorld(1)); // burger_healthy
 
-            _actorConversationWithPlayerManager.CreateConversation("CONV_FAMILY", new List<ulong> { 2, 3, 4 });
+            _actorConversationService.CreateConversation("CONV_FAMILY", new List<ulong> { 2, 3, 4 }, "A family barbecue on the beach, on a sunny afternoon.");
         }
 
         public void Play(
@@ -68,13 +68,13 @@ namespace OpenRP.Framework.Features.MainMenu.Entities.Scenes
 
             _openCdnService.PlayBase64(player, "music", "VGhlIEJlYWNoIEJveXMgLSBGdW4sIEZ1biwgRnVuICgxOTY0KS5tcDM=");
 
-            _actorConversationWithPlayerManager.AttachPlayerToConversationAsync("CONV_FAMILY", player);
+            _actorConversationService.AttachPlayer("CONV_FAMILY", player);
         }
 
         public void Leave(Player player)
         {
             player.StopAudioStream();
-            _actorConversationWithPlayerManager.DetachPlayerFromConversationAsync("CONV_FAMILY", player);
+            _actorConversationService.DetachPlayer(player);
         }
     }
 }

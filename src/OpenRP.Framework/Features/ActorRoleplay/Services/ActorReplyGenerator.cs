@@ -2,9 +2,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 using OpenRP.Framework.Features.ActorRoleplay.Entities;
 using OpenRP.Framework.Features.ActorRoleplay.Helpers;
+using OpenRP.Framework.Shared.AI.Helpers;
 
 namespace OpenRP.Framework.Features.ActorRoleplay.Services
 {
@@ -14,6 +14,8 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
     /// </summary>
     public class ActorReplyGenerator : IActorReplyGenerator
     {
+        private const string NothingNewMessage = "(Nothing new has happened. It's your turn.)";
+
         private readonly ActorRoleplayOptions _options;
         private readonly IChatCompletionService? _chatCompletionService;
 
@@ -27,7 +29,7 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
                 return;
             }
 
-            _chatCompletionService = CreateChatCompletionService();
+            _chatCompletionService = OpenAiChatCompletion.Create(_options.OpenAiApiKey, _options.ModelId);
         }
 
         public bool IsConfigured()
@@ -35,41 +37,26 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
             return _chatCompletionService != null;
         }
 
-        public async Task<string?> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines)
+        public async Task<List<ActorRoleplayLine>> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation = null)
         {
             if (_chatCompletionService == null)
             {
-                return null;
+                return new List<ActorRoleplayLine>();
             }
 
-            ChatHistory chatHistory = CreateChatHistory(actorName, actorPrompt, lines);
-            ChatMessageContent reply = await _chatCompletionService.GetChatMessageContentAsync(chatHistory, CreateExecutionSettings());
-            return reply.Content;
-        }
-
-        private IChatCompletionService CreateChatCompletionService()
-        {
-            return Kernel.CreateBuilder()
-                .AddOpenAIChatCompletion(_options.ModelId, _options.OpenAiApiKey!)
-                .Build()
-                .GetRequiredService<IChatCompletionService>();
-        }
-
-        private OpenAIPromptExecutionSettings CreateExecutionSettings()
-        {
-            return new OpenAIPromptExecutionSettings
-            {
-                ReasoningEffort = String.IsNullOrWhiteSpace(_options.ReasoningEffort) ? null : _options.ReasoningEffort
-            };
+            ChatHistory chatHistory = CreateChatHistory(actorName, actorPrompt, lines, situation);
+            ChatMessageContent reply = await _chatCompletionService.GetChatMessageContentAsync(chatHistory,
+                OpenAiChatCompletion.CreateExecutionSettings(_options.ReasoningEffort));
+            return ActorReplyParser.Parse(reply.Content ?? "", actorName);
         }
 
         /// <summary>
         /// The system prompt, then what the actor saw and heard as user messages and its own lines as assistant
         /// messages, with consecutive lines of the same side grouped into one message.
         /// </summary>
-        private static ChatHistory CreateChatHistory(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines)
+        private static ChatHistory CreateChatHistory(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation)
         {
-            ChatHistory chatHistory = new ChatHistory(ActorRoleplayPromptBuilder.Build(actorName, actorPrompt));
+            ChatHistory chatHistory = new ChatHistory(ActorRoleplayPromptBuilder.Build(actorName, actorPrompt, situation));
 
             int index = 0;
             while (index < lines.Count)
@@ -78,6 +65,12 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
                 List<string> group = lines.Skip(index).TakeWhile(line => line.IsOwnLine == isOwnLine).Select(line => line.Text).ToList();
                 AddMessage(chatHistory, isOwnLine, String.Join("\n", group));
                 index += group.Count;
+            }
+
+            // The model answers the last user message; when nothing new was said (the start of a scene), it still needs one.
+            if (lines.Count == 0 || lines[^1].IsOwnLine)
+            {
+                chatHistory.AddUserMessage(NothingNewMessage);
             }
 
             return chatHistory;

@@ -57,7 +57,7 @@ services.AddActorRoleplay(options =>
 - **Code:** `Features/ActorRoleplay/`. It uses the `Microsoft.SemanticKernel` package.
 - **Services:**
   - `IActorRoleplayService`: `HearPlayerMessage`, `ReplyToQuietActors` and `ForgetIdleActors`;
-  - `IActorReplyGenerator`: the Semantic Kernel call.
+  - `IActorReplyGenerator`: the Semantic Kernel call. It writes one character's next 1 to 3 lines and returns them parsed. An optional `situation` adds where the character is and what's expected of them; [ActorConversations](actor-conversations.md) uses it to write each scene turn, so both features share one engine and one set of settings.
 - **Components on the actor's entity:**
   - `ActorRoleplayMemory`: the lines, and whether it's replying;
   - the `ActorAwaitingReply` marker: the reply timer only looks at these.
@@ -67,7 +67,8 @@ services.AddActorRoleplay(options =>
 - **Helpers:**
   - `ActorRoleplayPromptBuilder`: the system prompt;
   - `ActorReplyParser`: only whole lines starting with a command count, so "24/7" in speech survives;
-  - `ChatLineSplitter`: parts of at most 110 characters, because the SA-MP client drops long messages.
+  - shared, in `Shared/Chat/Helpers/`: `RoleplayCommandLine` reads `/me`, `/do` and `/say` lines; `ChatLineSplitter` makes parts of at most 110 characters, because the SA-MP client drops long messages; `ChatTypingDelay` sets the pauses.
+  - the Semantic Kernel chat service comes from `Shared/AI/Helpers/OpenAiChatCompletion`.
 - **Threading:** replies start from the main-thread timer, and SampSharp brings every `await` back to the main thread. After each `await`, the code checks the actor still exists.
 
 Want more? → [Actors](actors.md) · [ActorConversations](actor-conversations.md)

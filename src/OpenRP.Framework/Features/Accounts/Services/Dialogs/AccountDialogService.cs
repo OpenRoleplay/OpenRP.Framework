@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenRP.Framework.Features.ActorConversations.Services;
 using OpenRP.Framework.Database;
 using OpenRP.Framework.Features.MainMenu.Services.Dialogs;
 
@@ -21,13 +20,11 @@ namespace OpenRP.Framework.Features.Accounts.Services.Dialogs
     {
         private IDialogService _dialogService;
         private IAccountService _accountService;
-        private IActorConversationWithPlayerManager _actorConversationWithPlayerManager;
         private readonly ILogger<AccountDialogService> _logger;
-        public AccountDialogService(IDialogService dialogService, IAccountService accountService, IActorConversationWithPlayerManager actorConversationWithPlayerManager, ILogger<AccountDialogService> logger)
+        public AccountDialogService(IDialogService dialogService, IAccountService accountService, ILogger<AccountDialogService> logger)
         {
             _dialogService = dialogService;
             _accountService = accountService;
-            _actorConversationWithPlayerManager = actorConversationWithPlayerManager;
             _logger = logger;
         }
         public void OpenLoginAskUsernameDialog(Player player, Action onGoBack)
