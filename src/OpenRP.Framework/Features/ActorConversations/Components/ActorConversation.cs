@@ -1,5 +1,6 @@
 using OpenRP.Framework.Features.ActorConversations.Entities;
-using SampSharp.Entities;
+using SampSharp.Entities;
+using OpenRP.Framework.Shared.AI.Helpers;
 
 namespace OpenRP.Framework.Features.ActorConversations.Components
 {
@@ -68,11 +69,12 @@ namespace OpenRP.Framework.Features.ActorConversations.Components
         }
 
         /// <summary>
-        /// The last <paramref name="count"/> lines, oldest first, as what the next speaker remembers.
+        /// What the next speaker remembers, oldest first: a window over the lines that jumps forward in chunks, so the
+        /// start of each request stays the same and OpenAI's prompt cache keeps hitting.
         /// </summary>
-        public List<ActorConversationLine> GetLastLines(int count)
+        public List<ActorConversationLine> GetMemoryLines()
         {
-            return _lines.Skip(Math.Max(0, _lines.Count - count)).ToList();
+            return _lines.Skip(ChunkedHistory.GetWindowStart(_lines.Count)).ToList();
         }
 
         /// <summary>

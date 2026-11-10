@@ -40,6 +40,12 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 |---|---|---|---|
 | `/givepermissiongroup [playerid] [permission group]` | Admin | Give a permission group to a player. | [Admins](features/admins.md) |
 
+## Admin > Phone
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/givephone [player]` | Admin | Give a player a new mobile phone with its own number. | [Phones](features/phones.md) |
+
 ## Admin > Properties
 
 | Command | Groups | Description | Feature |
@@ -131,6 +137,16 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
 | `/fish` | Default | Command to start fishing. | [Fishing](features/fishing.md) |
+
+## Phone
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/phone` | Default | Use your phone: dial, the phone book, messages, the call log, the ringer and power. | [Phones](features/phones.md) |
+| `/call [number]` | Default | Call a phone number, for example /call 382-0142 or /call 911. | [Phones](features/phones.md) |
+| `/sms [number] [message]` | Default | Send a text message. | [Phones](features/phones.md) |
+| `/answer`, `/p` | Default | Answer the call ringing on your phone. | [Phones](features/phones.md) |
+| `/hangup`, `/h` | Default | End your call, or decline the call ringing on your phone. | [Phones](features/phones.md) |
 
 ## Properties
 

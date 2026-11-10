@@ -16,7 +16,8 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
         /// <summary>
         /// The actor's reply to what it remembers: up to 3 /me, /do and /say lines, or none without an API key.
         /// <paramref name="situation"/> optionally describes where the actor is and what's expected of it.
+        /// <paramref name="cacheKey"/> names the conversation, so its requests share one prompt cache.
         /// </summary>
-        Task<List<ActorRoleplayLine>> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation = null);
+        Task<List<ActorRoleplayLine>> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation = null, string? cacheKey = null);
     }
 }

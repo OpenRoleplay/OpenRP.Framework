@@ -27,7 +27,7 @@ In code (`IActorConversationService`):
 ## How it works
 
 1. **One character per turn.** Each request writes only the next speaker's 1 to 3 lines.
-   - **What it gets:** that character's prompt, the situation, and the last 25 lines.
+   - **What it gets:** that character's prompt, the situation, and up to 40 lines of the conversation. Past 40, it skips ahead 20 lines at a time, so OpenAI's prompt cache keeps hitting (see [ActorRoleplay](actor-roleplay.md)). Each speaker has its own cache key, `conversation:{key}:{actor id}`.
    - **How it sees those lines:** the character's own lines as their commands, everyone else's as players see them in chat.
 2. **The next speaker** is the character addressed by first name in that turn. Otherwise it's whoever spoke longest ago. A character never speaks twice in a row.
 3. **One cache per conversation,** shared by all viewers. Every viewer starts at line 1 and plays at their own pace, with a typing pause after each line.

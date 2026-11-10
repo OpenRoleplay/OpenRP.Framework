@@ -22,8 +22,6 @@ namespace OpenRP.Framework.Features.ActorConversations.Services
     /// </summary>
     public class ActorConversationService : IActorConversationService
     {
-        // What the next speaker remembers of the conversation; enough to follow the story.
-        private const int MemoryLineCount = 25;
         // A failed turn waits this long before the next try, so an OpenAI outage doesn't cause a stream of requests.
         private static readonly TimeSpan RetryAfterFailure = TimeSpan.FromSeconds(30);
 
@@ -178,8 +176,9 @@ namespace OpenRP.Framework.Features.ActorConversations.Services
         {
             ActorConversationParticipant speaker = conversation.GetParticipant(conversation.NextSpeakerId) ?? conversation.Participants[0];
 
+            // One cache per speaker: each speaker's prompt starts with their own description.
             List<ActorRoleplayLine> reply = await _replyGenerator.GenerateReplyAsync(speaker.Name, speaker.Prompt,
-                GetSpeakerMemory(conversation, speaker), GetSituation(conversation, speaker));
+                GetSpeakerMemory(conversation, speaker), GetSituation(conversation, speaker), $"conversation:{conversation.Key}:{speaker.ActorId}");
 
             // The conversation can be gone by the time the model answers.
             if (!conversation.IsComponentAlive || reply.Count == 0)
@@ -200,7 +199,7 @@ namespace OpenRP.Framework.Features.ActorConversations.Services
         /// </summary>
         private static List<ActorMemoryLine> GetSpeakerMemory(ActorConversation conversation, ActorConversationParticipant speaker)
         {
-            return conversation.GetLastLines(MemoryLineCount)
+            return conversation.GetMemoryLines()
                 .Select(line => line.ActorId == speaker.ActorId
                     ? new ActorMemoryLine(true, RoleplayCommandLine.ToCommandText(line.Type, line.Text))
                     : new ActorMemoryLine(false, RoleplayCommandLine.FormatAsChat(line.Type, conversation.GetParticipant(line.ActorId)?.Name ?? "", line.Text)))

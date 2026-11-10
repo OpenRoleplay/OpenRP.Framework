@@ -15,5 +15,6 @@ namespace OpenRP.Framework.Features.Items.Enums
         VehicleKey = 5,
         Misc = 6,
         Fish = 7,
+        Phone = 8,
     }
 }

@@ -23,6 +23,8 @@ A command picks its groups in code, for example `[ServerCommand(PermissionGroups
 - **A rank** has its grants, as far as its faction has them. **The top rank has everything its faction has.**
 - **A character** gets all permissions of all their ranks. Changes apply straight away.
 
+**Other permissions** can be granted the same way, such as `dispatch.receive`, which makes a faction hear [911 calls](features/emergency-calls.md) relayed on the radio.
+
 **Why the `Faction` group:** every faction needs faction chat and the means to manage itself. Admins only grant what goes beyond that.
 
 **Why the top rank has everything:** leaders run their own faction without admins, and a faction can never lock itself out.

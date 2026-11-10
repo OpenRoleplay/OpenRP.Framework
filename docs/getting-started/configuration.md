@@ -7,7 +7,8 @@ The features that need settings, and what the Framework does when the server sta
 | Call | Options | Page |
 |---|---|---|
 | `AddActorConversations` | `MaxCachedLines`, `LinesAhead` (uses ActorRoleplay's key and model) | [ActorConversations](../features/actor-conversations.md) |
-| `AddActorRoleplay` | `OpenAiApiKey`, `ModelId`, `ReasoningEffort`, `MaxConcurrentReplies` | [ActorRoleplay](../features/actor-roleplay.md) |
+| `AddActorRoleplay` | `OpenAiApiKey`, `ModelId` (default `gpt-6-luna`), `ReasoningEffort` (default `none`), `MaxConcurrentReplies` | [ActorRoleplay](../features/actor-roleplay.md) |
+| `AddEmergencyCalls` | `OpenAiApiKey`, `ModelId` (default `gpt-6-luna`), `ReasoningEffort` (default `none`). Optional: without it, 911 is not in service | [EmergencyCalls](../features/emergency-calls.md) |
 | `AddWorldWeather` | weather ids per climate, temperature ranges, map bounds, seed | [WorldWeather](../features/world-weather.md) |
 | `AddWorldTime` | in-game days per real day, map bounds, time offset, exempt dates | [WorldTime](../features/world-time.md) |
 | `AddCDN` | `BaseUrl`, `Password` | [CDN](../features/cdn.md) |

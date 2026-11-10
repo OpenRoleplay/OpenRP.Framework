@@ -36,6 +36,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [DebugSettings](features/debug-settings.md): debug messages for testers
 - [Discord](features/discord.md): chat bridge and stats channels
 - [DroppedItems](features/dropped-items.md): items on the ground
+- [EmergencyCalls](features/emergency-calls.md): 911 with an AI dispatcher that relays calls on the radio
 - [Factions](features/factions.md): organisations with ranks and permissions
 - [Fishing](features/fishing.md): early fishing
 - [Harvestables](features/harvestables.md): harvestable plants
@@ -46,6 +47,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [MainMenu](features/main-menu.md): what you see after connecting
 - [Maps](features/maps.md): placeholder, not working yet
 - [Permissions](features/permissions.md): see the Permissions guide
+- [Phones](features/phones.md): 1992-style mobile phones: calls, texts, phone book, call log
 - [Players](features/players.md): find a player's account and character
 - [Properties](features/properties.md): buildings, doors and the property editor
 - [RoleplayChats](features/roleplay-chats.md): `/me`, `/do`, talk, OOC
@@ -60,6 +62,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [Chat](shared/chat.md): messages to players
 - [How commands work](shared/commands.md): writing commands
 - [Dialogs](shared/dialogs.md): menus
+- [Locations](shared/locations.md): the name of the area a position is in
 - [Logging](shared/logging.md): where logs go
 - [Extensions and colours](shared/extensions.md): small helpers
 

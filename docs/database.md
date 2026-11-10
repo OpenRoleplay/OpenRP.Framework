@@ -90,6 +90,17 @@ See [Permissions](permissions.md).
 
 See [Factions](features/factions.md).
 
+## Phones
+
+| Table | Columns | Notes |
+|---|---|---|
+| `Phones` (`PhoneModel`) | `Number` (unique), `IsOn`, `IsSilent` | Random 7-digit numbers; below 1000 is reserved for the server |
+| `PhoneContacts` (`PhoneContactModel`) | `PhoneId` → phones (cascade), `Name` (24), `Number` | The phone book. Unique per phone + number; at most 50 per phone |
+| `PhoneMessages` (`PhoneMessageModel`) | `PhoneId` → phones (cascade), `OtherNumber`, `Text` (160), `IsIncoming`, `IsRead`, `SentAt` | Each phone keeps its own copy; the last 20 per phone |
+| `PhoneCallLogs` (`PhoneCallLogModel`) | `PhoneId` → phones (cascade), `OtherNumber`, `Type` (Incoming, Outgoing, Missed), `StartedAt`, `DurationSeconds`, `IsSeen` | The last 20 per phone |
+
+See [Phones](features/phones.md).
+
 ## Jurisdictions
 
 | Table | Columns | Notes |
@@ -115,14 +126,15 @@ The item types (definitions), not the items players own.
 | `KeepOnDeath`, `CanDrop`, `CanDestroy`, `Stackable` | bool | |
 | `DropModelId` | int? | Object model shown when dropped |
 
-The Framework seeds 48 items:
+The Framework seeds 49 items:
 - a uniform (skin);
 - a wallet;
 - the bills and coins of the San Andreas Dollar and the Caeroyna Ruble;
 - a vehicle key;
 - the hotwire tools (rusty paperclip, worn-out screwdriver, roll of electrical tape);
 - a chicken egg;
-- twelve fish species.
+- twelve fish species;
+- a mobile phone (item 49, `UseType` Phone). Each phone item points to its row in `Phones` with `[PHONE_ID=x]`.
 
 ### `Inventories` (`InventoryModel`)
 `Name`, `MaxWeight` (grams, null = unlimited). Seeded: "World Inventory", which holds items lying on the ground.

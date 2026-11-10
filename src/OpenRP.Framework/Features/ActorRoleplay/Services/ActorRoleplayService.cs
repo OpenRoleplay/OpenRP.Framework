@@ -156,7 +156,8 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
 
             try
             {
-                List<ActorRoleplayLine> reply = await _replyGenerator.GenerateReplyAsync(actorName, serverActor.GetActorPrompt(), memory.GetLines());
+                List<ActorRoleplayLine> reply = await _replyGenerator.GenerateReplyAsync(actorName, serverActor.GetActorPrompt(), memory.GetLines(),
+                    cacheKey: $"actor:{serverActor.GetId()}");
 
                 // The actor or its memory can be gone by the time the model answers.
                 if (serverActor.IsComponentAlive && memory.IsComponentAlive)

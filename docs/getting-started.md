@@ -24,6 +24,7 @@ To run a server on the Framework, you make a [host](glossary.md#host): a SampSha
 4. **The six features with settings:** `AddActorConversations`, `AddActorRoleplay`, `AddWorldWeather`, `AddWorldTime`, `AddCDN` and `AddDiscord`.
    - Call them all, even with empty options (`options => { }`).
    - **Why:** other systems depend on their services.
+   - **Optional:** `AddEmergencyCalls` for 911. Without it, 911 is not in service.
 5. **Your own code:** `AddServerSystemsInAssembly(typeof(Startup).Assembly)`. SampSharp loads the host's own systems itself.
 6. **Your own commands:** if you have any, call `ServerCommandCache.RegisterApplicationAssembly(Assembly.GetExecutingAssembly())`.
 7. **Startup:** `Startup` implements `IEcsStartup`: `UseEntities().UseCommands()` in `Initialize`, and `EnableStreamerEvents()` in `Configure`. There's no `Program.cs`: SampSharp generates the entry point.

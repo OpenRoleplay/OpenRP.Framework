@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using OpenRP.Framework.Database.Entities;
 using OpenRP.Framework.Database.Models;
 using System;
@@ -45,6 +45,10 @@ namespace OpenRP.Framework.Database
         public DbSet<AccountSettingsModel> AccountSettings { get; set; }
         public DbSet<JurisdictionModel> Jurisdictions { get; set; }
         public DbSet<FactionTaxRegistrationModel> FactionTaxRegistrations { get; set; }
+        public DbSet<PhoneModel> Phones { get; set; }
+        public DbSet<PhoneContactModel> PhoneContacts { get; set; }
+        public DbSet<PhoneMessageModel> PhoneMessages { get; set; }
+        public DbSet<PhoneCallLogModel> PhoneCallLogs { get; set; }
 
         // Parameterless Constructor
         public BaseDataContext() : base() { }

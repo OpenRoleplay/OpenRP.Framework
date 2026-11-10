@@ -648,6 +648,20 @@ namespace OpenRP.Framework.Features.Items.Models.DefaultData
                     KeepOnDeath = true,
                     Stackable = false,
                     DropModelId = 19630
+                },
+                new ItemModel
+                {
+                    Id = 49,
+                    Name = "Mobile Phone",
+                    Description = "A brick of a mobile phone with a pull-out antenna and a green display. It calls, takes texts and remembers your phone book. Each one has its own number.",
+                    UseType = ItemType.Phone,
+                    UseValue = "",
+                    Weight = 800,
+                    CanDrop = true,
+                    CanDestroy = false,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 330
                 }
             );
         }

@@ -1,5 +1,6 @@
 using OpenRP.Framework.Features.ActorRoleplay.Entities;
-using SampSharp.Entities;
+using SampSharp.Entities;
+using OpenRP.Framework.Shared.AI.Helpers;
 
 namespace OpenRP.Framework.Features.ActorRoleplay.Components
 {
@@ -9,9 +10,6 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Components
     /// </summary>
     public class ActorRoleplayMemory : Component
     {
-        // Enough for a short scene; older lines matter little and every line is sent with each request.
-        private const int MaxLines = 30;
-
         private readonly List<ActorMemoryLine> _lines = new List<ActorMemoryLine>();
         private DateTime _lastHeardAt = DateTime.UtcNow;
         private bool _isReplying;
@@ -61,14 +59,14 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Components
             _isReplying = false;
         }
 
+        /// <summary>
+        /// Drops old lines in chunks rather than one per line, so the start of each request stays the same and
+        /// OpenAI's prompt cache keeps hitting.
+        /// </summary>
         private void AddLine(ActorMemoryLine line)
         {
             _lines.Add(line);
-
-            if (_lines.Count > MaxLines)
-            {
-                _lines.RemoveAt(0);
-            }
+            _lines.RemoveRange(0, ChunkedHistory.GetWindowStart(_lines.Count));
         }
     }
 }

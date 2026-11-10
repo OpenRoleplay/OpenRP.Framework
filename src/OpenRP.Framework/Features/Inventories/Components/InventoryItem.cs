@@ -20,6 +20,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
         private const string InventoryKey = "INVENTORY";
         private const string SkinKey = "SKIN";
         private const string VehicleIdKey = "VEHICLE_ID";
+        private const string PhoneIdKey = "PHONE_ID";
 
         private readonly InventoryItemModel _inventoryItemModel;
         private bool _hasChanges;
@@ -191,6 +192,18 @@ namespace OpenRP.Framework.Features.Inventories.Components
                 return null;
             }
             return GetAdditionalData().GetUlong(VehicleIdKey);
+        }
+
+        /// <summary>
+        /// The phone this item is, or null when the item isn't a phone.
+        /// </summary>
+        public ulong? GetPhoneId()
+        {
+            if (!GetItem().IsItemPhone())
+            {
+                return null;
+            }
+            return GetAdditionalData().GetUlong(PhoneIdKey);
         }
 
         /// <summary>

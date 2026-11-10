@@ -125,6 +125,11 @@ namespace OpenRP.Framework.Features.Items.Components
             return false;
         }
 
+        public bool IsItemPhone()
+        {
+            return _itemModel.UseType == ItemType.Phone;
+        }
+
         public bool IsItemInventory()
         {
             return IsItemWallet();

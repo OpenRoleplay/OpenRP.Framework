@@ -10,15 +10,15 @@ The host registers it with an API key (keep the key out of source control):
 services.AddActorRoleplay(options =>
 {
     options.OpenAiApiKey = configuration["OpenAI_API"];
-    options.ModelId = "gpt-5.4-mini";      // optional
+    options.ModelId = "gpt-6-luna";        // optional
 });
 ```
 
 | Option | Default | What it does |
 |---|---|---|
 | `OpenAiApiKey` | none | Without it, actors don't reply |
-| `ModelId` | `gpt-5.4-mini` | The OpenAI model |
-| `ReasoningEffort` | `low` | For reasoning models: `minimal`, `low`, `medium` or `high`. Set it to empty for models that don't reason, which reject it |
+| `ModelId` | `gpt-6-luna` | The OpenAI model |
+| `ReasoningEffort` | `none` | `none`, `low`, `medium` or `high`. `none` skips thinking, which is billed as output. Set it to empty for models that don't reason, which reject it |
 | `MaxConcurrentReplies` | 4 | OpenAI requests at once, across all actors |
 
 **Making an actor an AI actor:** give it an `ActorPrompts` row (who they are, how they talk) and a linked character for its name. Actors in a [main menu](main-menu.md) scene never reply.
@@ -28,7 +28,7 @@ services.AddActorRoleplay(options =>
 1. **Hearing.** Every `/me`, `/do` and `/say` publishes [`OnPlayerChatMessageSent`](../server-events.md). AI actors within the message's range (20 m for `/me` and `/do`, 7 m for `/say`) in the same virtual world remember the line as it appeared in chat.
 2. **Waiting.** The actor waits until it has heard nothing for 2 seconds, so a `/me` and a `/say` right after each other get one reply.
 3. **Replying.**
-   - The model gets the shared roleplay rules, the actor's prompt, and the last 30 lines it heard and said.
+   - The model gets the shared roleplay rules, the actor's prompt, and up to 40 lines it heard and said. Past 40, the oldest 20 go in one go.
    - Its reply is split into `/me`, `/do` and `/say` lines and sent from the actor's position, with a short typing pause between lines.
    - Lines heard during a reply lead to the next reply.
 4. **Forgetting.** An actor that heard nothing for 15 minutes forgets the scene, so the next visitor starts fresh.
@@ -43,7 +43,12 @@ services.AddActorRoleplay(options =>
 - **Request slots.** At most `MaxConcurrentReplies` requests run at once; other actors wait their turn.
   - **Why:** it stays under OpenAI's rate limits when many players talk to many actors.
 - **One client.** All actors share one Semantic Kernel chat service.
-- **Prompt caching.** The shared rules come first in every prompt, so OpenAI's automatic prompt caching can reuse them across actors.
+- **Prompt caching.** OpenAI bills input it has seen before at a tenth of the price (from 1,024 tokens).
+  - **Stable starts:** the shared rules come first, then the actor's prompt, then the memory. Memory is only trimmed in chunks of 20, so each request starts the same way as the one before and only the newest lines are new.
+  - **Cache keys:** each actor has one, `actor:{id}`, so its requests reach the same cache.
+  - **Checking it:** the log shows `AI usage (ActorRoleplay): 1534 in (1280 cached), 64 out` for every reply.
+  - **Why trim in chunks:** dropping one old line per reply changes the start of every request, so nothing after the rules would ever be cached.
+- **Why GPT-6 Luna:** $0.10 per million tokens in, $0.01 cached and $0.50 out (November 2026), with thinking turned off. That's about 8 times cheaper than `gpt-5.4-mini`, and it writes short roleplay lines well.
 
 ## Known limitations
 
@@ -68,7 +73,7 @@ services.AddActorRoleplay(options =>
   - `ActorRoleplayPromptBuilder`: the system prompt;
   - `ActorReplyParser`: only whole lines starting with a command count, so "24/7" in speech survives;
   - shared, in `Shared/Chat/Helpers/`: `RoleplayCommandLine` reads `/me`, `/do` and `/say` lines; `ChatLineSplitter` makes parts of at most 110 characters, because the SA-MP client drops long messages; `ChatTypingDelay` sets the pauses.
-  - the Semantic Kernel chat service comes from `Shared/AI/Helpers/OpenAiChatCompletion`.
+  - the Semantic Kernel chat service comes from `Shared/AI/Helpers/OpenAiChatCompletion`. It sends the reasoning effort and the cache key as raw request fields, because Semantic Kernel refuses efforts it doesn't know, such as `none`, before sending.
 - **Threading:** replies start from the main-thread timer, and SampSharp brings every `await` back to the main thread. After each `await`, the code checks the actor still exists.
 
 Want more? → [Actors](actors.md) · [ActorConversations](actor-conversations.md)

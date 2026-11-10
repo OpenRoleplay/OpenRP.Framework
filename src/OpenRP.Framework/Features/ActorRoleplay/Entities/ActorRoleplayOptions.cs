@@ -10,13 +10,13 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Entities
         /// <summary>
         /// The OpenAI model actors reply with. A cheap, fast model is enough for short roleplay replies.
         /// </summary>
-        public string ModelId { get; set; } = "gpt-5.4-mini";
+        public string ModelId { get; set; } = "gpt-6-luna";
 
         /// <summary>
-        /// "minimal", "low", "medium" or "high" for reasoning models; null or empty for models that don't reason
-        /// (they reject the setting). Lower is faster and cheaper.
+        /// "none", "low", "medium" or "high" for reasoning models; null or empty for models that don't reason
+        /// (they reject the setting). "none" skips thinking, which is billed as output, the expensive part.
         /// </summary>
-        public string? ReasoningEffort { get; set; } = "low";
+        public string? ReasoningEffort { get; set; } = "none";
 
         /// <summary>
         /// How many OpenAI requests may run at once across all actors. Other actors wait their turn, which keeps a

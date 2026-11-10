@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.AccountSettingsFeature.Models.Configuration;
 using OpenRP.Framework.Features.Actors.Models.Configurations;
@@ -15,6 +15,7 @@ using OpenRP.Framework.Features.Items.Models.DefaultData;
 using OpenRP.Framework.Features.Jurisdictions.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.DefaultData;
+using OpenRP.Framework.Features.Phones.Models.Configurations;
 using OpenRP.Framework.Features.Properties.Models.Configurations;
 using OpenRP.Framework.Features.Vehicles.Models.Configurations;
 using System;
@@ -65,6 +66,11 @@ namespace OpenRP.Framework.Extensions
 
             modelBuilder.ApplyConfiguration(new JurisdictionModelConfiguration());
             modelBuilder.ApplyConfiguration(new FactionTaxRegistrationModelConfiguration());
+
+            modelBuilder.ApplyConfiguration(new PhoneModelConfiguration());
+            modelBuilder.ApplyConfiguration(new PhoneContactModelConfiguration());
+            modelBuilder.ApplyConfiguration(new PhoneMessageModelConfiguration());
+            modelBuilder.ApplyConfiguration(new PhoneCallLogModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new PropertyModelConfiguration());
             modelBuilder.ApplyConfiguration(new PropertyDoorModelConfiguration());

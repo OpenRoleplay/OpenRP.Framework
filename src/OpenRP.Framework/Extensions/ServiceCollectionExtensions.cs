@@ -20,6 +20,7 @@ using OpenRP.Framework.Features.Items.Extensions;
 using OpenRP.Framework.Features.Jurisdictions.Extensions;
 using OpenRP.Framework.Features.MainMenu.Extensions;
 using OpenRP.Framework.Features.Permissions.Extensions;
+using OpenRP.Framework.Features.Phones.Extensions;
 using OpenRP.Framework.Features.Properties.Extensions;
 using OpenRP.Framework.Features.Vehicles.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
@@ -65,6 +66,7 @@ namespace OpenRP.Framework.Extensions
                 .AddChickenCoops()
                 .AddFactions()
                 .AddJurisdictions()
+                .AddPhones()
                 .AddDebugSettings()
                 .AddBiomeGenerator()
                 .AddCommands()

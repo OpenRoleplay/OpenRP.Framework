@@ -16,12 +16,16 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
     {
         private const string NothingNewMessage = "(Nothing new has happened. It's your turn.)";
 
+        private const string UsageFeatureName = "ActorRoleplay";
+
         private readonly ActorRoleplayOptions _options;
         private readonly IChatCompletionService? _chatCompletionService;
+        private readonly ILogger<ActorReplyGenerator> _logger;
 
         public ActorReplyGenerator(IOptions<ActorRoleplayOptions> options, ILogger<ActorReplyGenerator> logger)
         {
             _options = options.Value;
+            _logger = logger;
 
             if (String.IsNullOrWhiteSpace(_options.OpenAiApiKey))
             {
@@ -37,7 +41,7 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
             return _chatCompletionService != null;
         }
 
-        public async Task<List<ActorRoleplayLine>> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation = null)
+        public async Task<List<ActorRoleplayLine>> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation = null, string? cacheKey = null)
         {
             if (_chatCompletionService == null)
             {
@@ -46,7 +50,8 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
 
             ChatHistory chatHistory = CreateChatHistory(actorName, actorPrompt, lines, situation);
             ChatMessageContent reply = await _chatCompletionService.GetChatMessageContentAsync(chatHistory,
-                OpenAiChatCompletion.CreateExecutionSettings(_options.ReasoningEffort));
+                OpenAiChatCompletion.CreateExecutionSettings(_options.ReasoningEffort, cacheKey));
+            OpenAiChatCompletion.LogUsage(_logger, UsageFeatureName, reply);
             return ActorReplyParser.Parse(reply.Content ?? "", actorName);
         }
 
