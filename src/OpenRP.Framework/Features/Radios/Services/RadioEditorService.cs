@@ -10,6 +10,7 @@ using OpenRP.Framework.Features.Radios.Components;
 using OpenRP.Framework.Features.Radios.Entities;
 using OpenRP.Framework.Features.Radios.Enums;
 using OpenRP.Framework.Features.Radios.Helpers;
+using OpenRP.Framework.Shared.Batteries.Helpers;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -68,9 +69,15 @@ namespace OpenRP.Framework.Features.Radios.Services
             return null;
         }
 
-        public void SetPower(Radio radio, bool isOn)
+        public string? SetPower(Radio radio, bool isOn)
         {
+            if (isOn && !radio.IsVehicleRadio() && BatteryLevels.IsEmpty(radio.GetBatteryLevel()) && !radio.IsCharging())
+            {
+                return "The battery is dead. Recharge it first.";
+            }
+
             radio.SetOn(isOn);
+            return null;
         }
 
         public string? SetFrequency(Radio radio, string frequencyText)

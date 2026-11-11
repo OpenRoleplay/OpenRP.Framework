@@ -1,6 +1,8 @@
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Shared.BaseManager.Entities;
+using OpenRP.Framework.Shared.Batteries.Entities;
 using SampSharp.Entities;
+using System;
 
 namespace OpenRP.Framework.Features.Radios.Components
 {
@@ -10,6 +12,8 @@ namespace OpenRP.Framework.Features.Radios.Components
     public class Radio : Component, IBaseDataComponent, IChangeable, IDeletable
     {
         private readonly RadioModel _model;
+        // Runtime only: a restart ends a recharge.
+        private BatteryCharge? _charge;
         private bool _hasChanges;
         private bool _isDeleted;
 
@@ -95,6 +99,49 @@ namespace OpenRP.Framework.Features.Radios.Components
         public bool IsVehicleRadio()
         {
             return _model.VehicleId.HasValue;
+        }
+
+        public double GetBatteryLevel()
+        {
+            return _model.BatteryLevel;
+        }
+
+        public DateTime? GetBatteryUpdatedAt()
+        {
+            return _model.BatteryUpdatedAt;
+        }
+
+        /// <summary>
+        /// Sets the battery level and when it was worked out.
+        /// </summary>
+        public void SetBattery(double level, DateTime updatedAt)
+        {
+            _model.BatteryLevel = level;
+            _model.BatteryUpdatedAt = updatedAt;
+            ProcessChanges();
+        }
+
+        public bool IsCharging()
+        {
+            return _charge != null;
+        }
+
+        /// <summary>
+        /// The recharge in progress, or null.
+        /// </summary>
+        public BatteryCharge? GetCharge()
+        {
+            return _charge;
+        }
+
+        public void BeginCharging(BatteryCharge charge)
+        {
+            _charge = charge;
+        }
+
+        public void EndCharging()
+        {
+            _charge = null;
         }
     }
 }

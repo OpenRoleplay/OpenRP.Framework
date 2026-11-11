@@ -1,4 +1,6 @@
+using OpenRP.Framework.Database;
 using OpenRP.Framework.Features.Radios.Services;
+using OpenRP.Framework.Shared.Batteries.Services;
 using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using OpenRP.Framework.Shared.ServerEvents.Services;
 using SampSharp.Entities;
@@ -8,6 +10,9 @@ namespace OpenRP.Framework.Features.Radios.Systems
     public class RadioSystem : ISystem
     {
         private const int SyncIntervalInMilliseconds = 60000;
+        // Battery levels change slowly; charging finishes within a second of being done.
+        private const int BatteryIntervalInMilliseconds = 30000;
+        private const int ChargingIntervalInMilliseconds = 1000;
 
         /// <summary>
         /// Frequencies go before their factions, which belong to a frequency.
@@ -33,6 +38,21 @@ namespace OpenRP.Framework.Features.Radios.Systems
             radioFrequencyFactionManager.ProcessChanges();
             radioFrequencyManager.ProcessChanges();
             radioManager.ProcessChanges();
+        }
+
+        /// <summary>
+        /// The data context comes in per call: it's transient, and the timer reads offline characters from it.
+        /// </summary>
+        [Timer(BatteryIntervalInMilliseconds)]
+        public void UpdateBatteries(IRadioBatteryService batteryService, IBatteryPlaceService batteryPlaceService, BaseDataContext dataContext)
+        {
+            batteryService.UpdateBatteries(batteryPlaceService.TakeSnapshot(dataContext));
+        }
+
+        [Timer(ChargingIntervalInMilliseconds)]
+        public void ProcessCharging(IRadioBatteryService batteryService)
+        {
+            batteryService.ProcessCharging();
         }
 
         [Event]

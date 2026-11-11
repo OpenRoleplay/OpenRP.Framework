@@ -63,6 +63,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [Chat](shared/chat.md): messages to players
 - [How commands work](shared/commands.md): writing commands
 - [Dialogs](shared/dialogs.md): menus
+- [Batteries](shared/batteries.md): battery levels of phones and radios: draining, recharging and offline charging
 - [Locations](shared/locations.md): the name of the area a position is in
 - [Logging](shared/logging.md): where logs go
 - [Extensions and colours](shared/extensions.md): small helpers

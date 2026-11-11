@@ -1,6 +1,7 @@
 using OpenRP.Framework.Features.Phones.Components;
 using OpenRP.Framework.Features.Phones.Helpers;
 using OpenRP.Framework.Shared;
+using OpenRP.Framework.Shared.Batteries.Helpers;
 using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Shared.Dialogs.Extensions;
@@ -68,6 +69,7 @@ namespace OpenRP.Framework.Features.Phones.Services.Dialogs
             int callLogRow = menuDialog.AddRow(missedCalls > 0 ? $"Call log {ChatColor.Highlight}({missedCalls} missed)" : "Call log");
             int ringerRow = menuDialog.AddRow($"Ringer: {Highlight(phone.IsSilent() ? "Silent" : "On")}");
             int numberRow = menuDialog.AddRow($"My number: {Highlight(PhoneNumbers.Format(phone.GetNumber()))}");
+            int batteryRow = menuDialog.AddRow(GetBatteryLabel(phone));
             int powerRow = menuDialog.AddRow("Turn off");
 
             void OnChosen(ListDialogResponse response)
@@ -89,6 +91,8 @@ namespace OpenRP.Framework.Features.Phones.Services.Dialogs
                     WithCarriedPhone(player, phone, () => ToggleRinger(phone, reopenMenu));
                 else if (response.ItemIndex == numberRow)
                     ShowMessage(player, "My number", $"This phone's number is {Highlight(PhoneNumbers.Format(phone.GetNumber()))}.", reopenMenu);
+                else if (response.ItemIndex == batteryRow)
+                    WithCarriedPhone(player, phone, () => Recharge(player, phone, reopenMenu));
                 else if (response.ItemIndex == powerRow)
                     WithCarriedPhone(player, phone, () => TurnOff(player, phone));
             }
@@ -104,6 +108,7 @@ namespace OpenRP.Framework.Features.Phones.Services.Dialogs
             BetterListDialog offDialog = new BetterListDialog("Choose", "Close");
             offDialog.SetTitle(TitleType.Children, GetTitle(phone), "Off");
             int powerRow = offDialog.AddRow("Turn on");
+            int batteryRow = offDialog.AddRow(GetBatteryLabel(phone));
 
             _dialogService.ShowIgnoringDisconnect(player, offDialog, response =>
             {
@@ -111,12 +116,21 @@ namespace OpenRP.Framework.Features.Phones.Services.Dialogs
                 {
                     WithCarriedPhone(player, phone, () => TurnOn(player, phone));
                 }
+                else if (response.Response == DialogResponse.LeftButton && response.ItemIndex == batteryRow)
+                {
+                    WithCarriedPhone(player, phone, () => Recharge(player, phone, () => OpenPhoneMenu(player, phone)));
+                }
             });
         }
 
         private void TurnOn(Player player, Phone phone)
         {
-            _phoneEditorService.SetPower(phone, true);
+            string? error = _phoneEditorService.SetPower(phone, true);
+            if (error != null)
+            {
+                ShowMessage(player, "Turn on", error, () => OpenPhoneMenu(player, phone));
+                return;
+            }
             string? news = _phoneService.GetNewsSummary(phone);
             player.SendClientMessage($"{ChatColor.White}[Phone] Your phone is on.{(news == null ? string.Empty : $" {news}.")}");
             OpenPhoneMenu(player, phone);
@@ -129,6 +143,29 @@ namespace OpenRP.Framework.Features.Phones.Services.Dialogs
         {
             _phoneEditorService.SetPower(phone, false);
             player.SendClientMessage($"{ChatColor.White}[Phone] Your phone is off. Calls can't reach it, but texts wait until it's on.");
+        }
+
+        /// <summary>
+        /// Puts the phone on charge. It stays usable, and is full after at most a minute.
+        /// </summary>
+        private void Recharge(Player player, Phone phone, Action onBack)
+        {
+            string? error = _phoneBatteryService.BeginRecharge(player, phone);
+            if (error != null)
+            {
+                ShowMessage(player, "Battery", error, onBack);
+                return;
+            }
+
+            int seconds = (int)Math.Ceiling(phone.GetCharge()!.Duration.TotalSeconds);
+            player.SendClientMessage($"{ChatColor.White}[Phone] You put your phone on charge. It's full in {seconds} seconds.");
+            onBack();
+        }
+
+        private string GetBatteryLabel(Phone phone)
+        {
+            string charging = phone.IsCharging() ? $" {ChatColor.LightGray}(charging)" : string.Empty;
+            return $"Battery: {Highlight(BatteryLevels.Format(_phoneBatteryService.GetCurrentLevel(phone)))}{charging}";
         }
 
         private void ToggleRinger(Phone phone, Action onBack)

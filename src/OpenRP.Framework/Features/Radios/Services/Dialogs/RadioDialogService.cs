@@ -21,10 +21,12 @@ namespace OpenRP.Framework.Features.Radios.Services.Dialogs
         private readonly IRadioFrequencyService _radioFrequencyService;
         private readonly IRadioEditorService _radioEditorService;
         private readonly IFactionDialogService _factionDialogService;
+        private readonly IRadioBatteryService _radioBatteryService;
 
         public RadioDialogService(IDialogService dialogService, IRadioService radioService, IRadioFrequencyService radioFrequencyService, IRadioEditorService radioEditorService,
-            IFactionDialogService factionDialogService)
+            IFactionDialogService factionDialogService, IRadioBatteryService radioBatteryService)
         {
+            _radioBatteryService = radioBatteryService;
             _dialogService = dialogService;
             _radioService = radioService;
             _radioFrequencyService = radioFrequencyService;

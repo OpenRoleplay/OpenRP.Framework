@@ -21,7 +21,10 @@ namespace OpenRP.Framework.Features.Radios.Services
         /// </summary>
         string? GiveEarpiece(Player player);
 
-        void SetPower(Radio radio, bool isOn);
+        /// <summary>
+        /// Turns the radio on or off. Returns why it can't turn on (an empty battery), or null.
+        /// </summary>
+        string? SetPower(Radio radio, bool isOn);
 
         /// <summary>
         /// Tunes the radio to the frequency in the text.

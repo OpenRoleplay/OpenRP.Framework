@@ -22,10 +22,12 @@ namespace OpenRP.Framework.Features.Phones.Services.Dialogs
         private readonly IPhoneEditorService _phoneEditorService;
         private readonly IPhoneCallService _phoneCallService;
         private readonly IPhoneRoleplayService _phoneRoleplayService;
+        private readonly IPhoneBatteryService _phoneBatteryService;
 
         public PhoneDialogService(IDialogService dialogService, IPhoneService phoneService, IPhoneEditorService phoneEditorService, IPhoneCallService phoneCallService,
-            IPhoneRoleplayService phoneRoleplayService)
+            IPhoneRoleplayService phoneRoleplayService, IPhoneBatteryService phoneBatteryService)
         {
+            _phoneBatteryService = phoneBatteryService;
             _phoneRoleplayService = phoneRoleplayService;
             _dialogService = dialogService;
             _phoneService = phoneService;

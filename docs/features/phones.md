@@ -49,6 +49,18 @@
 6. **Texts** are at most 160 characters, the length of an SMS in 1992. Both phones keep a copy. Texts to a phone that's off wait, and it beeps for them when it's turned on, as 1992 networks did.
 7. **Memory, like 1992.** A phone keeps its last 20 texts and 20 calls; the oldest makes room for the newest. The phone book holds 50 names.
 8. **When you log in,** you're told about missed calls and new messages on the phones you carry.
+9. **The battery,** in real time, like a 1992 MicroTAC-class phone:
+
+   | State | A full battery lasts |
+   |---|---|
+   | On | about 10 hours |
+   | In a call | about 75 minutes |
+   | Off | forever: it doesn't drain |
+
+   - **Warnings:** a `/do` at 10%, 5% and 2% ("Their phone beeps: low battery."), only to you when the phone is silent. At 0% it beeps, dies and switches off, which ends a call.
+   - **Recharge:** the **Battery** row in `/phone`, also when the phone is off or dead. It takes up to a minute from empty, and the phone stays usable meanwhile. A dead phone can't be turned on until it's recharged.
+   - **Offline:** in your inventory while you're offline, it recharges after the first hour, from empty to full in 24 hours. A switched-off phone never recharges while you play.
+   - See [Batteries](../shared/batteries.md) for the exact rules.
 
 **Why calls use what you say in chat:** you roleplay a phone call the way you roleplay talking, and people around you hear your side of it, as in real life.
 

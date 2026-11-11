@@ -17,9 +17,10 @@ namespace OpenRP.Framework.Features.Phones.Services
         (Phone? Phone, string? Error) GivePhone(Player player);
 
         /// <summary>
-        /// Turns the phone on or off. Turning it on beeps for texts that came in while it was off.
+        /// Turns the phone on or off. Turning it on beeps for texts that came in while it was off. Returns why it can't
+        /// turn on (an empty battery), or null.
         /// </summary>
-        void SetPower(Phone phone, bool isOn);
+        string? SetPower(Phone phone, bool isOn);
 
         void SetSilent(Phone phone, bool isSilent);
 

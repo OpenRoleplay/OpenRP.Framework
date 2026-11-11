@@ -13,9 +13,10 @@
 | Call log | Missed, received and dialed calls; shows "(1 missed)" |
 | Ringer | On or Silent. Silent means no `/do`: only you notice |
 | My number | Shows the phone's number |
+| Battery | Shows the level, for example `73%` or `40% (charging)`. Picking it recharges the phone, in up to a minute |
 | Turn off | Calls can't reach it, but texts wait until it's on |
 
-A phone that's off only has "Turn on". Turning it on tells you what came in.
+A phone that's off only has "Turn on" and "Battery". Turning it on tells you what came in. A dead phone has to be recharged before it turns on.
 
 ## Phone book
 - **Add a name:** a name (at most 24 characters), then the number.

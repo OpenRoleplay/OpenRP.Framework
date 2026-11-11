@@ -32,6 +32,22 @@ namespace OpenRP.Framework.Features.Phones.Services
             Alert(phone, BeepText, $"{ChatColor.Highlight}New message{ChatColor.White} from {sender}. Use /phone to read it.");
         }
 
+        public void WarnLowBattery(Phone phone, Player holder, double warningLevel)
+        {
+            string doText = warningLevel switch
+            {
+                <= 2 => "Their phone beeps rapidly: battery almost dead.",
+                <= 5 => "Their phone beeps twice: battery very low.",
+                _ => "Their phone beeps: low battery."
+            };
+            AlertHolder(phone, holder, doText, $"{ChatColor.Highlight}Low battery{ChatColor.White} ({warningLevel}%). Recharge it in /phone.");
+        }
+
+        public void AnnounceEmptyBattery(Phone phone, Player holder)
+        {
+            AlertHolder(phone, holder, "Their phone beeps and dies.", $"{ChatColor.Highlight}The battery is empty{ChatColor.White} and the phone switched off. Recharge it in /phone.");
+        }
+
         /// <summary>
         /// Out loud with a /do, or only to the carrier when the phone is silent. Nothing when it's off or not carried.
         /// </summary>
@@ -43,11 +59,21 @@ namespace OpenRP.Framework.Features.Phones.Services
                 return;
             }
 
+            AlertHolder(phone, carrier, doText, carrierText);
+        }
+
+        private void AlertHolder(Phone phone, Player holder, string doText, string holderText)
+        {
+            if (!holder.IsComponentAlive)
+            {
+                return;
+            }
+
             if (!phone.IsSilent())
             {
-                _chatService.SendPlayerChatMessage(carrier, PlayerChatMessageType.DO, doText);
+                _chatService.SendPlayerChatMessage(holder, PlayerChatMessageType.DO, doText);
             }
-            carrier.SendClientMessage($"{ChatColor.White}[Phone] {carrierText}");
+            holder.SendClientMessage($"{ChatColor.White}[Phone] {holderText}");
         }
     }
 }

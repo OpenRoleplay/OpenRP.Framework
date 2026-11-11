@@ -25,9 +25,12 @@ namespace OpenRP.Framework.Features.Radios.Services
         private readonly IRadioService _radioService;
         private readonly IRadioFrequencyService _radioFrequencyService;
         private readonly IChatService _chatService;
+        private readonly IRadioBatteryService _radioBatteryService;
 
-        public RadioBroadcastService(IEntityManager entityManager, IRadioService radioService, IRadioFrequencyService radioFrequencyService, IChatService chatService)
+        public RadioBroadcastService(IEntityManager entityManager, IRadioService radioService, IRadioFrequencyService radioFrequencyService, IChatService chatService,
+            IRadioBatteryService radioBatteryService)
         {
+            _radioBatteryService = radioBatteryService;
             _entityManager = entityManager;
             _radioService = radioService;
             _radioFrequencyService = radioFrequencyService;
@@ -52,6 +55,7 @@ namespace OpenRP.Framework.Features.Radios.Services
             _chatService.SendTalkMessage(player, text, TalkVia);
             HashSet<Player> heardOverRadio = Transmit(radio!.GetFrequency(), character.GetName(), text, radio);
             SendConfirmation(player, radio.GetFrequency(), character.GetName(), text, heardOverRadio);
+            _radioBatteryService.UseTransmitBattery(player, radio);
             return null;
         }
 

@@ -6,7 +6,7 @@ Two-way radios on numbered frequencies: a handheld radio item, and a radio an ad
 
 | Command | Groups | Does |
 |---|---|---|
-| `/radio` | Default | The radio menu: power, frequency, and Speaker or Earpiece. Holding several radios, you pick one first. "Use" on a radio in your inventory opens that radio's menu |
+| `/radio` | Default | The radio menu: power, frequency, Speaker or Earpiece, and the battery. Holding several radios, you pick one first. "Use" on a radio in your inventory opens that radio's menu |
 | `/r [message]` | Default | Says the message out loud and sends it over your radio |
 | `/freq [frequency]` | Default | Tunes your radio, for example `/freq 1500` |
 | `/giveradio [player]` | Admin | Gives the player a new handheld radio, tuned to 1000 |
@@ -53,6 +53,15 @@ Say Unit 12 types `/r Shots fired on Grove Street` on frequency 911:
 - **The earpiece** is its own item. Only while you carry it does `/radio` offer Speaker or Earpiece. Drop it and your radio plays out loud again.
   - **Why an item:** earpieces were a cheap accessory in 1992, so keeping traffic private costs one.
 - **Encrypted frequencies** only play on a radio that a member holds or sits with. Bystanders still overhear it from the speaker, because the radio decrypts it.
+
+## Battery
+
+A handheld runs on a battery, in real time, like a 1992 police handheld. Vehicle radios run on the car and have none.
+- **How long:** a full battery lasts about one 10-hour shift switched on, and each `/r` costs a little extra (0.25%). Off, it doesn't drain.
+- **Warnings:** a `/do` at 10%, 5% and 2% ("Their radio chirps: low battery."). At 0% it crackles, goes dead and switches off.
+- **Recharge:** the **Battery** row in `/radio`, in up to a minute from empty. The radio stays usable meanwhile. A dead radio can't be turned on until it's recharged.
+- **Offline:** in your inventory while you're offline, it recharges after the first hour, from empty to full in 24 hours. A switched-off radio never recharges while you play.
+- See [Batteries](../shared/batteries.md) for the exact rules.
 
 ## Known limitations
 

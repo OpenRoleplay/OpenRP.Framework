@@ -14,6 +14,7 @@ namespace OpenRP.Framework.Features.Radios.Extensions
                 .AddSingleton<IRadioFrequencyFactionManager, RadioFrequencyFactionManager>()
                 .AddSingleton<IRadioService, RadioService>()
                 .AddSingleton<IRadioFrequencyService, RadioFrequencyService>()
+                .AddSingleton<IRadioBatteryService, RadioBatteryService>()
                 .AddSingleton<IRadioBroadcastService, RadioBroadcastService>()
                 .AddSingleton<IRadioEditorService, RadioEditorService>()
                 .AddSingleton<IRadioDialogService, RadioDialogService>();

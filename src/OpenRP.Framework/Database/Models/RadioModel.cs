@@ -1,4 +1,5 @@
 using OpenRP.Framework.Database.Entities;
+using System;
 
 namespace OpenRP.Framework.Database.Models
 {
@@ -11,6 +12,10 @@ namespace OpenRP.Framework.Database.Models
         public bool IsOn { get; set; }
         // Only counts while the holder carries an earpiece item; otherwise the radio plays out loud.
         public bool UsesEarpiece { get; set; }
+        // Percent, 0 to 100. Vehicle radios run on the car and ignore it.
+        public double BatteryLevel { get; set; }
+        // When the battery was last updated while in play; null when never. See Shared/Batteries.
+        public DateTime? BatteryUpdatedAt { get; set; }
         // The vehicle the radio is installed in; null for a handheld.
         public ulong? VehicleId { get; set; }
 
@@ -22,6 +27,7 @@ namespace OpenRP.Framework.Database.Models
             Frequency = 1000;
             IsOn = true;
             UsesEarpiece = false;
+            BatteryLevel = 100;
         }
     }
 }

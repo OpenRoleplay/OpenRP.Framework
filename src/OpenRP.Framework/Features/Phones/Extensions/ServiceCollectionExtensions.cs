@@ -18,6 +18,7 @@ namespace OpenRP.Framework.Features.Phones.Extensions
                 .AddSingleton<IPhoneMessageManager, PhoneMessageManager>()
                 .AddSingleton<IPhoneCallLogManager, PhoneCallLogManager>()
                 .AddSingleton<IPhoneAlertService, PhoneAlertService>()
+                .AddSingleton<IPhoneBatteryService, PhoneBatteryService>()
                 .AddSingleton<IPhoneRoleplayService, PhoneRoleplayService>()
                 .AddSingleton<IPhoneEditorService, PhoneEditorService>()
                 .AddSingleton<IPhoneCallService, PhoneCallService>()

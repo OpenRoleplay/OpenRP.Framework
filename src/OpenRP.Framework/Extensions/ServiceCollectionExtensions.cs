@@ -25,6 +25,7 @@ using OpenRP.Framework.Features.Radios.Extensions;
 using OpenRP.Framework.Features.Properties.Extensions;
 using OpenRP.Framework.Features.Vehicles.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
+using OpenRP.Framework.Shared.Batteries.Extensions;
 using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.Commands.Extensions;
 using OpenRP.Framework.Shared.Logging.Extensions;
@@ -67,6 +68,7 @@ namespace OpenRP.Framework.Extensions
                 .AddChickenCoops()
                 .AddFactions()
                 .AddJurisdictions()
+                .AddBatteries()
                 .AddPhones()
                 .AddRadios()
                 .AddDebugSettings()

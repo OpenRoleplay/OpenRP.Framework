@@ -1,4 +1,6 @@
+using OpenRP.Framework.Database;
 using OpenRP.Framework.Features.Phones.Services;
+using OpenRP.Framework.Shared.Batteries.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 
@@ -8,6 +10,9 @@ namespace OpenRP.Framework.Features.Phones.Systems
     {
         private const int SyncIntervalInMilliseconds = 60000;
         private const int CallIntervalInMilliseconds = 1000;
+        // Battery levels change slowly; charging finishes within a second of being done.
+        private const int BatteryIntervalInMilliseconds = 30000;
+        private const int ChargingIntervalInMilliseconds = 1000;
 
         /// <summary>
         /// Phones go first, because contacts, texts and call logs belong to a phone.
@@ -43,6 +48,21 @@ namespace OpenRP.Framework.Features.Phones.Systems
         public void ProcessCalls(IPhoneCallService phoneCallService)
         {
             phoneCallService.ProcessCalls();
+        }
+
+        /// <summary>
+        /// The data context comes in per call: it's transient, and the timer reads offline characters from it.
+        /// </summary>
+        [Timer(BatteryIntervalInMilliseconds)]
+        public void UpdateBatteries(IPhoneBatteryService batteryService, IBatteryPlaceService batteryPlaceService, BaseDataContext dataContext)
+        {
+            batteryService.UpdateBatteries(batteryPlaceService.TakeSnapshot(dataContext));
+        }
+
+        [Timer(ChargingIntervalInMilliseconds)]
+        public void ProcessCharging(IPhoneBatteryService batteryService)
+        {
+            batteryService.ProcessCharging();
         }
 
         [Event]

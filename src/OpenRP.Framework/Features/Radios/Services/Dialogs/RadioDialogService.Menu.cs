@@ -1,6 +1,7 @@
 using OpenRP.Framework.Features.Radios.Components;
 using OpenRP.Framework.Features.Radios.Helpers;
 using OpenRP.Framework.Shared;
+using OpenRP.Framework.Shared.Batteries.Helpers;
 using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Shared.Dialogs.Extensions;
@@ -61,6 +62,8 @@ namespace OpenRP.Framework.Features.Radios.Services.Dialogs
             int powerRow = menuDialog.AddRow($"Power: {Highlight(radio.IsOn() ? "On" : "Off")}");
             int frequencyRow = menuDialog.AddRow($"Frequency: {Highlight(_radioFrequencyService.GetLabel(radio.GetFrequency()))}");
             int? earpieceRow = canChooseEarpiece ? menuDialog.AddRow($"Listen through: {Highlight(radio.UsesEarpiece() ? "Earpiece" : "Speaker")}") : null;
+            // A vehicle radio runs on the car.
+            int? batteryRow = radio.IsVehicleRadio() ? null : menuDialog.AddRow(GetBatteryLabel(radio));
 
             void OnChosen(ListDialogResponse response)
             {
@@ -73,6 +76,8 @@ namespace OpenRP.Framework.Features.Radios.Services.Dialogs
                     OpenTune(player, radio, reopenMenu);
                 else if (response.ItemIndex == earpieceRow)
                     WithUsableRadio(player, radio, () => ToggleEarpiece(player, radio, reopenMenu));
+                else if (response.ItemIndex == batteryRow)
+                    WithUsableRadio(player, radio, () => Recharge(player, radio, reopenMenu));
             }
 
             _dialogService.ShowIgnoringDisconnect(player, menuDialog, OnChosen);
@@ -80,11 +85,39 @@ namespace OpenRP.Framework.Features.Radios.Services.Dialogs
 
         private void TogglePower(Player player, Radio radio, Action onBack)
         {
-            _radioEditorService.SetPower(radio, !radio.IsOn());
+            string? error = _radioEditorService.SetPower(radio, !radio.IsOn());
+            if (error != null)
+            {
+                ShowMessage(player, RadioTitle, "Power", error, onBack);
+                return;
+            }
             player.SendClientMessage(radio.IsOn()
                 ? $"{ChatColor.White}[Radio] Your radio is on, tuned to {_radioFrequencyService.GetLabel(radio.GetFrequency())}."
                 : $"{ChatColor.White}[Radio] Your radio is off.");
             onBack();
+        }
+
+        /// <summary>
+        /// Puts the handheld on charge. It stays usable, and is full after at most a minute.
+        /// </summary>
+        private void Recharge(Player player, Radio radio, Action onBack)
+        {
+            string? error = _radioBatteryService.BeginRecharge(player, radio);
+            if (error != null)
+            {
+                ShowMessage(player, RadioTitle, "Battery", error, onBack);
+                return;
+            }
+
+            int seconds = (int)Math.Ceiling(radio.GetCharge()!.Duration.TotalSeconds);
+            player.SendClientMessage($"{ChatColor.White}[Radio] You put your radio on charge. It's full in {seconds} seconds.");
+            onBack();
+        }
+
+        private string GetBatteryLabel(Radio radio)
+        {
+            string charging = radio.IsCharging() ? $" {ChatColor.LightGray}(charging)" : string.Empty;
+            return $"Battery: {Highlight(BatteryLevels.Format(_radioBatteryService.GetCurrentLevel(radio)))}{charging}";
         }
 
         private void ToggleEarpiece(Player player, Radio radio, Action onBack)

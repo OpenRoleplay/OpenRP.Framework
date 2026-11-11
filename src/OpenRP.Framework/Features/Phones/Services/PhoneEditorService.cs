@@ -9,6 +9,7 @@ using OpenRP.Framework.Features.Phones.Enums;
 using OpenRP.Framework.Features.Phones.Helpers;
 using OpenRP.Framework.Features.Players.Extensions;
 using OpenRP.Framework.Shared.BaseManager.Entities;
+using OpenRP.Framework.Shared.Batteries.Helpers;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -69,14 +70,20 @@ namespace OpenRP.Framework.Features.Phones.Services
             return (phone, null);
         }
 
-        public void SetPower(Phone phone, bool isOn)
+        public string? SetPower(Phone phone, bool isOn)
         {
+            if (isOn && BatteryLevels.IsEmpty(phone.GetBatteryLevel()) && !phone.IsCharging())
+            {
+                return "The battery is dead. Recharge it first.";
+            }
+
             phone.SetOn(isOn);
             PhoneMessage? newestUnread = _phoneService.GetMessages(phone).FirstOrDefault(message => message.IsIncoming() && !message.IsRead());
             if (isOn && newestUnread != null)
             {
                 _phoneAlertService.BeepForMessage(phone, newestUnread.GetOtherNumber());
             }
+            return null;
         }
 
         public void SetSilent(Phone phone, bool isSilent)

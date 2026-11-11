@@ -1,4 +1,5 @@
 using OpenRP.Framework.Features.Phones.Components;
+using SampSharp.Entities.SAMP;
 
 namespace OpenRP.Framework.Features.Phones.Services
 {
@@ -17,5 +18,15 @@ namespace OpenRP.Framework.Features.Phones.Services
         /// The beep of a text that just came in.
         /// </summary>
         void BeepForMessage(Phone phone, uint senderNumber);
+
+        /// <summary>
+        /// The low battery beep at 10%, 5% or 2%, more urgent the lower it is. The holder may have the phone in a wallet.
+        /// </summary>
+        void WarnLowBattery(Phone phone, Player holder, double warningLevel);
+
+        /// <summary>
+        /// The last beep before the phone switches itself off.
+        /// </summary>
+        void AnnounceEmptyBattery(Phone phone, Player holder);
     }
 }

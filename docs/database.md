@@ -94,7 +94,7 @@ See [Factions](features/factions.md).
 
 | Table | Columns | Notes |
 |---|---|---|
-| `Phones` (`PhoneModel`) | `Number` (unique), `IsOn`, `IsSilent` | Random 7-digit numbers; below 1000 is reserved for the server |
+| `Phones` (`PhoneModel`) | `Number` (unique), `IsOn`, `IsSilent`, `BatteryLevel` (percent), `BatteryUpdatedAt` (nullable) | Random 7-digit numbers; below 1000 is reserved for the server |
 | `PhoneContacts` (`PhoneContactModel`) | `PhoneId` → phones (cascade), `Name` (24), `Number` | The phone book. Unique per phone + number; at most 50 per phone |
 | `PhoneMessages` (`PhoneMessageModel`) | `PhoneId` → phones (cascade), `OtherNumber`, `Text` (160), `IsIncoming`, `IsRead`, `SentAt` | Each phone keeps its own copy; the last 20 per phone |
 | `PhoneCallLogs` (`PhoneCallLogModel`) | `PhoneId` → phones (cascade), `OtherNumber`, `Type` (Incoming, Outgoing, Missed), `StartedAt`, `DurationSeconds`, `IsSeen` | The last 20 per phone |
@@ -105,7 +105,7 @@ See [Phones](features/phones.md).
 
 | Table | Columns | Notes |
 |---|---|---|
-| `Radios` (`RadioModel`) | `Frequency`, `IsOn`, `UsesEarpiece`, `VehicleId` → `Vehicles` (cascade, unique) | A handheld (its item points to it) or, with `VehicleId`, a vehicle radio |
+| `Radios` (`RadioModel`) | `Frequency`, `IsOn`, `UsesEarpiece`, `BatteryLevel` (percent), `BatteryUpdatedAt` (nullable), `VehicleId` → `Vehicles` (cascade, unique) | A handheld (its item points to it) or, with `VehicleId`, a vehicle radio |
 | `RadioFrequencies` (`RadioFrequencyModel`) | `Number` (unique), `Name` (32), `Mode` (Protected, Encrypted) | Only frequencies with their own rules; others follow the defaults |
 | `RadioFrequencyFactions` (`RadioFrequencyFactionModel`) | `RadioFrequencyId` → frequencies (cascade), `FactionId` → factions (cascade) | The factions on a frequency. Unique per frequency + faction |
 
