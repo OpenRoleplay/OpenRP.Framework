@@ -21,6 +21,10 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Helpers
         // "**Hang up**".
         private static readonly Regex HangUpLine = new Regex(@"^[\W_]*HANG\s*UP[\W_]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        // A service name in capitals right after the end of a sentence, followed by a capitalised word: the start of
+        // another service's broadcast. "EMS en route" mid-sentence doesn't match.
+        private static readonly Regex GluedDispatch = new Regex(@"(?<=[.!?])\s+(?=(?:POLICE|FIRE|EMS|AMBULANCE):?\s+[A-Z])", RegexOptions.Compiled);
+
         public static EmergencyDispatcherReply Parse(string replyText)
         {
             EmergencyDispatcherReply reply = new EmergencyDispatcherReply();
@@ -48,7 +52,7 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Helpers
             }
             else if (line.StartsWith(DispatchPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                ReadDispatch(reply, line[DispatchPrefix.Length..].Trim());
+                ReadDispatchLine(reply, line[DispatchPrefix.Length..].Trim());
             }
             else if (HangUpLine.IsMatch(line))
             {
@@ -65,6 +69,18 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Helpers
         }
 
         /// <summary>
+        /// The model sometimes glues a second service's broadcast onto the first: "EMS Units, ... callback 382-0142.
+        /// POLICE Units, ...". Each one becomes its own dispatch.
+        /// </summary>
+        private static void ReadDispatchLine(EmergencyDispatcherReply reply, string dispatchLine)
+        {
+            foreach (string dispatch in GluedDispatch.Split(dispatchLine))
+            {
+                ReadDispatch(reply, dispatch.Trim());
+            }
+        }
+
+        /// <summary>
         /// "POLICE All units, ..." becomes the service and the broadcast text.
         /// </summary>
         private static void ReadDispatch(EmergencyDispatcherReply reply, string dispatch)
@@ -75,12 +91,10 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Helpers
                 return;
             }
 
-            EmergencyServiceType? service = GetService(dispatch[..firstSpace]);
-            string text = dispatch[(firstSpace + 1)..].Trim();
-            if (service.HasValue && text.Length > 0)
+            EmergencyServiceType? service = GetService(dispatch[..firstSpace].TrimEnd(':'));
+            if (service.HasValue)
             {
-                reply.DispatchService = service;
-                reply.DispatchText = text;
+                reply.AddDispatch(service.Value, dispatch[(firstSpace + 1)..].Trim());
             }
         }
 

@@ -31,12 +31,20 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Helpers
             Rules for the format:
             - Put each SAY, DISPATCH and HANGUP on its own line; never two on one line.
             - One or more SAY lines every time.
-            - At most one DISPATCH line. The broadcast is what you say on the radio to the units, in dispatcher style,
-              for example: "All units, armed robbery in progress at the 24/7 on Grove Street, Ganton. Suspect is a male
-              in a black jacket with a pistol, fled on foot towards Idlewood. No injuries reported. Caller is John
-              Smith, callback 382-0142." Put every detail you know in it: what, the exact location and area, suspects,
-              vehicles, weapons, injuries, the caller's name if given, and the callback number.
+            - At most one DISPATCH line per service (POLICE, FIRE, EMS), each on its own line. When a call needs two
+              services, such as a shooting with someone hurt, write two DISPATCH lines; never put two services in one.
+            - The broadcast is what you say on the radio to that service's units, in dispatcher style, for example:
+              "All units, armed robbery in progress at the 24/7 on Grove Street, Ganton. Suspect is a male in a black
+              jacket with a pistol, fled on foot towards Idlewood. No injuries reported. Caller is John Smith, callback
+              382-0142." Give each service what it needs: the exact location and area, what happened, and the caller's
+              name if given and the callback number; for POLICE the suspects, vehicles and weapons, for EMS the injured
+              and their condition, for FIRE what is burning and who may be inside.
             - HANGUP only as the last line, when the call is over. Write it exactly as HANGUP, alone on its line.
+
+            Example of a reply that sends two services:
+            SAY: Help is on the way. Stay down and keep pressure on the wound.
+            DISPATCH: POLICE All units, shots fired outside the bar on Main Street, Montgomery. Suspect fled on foot.
+            DISPATCH: EMS Units, gunshot victim outside the bar on Main Street, Montgomery. Male, conscious, bleeding.
 
             Example of a reply that ends the call:
             SAY: Officers are on their way. Stay inside and keep your distance. Goodbye.

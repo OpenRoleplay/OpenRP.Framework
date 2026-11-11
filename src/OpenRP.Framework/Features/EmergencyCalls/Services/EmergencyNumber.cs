@@ -27,7 +27,7 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Services
         private const string Greeting = "911, what is your emergency?";
         // Each reply is a paid request; a call that goes on this long is wrapped up.
         private const int MaxReplies = 8;
-        private const int MaxDispatchesPerCall = 3;
+        private const int MaxDispatchesPerServicePerCall = 3;
         private static readonly TimeSpan DispatchCooldown = TimeSpan.FromMinutes(1);
 
         private readonly IEntityManager _entityManager;
@@ -165,9 +165,9 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Services
             {
                 Say(line, call, sayLine);
             }
-            if (reply.HasDispatch())
+            foreach (EmergencyDispatch dispatch in reply.Dispatches)
             {
-                TryDispatch(line, call, reply.DispatchService!.Value, reply.DispatchText!);
+                TryDispatch(line, call, dispatch.Service, dispatch.Text);
             }
             if (reply.HangsUp)
             {
@@ -200,23 +200,27 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Services
         private void TryDispatch(IServerPhoneLine line, EmergencyCall call, EmergencyServiceType service, string text)
         {
             Player? caller = line.GetCaller();
-            if (caller == null || !CanDispatch(caller, line, call))
+            if (caller == null || !CanDispatch(caller, line, call, service))
             {
                 _logger.LogInformation("A 911 dispatch from {CallerNumber} was held back by the dispatch limits.", call.GetCallerNumber());
                 return;
             }
 
             _dispatchService.Broadcast(service, text);
-            call.AddDispatch();
+            call.AddDispatch(service);
             call.AddDispatcherLine($"DISPATCH: {service.ToString().ToUpperInvariant()} {text}");
             caller.DestroyComponents<EmergencyDispatchCooldown>();
             caller.AddComponent<EmergencyDispatchCooldown>(new object[] { line.GetCallId(), DateTime.UtcNow });
         }
 
-        private static bool CanDispatch(Player caller, IServerPhoneLine line, EmergencyCall call)
+        /// <summary>
+        /// At most a few broadcasts per service per call, and none from a new call within a minute of the caller's last
+        /// dispatch. Several services in one call are fine: the cooldown only blocks other calls.
+        /// </summary>
+        private static bool CanDispatch(Player caller, IServerPhoneLine line, EmergencyCall call, EmergencyServiceType service)
         {
             EmergencyDispatchCooldown? cooldown = caller.GetComponent<EmergencyDispatchCooldown>();
-            return call.GetDispatchCount() < MaxDispatchesPerCall
+            return call.GetDispatchCount(service) < MaxDispatchesPerServicePerCall
                 && (cooldown == null || !cooldown.IsBlocking(line.GetCallId(), DispatchCooldown));
         }
 

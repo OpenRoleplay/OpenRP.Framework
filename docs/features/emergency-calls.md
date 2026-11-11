@@ -35,14 +35,14 @@ Without `AddEmergencyCalls`, 911 is "not in service".
 
 1. **Answering.** The dispatcher answers "911, what is your emergency?".
 2. **Talking.** The dispatcher waits until the caller has been quiet for 5 seconds, so several lines in a row get one answer, like with [AI actors](actor-roleplay.md). Everything the caller says goes to the model, with the call so far, the caller ID and the area the call comes in from (such as "Red County"). The model doesn't get the caller's name: it asks, like a real dispatcher.
-3. **Replying.** The model writes what it says, and, as soon as it knows what and where, a radio broadcast in its own voice with every detail it knows. New details later in the call lead to an update broadcast.
+3. **Replying.** The model writes what it says, and, as soon as it knows what and where, a radio broadcast in its own voice for each service that's needed, each on its own radio line (`Dispatch (Police)`, `Dispatch (EMS)`, `Dispatch (Fire)`). Each one has what that service needs: the location and caller for all, the suspects for police, the injured for EMS. New details later in the call lead to an update broadcast.
 4. **Hanging up.** Once help is dispatched and the caller has nothing new (an "okay" or "thanks"), the dispatcher says goodbye and hangs up in the same reply. It also hangs up on pranks.
 5. **Without an API key,** the caller gets a form: Police, Fire or Ambulance, what's happening, and where. The broadcast is built from the answers, the caller's name and number, and the area.
 
 **Limits:**
 - **Replies:** at most 8 per call.
   - **Why:** each reply is a paid request.
-- **Broadcasts:** at most 3 per call. A new call can't dispatch until a minute after the caller's last dispatch.
+- **Broadcasts:** at most 3 per service per call. A new call can't dispatch until a minute after the caller's last dispatch; several services in the same call are fine.
   - **Why:** it stops prank floods on the radio.
 
 ## Known limitations
@@ -63,7 +63,7 @@ Without `AddEmergencyCalls`, 911 is "not in service".
 - **Helpers:**
   - `EmergencyDispatcherPromptBuilder`: the rules, with the call details last, so OpenAI's prompt caching can reuse the rules;
   - **Caching:** the whole call is sent each turn and only grows, with the cache key `call:{call id}`, so earlier turns are billed at the cached rate. The log shows `AI usage (EmergencyCalls)` for every reply;
-  - `EmergencyDispatcherReplyParser`: reads `SAY:`, `DISPATCH:` and `HANGUP` lines and ignores anything else, so stray text never reaches the game. Commands the model puts on one line (`SAY: … DISPATCH: …`) are split first, so a broadcast is never read as speech. A hang-up counts in any case and decoration (`HANGUP.`, `[HANGUP]`, `Hang up`), as long as it's on its own line. Each raw reply is logged at Debug level.
+  - `EmergencyDispatcherReplyParser`: reads `SAY:`, `DISPATCH:` and `HANGUP` lines and ignores anything else, so stray text never reaches the game. Commands the model puts on one line (`SAY: … DISPATCH: …`) are split first, so a broadcast is never read as speech. A second service's broadcast glued onto the first (`… callback 382-0142. POLICE Units, …`) is split off into its own broadcast. A hang-up counts in any case and decoration (`HANGUP.`, `[HANGUP]`, `Hang up`), as long as it's on its own line. Each raw reply is logged at Debug level.
 - **`EmergencyDispatchCooldown`:** a component on the caller for the one-minute limit.
 - **The area:** [`ZoneNames`](../shared/locations.md).
 

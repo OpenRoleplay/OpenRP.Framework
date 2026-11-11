@@ -1,4 +1,5 @@
 using OpenRP.Framework.Features.EmergencyCalls.Entities;
+using OpenRP.Framework.Features.EmergencyCalls.Enums;
 using OpenRP.Framework.Features.Phones.Entities;
 using SampSharp.Entities;
 using System;
@@ -18,7 +19,7 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Components
         private readonly IServerPhoneLine _line;
         private DateTime _lastCallerLineAt;
         private int _replyCount;
-        private int _dispatchCount;
+        private readonly Dictionary<EmergencyServiceType, int> _dispatchCounts = new Dictionary<EmergencyServiceType, int>();
         private bool _isReplying;
         private bool _hasUnansweredLines;
 
@@ -122,14 +123,17 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Components
             return _replyCount;
         }
 
-        public int GetDispatchCount()
+        /// <summary>
+        /// How many broadcasts this call sent to the service.
+        /// </summary>
+        public int GetDispatchCount(EmergencyServiceType service)
         {
-            return _dispatchCount;
+            return _dispatchCounts.TryGetValue(service, out int count) ? count : 0;
         }
 
-        public void AddDispatch()
+        public void AddDispatch(EmergencyServiceType service)
         {
-            _dispatchCount++;
+            _dispatchCounts[service] = GetDispatchCount(service) + 1;
         }
     }
 }
