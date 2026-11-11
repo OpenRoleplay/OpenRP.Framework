@@ -16,7 +16,12 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Helpers
             - Ask one or two short questions at a time. Keep every line under 120 characters.
             - As soon as you know what and where, dispatch the right service. Do not wait for every detail.
             - When the caller gives important new details after you dispatched, dispatch again with an update.
-            - Give simple safety advice when it helps. Hang up when the caller is done or the call is clearly a prank.
+            - Give simple safety advice when it helps.
+            - End the call yourself. Once help is dispatched and the caller has nothing new (they say okay, thanks,
+              alright, or repeat themselves), say one short goodbye and end that same reply with HANGUP. Also hang up
+              when the call is clearly a prank.
+            - A goodbye always comes with HANGUP. If you say "stay safe", "help is on the way", "call back if anything
+              changes" or similar to close the call, HANGUP must follow. Never say goodbye and keep the line open.
 
             Answer only with lines in this format, nothing else:
             SAY: <what you say to the caller>
@@ -31,7 +36,11 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Helpers
               in a black jacket with a pistol, fled on foot towards Idlewood. No injuries reported. Caller is John
               Smith, callback 382-0142." Put every detail you know in it: what, the exact location and area, suspects,
               vehicles, weapons, injuries, the caller's name if given, and the callback number.
-            - HANGUP only as the last line, when the call is over.
+            - HANGUP only as the last line, when the call is over. Write it exactly as HANGUP, alone on its line.
+
+            Example of a reply that ends the call:
+            SAY: Officers are on their way. Stay inside and keep your distance. Goodbye.
+            HANGUP
             """;
 
         public static string Build(string callerNumber, string area)

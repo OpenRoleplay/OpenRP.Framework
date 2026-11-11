@@ -81,41 +81,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                 onBack();
             }
 
-            OpenFactionPicker(player, "Government", "None, use the parent's government", SetGovernment, onBack);
-        }
-
-        /// <summary>
-        /// Lets the player pick a faction, or none (null) through the first row when noneLabel isn't null.
-        /// </summary>
-        private void OpenFactionPicker(Player player, string title, string? noneLabel, Action<Faction?> onPicked, Action onBack)
-        {
-            BetterListDialog factionDialog = new BetterListDialog("Choose", "Back");
-            factionDialog.SetTitle(TitleType.Children, JurisdictionsTitle, title);
-            int? noneRow = noneLabel == null ? null : factionDialog.AddRow($"{ChatColor.CornflowerBlue}{noneLabel}");
-            Dictionary<int, Faction> factionsByRow = new Dictionary<int, Faction>();
-            foreach (Faction faction in GetFactions())
-            {
-                factionsByRow[factionDialog.AddRow($"{faction.GetName()} {ChatColor.LightGray}(#{faction.GetId()})")] = faction;
-            }
-
-            void OnFactionChosen(ListDialogResponse response)
-            {
-                if (response.Response != DialogResponse.LeftButton)
-                    onBack();
-                else if (response.ItemIndex == noneRow)
-                    onPicked(null);
-                else if (factionsByRow.TryGetValue(response.ItemIndex, out Faction? faction))
-                    onPicked(faction);
-            }
-
-            _dialogService.ShowIgnoringDisconnect(player, factionDialog, OnFactionChosen);
-        }
-
-        private List<Faction> GetFactions()
-        {
-            return _entityManager.GetComponents<Faction>()
-                .OrderBy(faction => faction.GetName(), StringComparer.OrdinalIgnoreCase)
-                .ToList();
+            _factionDialogService.OpenFactionPicker(player, "Government", "None, use the parent's government", SetGovernment, onBack);
         }
     }
 }

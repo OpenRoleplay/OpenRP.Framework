@@ -2,6 +2,7 @@ using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.AccountSettingsFeature.Components;
 using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Features.Players.Extensions;
+using OpenRP.Framework.Shared.Chat.Entities;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.Chat.Helpers;
@@ -22,10 +23,26 @@ namespace OpenRP.Framework.Shared.Chat.Services
     {
         private IEntityManager _entityManager;
         private IServerEventAggregator _serverEventAggregator;
-        public ChatService(IEntityManager entityManager, IServerEventAggregator serverEventAggregator)
+        private readonly List<IChatSpeechLabelProvider> _speechLabelProviders;
+        public ChatService(IEntityManager entityManager, IServerEventAggregator serverEventAggregator, IEnumerable<IChatSpeechLabelProvider> speechLabelProviders)
         {
             _entityManager = entityManager;
             _serverEventAggregator = serverEventAggregator;
+            _speechLabelProviders = speechLabelProviders.ToList();
+        }
+
+        /// <summary>
+        /// What the player talks into, for example "phone" during a call, from the first provider that knows; null for
+        /// plain speech.
+        /// </summary>
+        private string? GetSpeechLabel(Player player)
+        {
+            return _speechLabelProviders.Select(provider => provider.GetSpeechLabel(player)).FirstOrDefault(label => !String.IsNullOrEmpty(label));
+        }
+
+        private static string FormatSpeechLabel(string? label)
+        {
+            return String.IsNullOrEmpty(label) ? "" : $" ({label})";
         }
 
         public void SendInfoMessage(PlayerInfoMessageType type, string text)
@@ -100,10 +117,15 @@ namespace OpenRP.Framework.Shared.Chat.Services
 
         public void SendTalkMessage(string name, Vector3 position, string text, string accent = null, int virtualWorld = 0)
         {
+            SendTalkLines(name, position, text, accent, virtualWorld, null);
+        }
+
+        private void SendTalkLines(string name, Vector3 position, string text, string? accent, int virtualWorld, string? via)
+        {
             foreach (Player listener in GetTalkListeners(position, virtualWorld))
             {
                 string heardText = GetTalkTextForDistance(text, listener.GetDistanceFromPoint(position));
-                listener.SendClientMessage(TalkColor, FormatTalkMessage(name, accent, heardText));
+                listener.SendClientMessage(TalkColor, FormatTalkMessage(name, accent, heardText, via));
             }
         }
 
@@ -121,13 +143,18 @@ namespace OpenRP.Framework.Shared.Chat.Services
             return distance >= TalkClearRange ? text.Muffle(distance, 3, 5) : text;
         }
 
-        private static string FormatTalkMessage(string name, string accent, string text)
+        private static string FormatTalkMessage(string name, string? accent, string text, string? via = null)
         {
             string accentPart = String.IsNullOrEmpty(accent) ? "" : $"[{accent} accent] ";
-            return $"{name} {accentPart}says: {text}";
+            return $"{name} {accentPart}says{FormatSpeechLabel(via)}: {text}";
         }
 
         public void SendTalkMessage(Player player, string text)
+        {
+            SendTalkMessage(player, text, null);
+        }
+
+        public void SendTalkMessage(Player player, string text, string? via)
         {
             Character character = player.GetPlayerCurrentlyPlayingAsCharacter();
 
@@ -137,7 +164,7 @@ namespace OpenRP.Framework.Shared.Chat.Services
                 string accent = character.GetAccent();
                 Vector3 position = player.Position;
 
-                SendTalkMessage(name, position, text, accent, player.VirtualWorld);
+                SendTalkLines(name, position, text, accent, player.VirtualWorld, via ?? GetSpeechLabel(player));
                 PublishChatMessageSent(player, character, PlayerChatMessageType.TALK, text, TalkRange);
             }
             else
@@ -211,13 +238,13 @@ namespace OpenRP.Framework.Shared.Chat.Services
                         SendTalkMessage(player, text);
                         break;
                     case PlayerChatMessageType.LOW:
-                        string CHAT_ACTION_LOW = String.Format("{0} says quietly: {1}", character.GetName(), text);
+                        string CHAT_ACTION_LOW = String.Format("{0} says quietly{1}: {2}", character.GetName(), FormatSpeechLabel(GetSpeechLabel(player)), text);
 
                         SendClientRangedMessage(player, Color.LightSlateGray, LowRange, CHAT_ACTION_LOW);
                         PublishChatMessageSent(player, character, type, text, LowRange);
                         break;
                     case PlayerChatMessageType.SHOUT:
-                        string CHAT_ACTION_SHOUT = String.Format("{0} shouts: {1}", character.GetName(), text);
+                        string CHAT_ACTION_SHOUT = String.Format("{0} shouts{1}: {2}", character.GetName(), FormatSpeechLabel(GetSpeechLabel(player)), text);
 
                         SendClientRangedMessage(player, Color.Orange, ShoutRange, CHAT_ACTION_SHOUT);
                         PublishChatMessageSent(player, character, type, text, ShoutRange);

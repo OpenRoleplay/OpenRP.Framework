@@ -21,6 +21,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
         private const string SkinKey = "SKIN";
         private const string VehicleIdKey = "VEHICLE_ID";
         private const string PhoneIdKey = "PHONE_ID";
+        private const string RadioIdKey = "RADIO_ID";
 
         private readonly InventoryItemModel _inventoryItemModel;
         private bool _hasChanges;
@@ -107,8 +108,16 @@ namespace OpenRP.Framework.Features.Inventories.Components
             return _inventoryItemModel.UsesRemaining.HasValue && _inventoryItemModel.UsesRemaining.Value > 0;
         }
 
+        /// <summary>
+        /// Uses the item once. Only items with a use limit count down and disappear at zero; a phone or radio isn't used up.
+        /// </summary>
         public void Use()
         {
+            if (!HasMaxUses())
+            {
+                return;
+            }
+
             _inventoryItemModel.UsesRemaining--;
 
             if( _inventoryItemModel.UsesRemaining > 0)
@@ -204,6 +213,18 @@ namespace OpenRP.Framework.Features.Inventories.Components
                 return null;
             }
             return GetAdditionalData().GetUlong(PhoneIdKey);
+        }
+
+        /// <summary>
+        /// The radio this item is, or null when the item isn't a handheld radio.
+        /// </summary>
+        public ulong? GetRadioId()
+        {
+            if (!GetItem().IsItemRadio())
+            {
+                return null;
+            }
+            return GetAdditionalData().GetUlong(RadioIdKey);
         }
 
         /// <summary>

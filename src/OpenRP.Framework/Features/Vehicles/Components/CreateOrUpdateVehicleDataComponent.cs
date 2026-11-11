@@ -13,6 +13,8 @@ namespace OpenRP.Framework.Features.Vehicles.Components
     {
         public VehicleModel CreateOrUpdateVehicleData { get; set; }
         public Vehicle EditedVehicle { get; set; }
+        // For a vehicle that isn't saved yet: install a radio once saving gives it an id.
+        public bool InstallRadioOnSave { get; set; }
 
         public CreateOrUpdateVehicleDataComponent()
         {

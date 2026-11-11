@@ -17,6 +17,7 @@ using OpenRP.Framework.Features.Vehicles.Dialogs;
 using OpenRP.Framework.Database;
 using OpenRP.Framework.Features.Jurisdictions.Services;
 using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
+using OpenRP.Framework.Features.Radios.Services;
 
 namespace OpenRP.Framework.Features.Vehicles.Commands
 {
@@ -27,12 +28,16 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
         private readonly IVehicleManager _vehicleManager;
         private readonly IJurisdictionService _jurisdictionService;
         private readonly IJurisdictionDialogService _jurisdictionDialogService;
+        private readonly IRadioService _radioService;
+        private readonly IRadioEditorService _radioEditorService;
 
         public CreateVehicleCommand(IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager,
-            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService)
+            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, IRadioService radioService, IRadioEditorService radioEditorService)
         {
             _jurisdictionService = jurisdictionService;
             _jurisdictionDialogService = jurisdictionDialogService;
+            _radioService = radioService;
+            _radioEditorService = radioEditorService;
             _dialogService = dialogService;
             _entityManager = entityManager;
             _vehicleManager = vehicleManager;
@@ -67,7 +72,7 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
                 };
 
                 // Open the vehicle creation dialog
-                CreateOrUpdateVehicleDialog.Open(player, _dialogService, _entityManager, _vehicleManager, _jurisdictionService, _jurisdictionDialogService, dataContext, createOrUpdateVehicleDataComponent);
+                CreateOrUpdateVehicleDialog.Open(player, _dialogService, _entityManager, _vehicleManager, _jurisdictionService, _jurisdictionDialogService, _radioService, _radioEditorService, dataContext, createOrUpdateVehicleDataComponent);
             }
         }
 

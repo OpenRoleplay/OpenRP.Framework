@@ -16,5 +16,7 @@ namespace OpenRP.Framework.Features.Items.Enums
         Misc = 6,
         Fish = 7,
         Phone = 8,
+        Radio = 9,
+        RadioEarpiece = 10,
     }
 }

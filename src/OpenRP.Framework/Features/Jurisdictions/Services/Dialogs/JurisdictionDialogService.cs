@@ -1,5 +1,6 @@
 using OpenRP.Framework.Features.Currencies.Services;
 using OpenRP.Framework.Features.Factions.Services;
+using OpenRP.Framework.Features.Factions.Services.Dialogs;
 using OpenRP.Framework.Features.Jurisdictions.Components;
 using OpenRP.Framework.Shared;
 using OpenRP.Framework.Shared.Dialogs;
@@ -22,21 +23,21 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
         private const string TreeIndentation = "    ";
 
         private readonly IDialogService _dialogService;
-        private readonly IEntityManager _entityManager;
         private readonly IJurisdictionService _jurisdictionService;
         private readonly IJurisdictionEditorService _jurisdictionEditorService;
         private readonly ICurrencyService _currencyService;
         private readonly IFactionService _factionService;
+        private readonly IFactionDialogService _factionDialogService;
 
-        public JurisdictionDialogService(IDialogService dialogService, IEntityManager entityManager, IJurisdictionService jurisdictionService,
-            IJurisdictionEditorService jurisdictionEditorService, ICurrencyService currencyService, IFactionService factionService)
+        public JurisdictionDialogService(IDialogService dialogService, IJurisdictionService jurisdictionService,
+            IJurisdictionEditorService jurisdictionEditorService, ICurrencyService currencyService, IFactionService factionService, IFactionDialogService factionDialogService)
         {
             _dialogService = dialogService;
-            _entityManager = entityManager;
             _jurisdictionService = jurisdictionService;
             _jurisdictionEditorService = jurisdictionEditorService;
             _currencyService = currencyService;
             _factionService = factionService;
+            _factionDialogService = factionDialogService;
         }
 
         /// <summary>

@@ -10,8 +10,8 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Extensions
     public static partial class ServiceCollectionExtensions
     {
         /// <summary>
-        /// 911 with an AI dispatcher that relays calls to everyone with dispatch.receive. Without an API key, callers
-        /// fill in a short form instead.
+        /// 911 with an AI dispatcher that relays calls over the dispatch radio frequency (911 by default). Without an
+        /// API key, callers fill in a short form instead.
         /// </summary>
         public static IServiceCollection AddEmergencyCalls(this IServiceCollection services, Action<EmergencyCallOptions> configureOptions)
         {
@@ -21,7 +21,9 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Extensions
                 .AddSingleton<IEmergencyDispatcherAi, EmergencyDispatcherAi>()
                 .AddSingleton<IDispatchService, DispatchService>()
                 .AddSingleton<IEmergencyCallDialogService, EmergencyCallDialogService>()
-                .AddServerPhoneNumber<EmergencyNumber>();
+                // One instance: the phone network reaches it as a server number, the reply timer as itself.
+                .AddSingleton<EmergencyNumber>()
+                .AddServerPhoneNumber(provider => provider.GetRequiredService<EmergencyNumber>());
         }
     }
 }

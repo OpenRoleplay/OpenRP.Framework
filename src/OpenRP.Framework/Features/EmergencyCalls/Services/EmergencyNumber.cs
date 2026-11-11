@@ -6,6 +6,7 @@ using OpenRP.Framework.Features.EmergencyCalls.Services.Dialogs;
 using OpenRP.Framework.Features.Phones.Entities;
 using OpenRP.Framework.Features.Phones.Helpers;
 using OpenRP.Framework.Features.Players.Extensions;
+using OpenRP.Framework.Shared.AI.Helpers;
 using OpenRP.Framework.Shared.Locations.Helpers;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
@@ -80,10 +81,21 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Services
                 return;
             }
 
+            // The reply waits until the caller pauses, so a follow-up line gets the same answer (ReplyToQuietCallers).
             call.AddCallerLine(text);
-            if (!call.IsReplying())
+        }
+
+        /// <summary>
+        /// Starts a reply on every call whose caller said something new and then paused. Called twice a second.
+        /// </summary>
+        public void ReplyToQuietCallers()
+        {
+            foreach (EmergencyCall call in _entityManager.GetComponents<EmergencyCall>())
             {
-                _ = ReplyAsync(line, call);
+                if (call.GetLine().IsActive() && call.IsWaitingForReply(AiReplyTiming.QuietTimeBeforeReply))
+                {
+                    _ = ReplyAsync(call.GetLine(), call);
+                }
             }
         }
 
@@ -97,7 +109,7 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Services
             string callerName = caller.GetPlayerCurrentlyPlayingAsCharacter().GetName();
             string callerNumber = PhoneNumbers.Format(line.GetCallerNumber());
             string area = ZoneNames.GetZoneName(caller.Position);
-            return _entityManager.AddComponent<EmergencyCall>(line.GetCallId(), new object[] { callerName, callerNumber, area });
+            return _entityManager.AddComponent<EmergencyCall>(line.GetCallId(), new object[] { callerName, callerNumber, area, line });
         }
 
         private EmergencyCall? GetEmergencyCall(IServerPhoneLine line)
@@ -106,35 +118,32 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Services
         }
 
         /// <summary>
-        /// Replies until the caller has said nothing new since the last reply. Lines said during a reply get the next
-        /// one. The call can end during any await, so it's checked again after each.
+        /// Answers everything the caller said so far. Lines said while it's written wait for the next pause. The call
+        /// can end during the await, so it's checked again after it.
         /// </summary>
         private async Task ReplyAsync(IServerPhoneLine line, EmergencyCall call)
         {
-            while (call.IsComponentAlive && line.IsActive() && call.HasUnansweredLines())
+            if (call.GetReplyCount() >= MaxReplies)
             {
-                if (call.GetReplyCount() >= MaxReplies)
-                {
-                    EndLongCall(line, call);
-                    return;
-                }
-
-                call.BeginReply();
-                EmergencyDispatcherReply? reply = await TryGenerateReplyAsync(call);
-                if (!call.IsComponentAlive || !line.IsActive())
-                {
-                    return;
-                }
-                call.EndReply();
-
-                if (reply == null)
-                {
-                    Say(line, call, "Sorry, you're breaking up. Please call again.");
-                    line.HangUp();
-                    return;
-                }
-                ApplyReply(line, call, reply);
+                EndLongCall(line, call);
+                return;
             }
+
+            call.BeginReply();
+            EmergencyDispatcherReply? reply = await TryGenerateReplyAsync(call);
+            if (!call.IsComponentAlive || !line.IsActive())
+            {
+                return;
+            }
+            call.EndReply();
+
+            if (reply == null)
+            {
+                Say(line, call, "Sorry, you're breaking up. Please call again.");
+                line.HangUp();
+                return;
+            }
+            ApplyReply(line, call, reply);
         }
 
         private async Task<EmergencyDispatcherReply?> TryGenerateReplyAsync(EmergencyCall call)

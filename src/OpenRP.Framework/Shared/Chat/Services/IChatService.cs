@@ -15,6 +15,12 @@ namespace OpenRP.Framework.Shared.Chat.Services
         void SendTalkMessage(Player player, string text);
 
         /// <summary>
+        /// Like SendTalkMessage, but says what the character talks into, for example "Name says (radio): text". Without
+        /// a label, the registered IChatSpeechLabelProviders may add one, such as "(phone)" during a call.
+        /// </summary>
+        void SendTalkMessage(Player player, string text, string? via);
+
+        /// <summary>
         /// Sends "* Name text *" to players near the position, like /me.
         /// </summary>
         void SendActionMessage(string name, Vector3 position, int virtualWorld, string text);

@@ -101,6 +101,16 @@ See [Factions](features/factions.md).
 
 See [Phones](features/phones.md).
 
+## Radios
+
+| Table | Columns | Notes |
+|---|---|---|
+| `Radios` (`RadioModel`) | `Frequency`, `IsOn`, `UsesEarpiece`, `VehicleId` → `Vehicles` (cascade, unique) | A handheld (its item points to it) or, with `VehicleId`, a vehicle radio |
+| `RadioFrequencies` (`RadioFrequencyModel`) | `Number` (unique), `Name` (32), `Mode` (Protected, Encrypted) | Only frequencies with their own rules; others follow the defaults |
+| `RadioFrequencyFactions` (`RadioFrequencyFactionModel`) | `RadioFrequencyId` → frequencies (cascade), `FactionId` → factions (cascade) | The factions on a frequency. Unique per frequency + faction |
+
+See [Radios](features/radios.md).
+
 ## Jurisdictions
 
 | Table | Columns | Notes |
@@ -119,14 +129,14 @@ The item types (definitions), not the items players own.
 |---|---|---|
 | `Name` | string(255) | |
 | `Description` | string? | |
-| `UseType` | `ItemType` | Skin, Wallet, Currency, Attachment, VehicleKey, Misc, Fish |
+| `UseType` | `ItemType` | Skin, Wallet, Currency, Attachment, VehicleKey, Misc, Fish, Phone, Radio, RadioEarpiece |
 | `UseValue` | string? | Meaning depends on `UseType`, for example the skin id or currency unit id |
 | `Weight` | uint | Grams per unit |
 | `MaxUses` | uint? | Uses before it's used up |
 | `KeepOnDeath`, `CanDrop`, `CanDestroy`, `Stackable` | bool | |
 | `DropModelId` | int? | Object model shown when dropped |
 
-The Framework seeds 49 items:
+The Framework seeds 51 items:
 - a uniform (skin);
 - a wallet;
 - the bills and coins of the San Andreas Dollar and the Caeroyna Ruble;
@@ -134,7 +144,8 @@ The Framework seeds 49 items:
 - the hotwire tools (rusty paperclip, worn-out screwdriver, roll of electrical tape);
 - a chicken egg;
 - twelve fish species;
-- a mobile phone (item 49, `UseType` Phone). Each phone item points to its row in `Phones` with `[PHONE_ID=x]`.
+- a mobile phone (item 49, `UseType` Phone). Each phone item points to its row in `Phones` with `[PHONE_ID=x]`;
+- a handheld radio (item 50, `UseType` Radio), pointing to its row in `Radios` with `[RADIO_ID=x]`, and a radio earpiece (item 51).
 
 ### `Inventories` (`InventoryModel`)
 `Name`, `MaxWeight` (grams, null = unlimited). Seeded: "World Inventory", which holds items lying on the ground.

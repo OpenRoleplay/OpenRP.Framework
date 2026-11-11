@@ -22,6 +22,7 @@ player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You are not near any 
 |---|---|
 | `SendInfoMessage(type, text)` | Info message to everyone |
 | `SendTalkMessage(player, text)` | The character says something to people nearby |
+| `SendTalkMessage(player, text, via)` | The same, saying what they talk into: `Name says (radio): text` |
 | `SendTalkMessage(name, position, text, accent, virtualWorld)` | Someone (for example an actor) talks at a spot. `virtualWorld` defaults to 0 |
 | `SendPlayerChatMessage(player, type, text)` | A roleplay message (`ME`, `DO`, `LOW`, `SHOUT`, `OOC`, …) |
 | `SendActionMessage(name, position, virtualWorld, text)` | `* Name text *` at a spot, like `/me` (for example from an actor) |
@@ -37,6 +38,8 @@ player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You are not near any 
 | `ChatTypingDelay` | How long to pause after a line, as if it was typed |
 
 **Ranges:** `/me`, `/do` and `/my` reach 20 units, `/low` 3 and `/shout` 30, in the sender's virtual world.
+
+**Speech labels.** Without an explicit `via`, talk, `/low` and `/shout` ask every registered `IChatSpeechLabelProvider` what the player talks into, and show the first answer, for example `Name says (phone): text` during a [phone call](../features/phones.md). A feature registers one with `services.AddChatSpeechLabelProvider<T>()`.
 
 **Nearby chat is an event.** Every nearby in-character message from a player (talk, `/me`, `/do`, `/my`, `/low`, `/shout`) also publishes [`OnPlayerChatMessageSent`](../server-events.md#onplayerchatmessagesent), with where it was sent and how far it reached. [AI actors](../features/actor-roleplay.md) use it to hear players.
 

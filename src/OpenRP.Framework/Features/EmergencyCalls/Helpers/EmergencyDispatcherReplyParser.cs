@@ -13,11 +13,13 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Helpers
     {
         private const string SayPrefix = "SAY:";
         private const string DispatchPrefix = "DISPATCH:";
-        private const string HangUpLine = "HANGUP";
+        // A command that starts after other text on the same line, possibly in brackets or bold. Uppercase only, so
+        // speech like "say" or "hang up" isn't split.
+        private static readonly Regex CommandAfterText = new Regex(@"(?<=\S)[ \t]+(?=[\[\(\*]*(SAY:|DISPATCH:|HANG ?UP\b))", RegexOptions.Compiled);
 
-        // A command that starts after other text on the same line. Uppercase only, so speech like "say" or "hang up"
-        // isn't split.
-        private static readonly Regex CommandAfterText = new Regex(@"(?<=\S)[ \t]+(?=(SAY:|DISPATCH:|HANGUP\b))", RegexOptions.Compiled);
+        // A line that is only a hang-up, in any case, also when the model decorates it: "HANGUP.", "[HANGUP]",
+        // "**Hang up**".
+        private static readonly Regex HangUpLine = new Regex(@"^[\W_]*HANG\s*UP[\W_]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static EmergencyDispatcherReply Parse(string replyText)
         {
@@ -48,7 +50,7 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Helpers
             {
                 ReadDispatch(reply, line[DispatchPrefix.Length..].Trim());
             }
-            else if (line.Equals(HangUpLine, StringComparison.OrdinalIgnoreCase))
+            else if (HangUpLine.IsMatch(line))
             {
                 reply.HangsUp = true;
             }

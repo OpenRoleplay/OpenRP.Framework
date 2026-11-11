@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Accounts.Services;
+using OpenRP.Framework.Shared.Chat.Entities;
 using OpenRP.Framework.Shared.Chat.Services;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,15 @@ namespace OpenRP.Framework.Shared.Chat.Extensions
         {
             return self
                 .AddSingleton<IChatService, ChatService>();
+        }
+
+        /// <summary>
+        /// Adds a provider that labels what a player talks into, for example "(phone)" during a call.
+        /// </summary>
+        public static IServiceCollection AddChatSpeechLabelProvider<TProvider>(this IServiceCollection self)
+            where TProvider : class, IChatSpeechLabelProvider
+        {
+            return self.AddSingleton<IChatSpeechLabelProvider, TProvider>();
         }
     }
 }

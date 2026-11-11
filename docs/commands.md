@@ -46,6 +46,14 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 |---|---|---|---|
 | `/givephone [player]` | Admin | Give a player a new mobile phone with its own number. | [Phones](features/phones.md) |
 
+## Admin > Radio
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/giveradio [player]` | Admin | Give a player a new handheld radio. | [Radios](features/radios.md) |
+| `/giveearpiece [player]` | Admin | Give a player a radio earpiece, so they can keep their radio traffic to themselves. | [Radios](features/radios.md) |
+| `/editfrequencies` | Admin | Create protected and encrypted radio frequencies and choose the factions on them. | [Radios](features/radios.md) |
+
 ## Admin > Properties
 
 | Command | Groups | Description | Feature |
@@ -147,6 +155,14 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 | `/sms [number] [message]` | Default | Send a text message. | [Phones](features/phones.md) |
 | `/answer`, `/p` | Default | Answer the call ringing on your phone. | [Phones](features/phones.md) |
 | `/hangup`, `/h` | Default | End your call, or decline the call ringing on your phone. | [Phones](features/phones.md) |
+
+## Radio
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/radio` | Default | Use your radio, or the one in your vehicle: power, frequency and earpiece. | [Radios](features/radios.md) |
+| `/r [message]` | Default | Talk over your radio, for example /r Unit 12 en route. | [Radios](features/radios.md) |
+| `/freq [frequency]` | Default | Tune your radio, or the one in your vehicle, for example /freq 1500. | [Radios](features/radios.md) |
 
 ## Properties
 

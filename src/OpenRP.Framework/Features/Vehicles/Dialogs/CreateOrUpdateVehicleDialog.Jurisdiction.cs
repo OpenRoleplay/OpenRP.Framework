@@ -2,6 +2,7 @@ using OpenRP.Framework.Database;
 using OpenRP.Framework.Features.Jurisdictions.Components;
 using OpenRP.Framework.Features.Jurisdictions.Services;
 using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
+using OpenRP.Framework.Features.Radios.Services;
 using OpenRP.Framework.Features.Vehicles.Components;
 using OpenRP.Framework.Features.Vehicles.Services;
 using SampSharp.Entities;
@@ -15,11 +16,11 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
     public partial class CreateOrUpdateVehicleDialog
     {
         private static void OpenRegisteredIn(Player player, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager,
-            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, BaseDataContext context, CreateOrUpdateVehicleDataComponent component)
+            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, IRadioService radioService, IRadioEditorService radioEditorService, BaseDataContext context, CreateOrUpdateVehicleDataComponent component)
         {
             void ReopenEditor()
             {
-                Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, context, component);
+                Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, component);
             }
 
             void SetRegisteredIn(Jurisdiction? jurisdiction)

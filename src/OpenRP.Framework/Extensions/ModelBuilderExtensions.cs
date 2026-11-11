@@ -16,6 +16,7 @@ using OpenRP.Framework.Features.Jurisdictions.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.DefaultData;
 using OpenRP.Framework.Features.Phones.Models.Configurations;
+using OpenRP.Framework.Features.Radios.Models.Configurations;
 using OpenRP.Framework.Features.Properties.Models.Configurations;
 using OpenRP.Framework.Features.Vehicles.Models.Configurations;
 using System;
@@ -71,6 +72,10 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new PhoneContactModelConfiguration());
             modelBuilder.ApplyConfiguration(new PhoneMessageModelConfiguration());
             modelBuilder.ApplyConfiguration(new PhoneCallLogModelConfiguration());
+
+            modelBuilder.ApplyConfiguration(new RadioModelConfiguration());
+            modelBuilder.ApplyConfiguration(new RadioFrequencyModelConfiguration());
+            modelBuilder.ApplyConfiguration(new RadioFrequencyFactionModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new PropertyModelConfiguration());
             modelBuilder.ApplyConfiguration(new PropertyDoorModelConfiguration());

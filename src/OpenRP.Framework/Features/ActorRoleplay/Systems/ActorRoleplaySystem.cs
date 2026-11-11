@@ -5,7 +5,7 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Systems
 {
     public class ActorRoleplaySystem : ISystem
     {
-        // Replies wait for a 2 second pause, so checking twice a second is precise enough.
+        // Replies wait for a pause of a few seconds (AiReplyTiming), so checking twice a second is precise enough.
         private const int ReplyCheckIntervalInMilliseconds = 500;
         private const int ForgetCheckIntervalInMilliseconds = 60000;
 

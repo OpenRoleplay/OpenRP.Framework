@@ -49,6 +49,8 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Services
             ChatMessageContent reply = await _chatCompletionService.GetChatMessageContentAsync(CreateChatHistory(call),
                 OpenAiChatCompletion.CreateExecutionSettings(_options.ReasoningEffort, $"call:{call.Entity}"));
             OpenAiChatCompletion.LogUsage(_logger, UsageFeatureName, reply);
+            // The raw reply shows what the parser had to work with, for example a HANGUP it didn't recognise.
+            _logger.LogDebug("911 dispatcher reply for {CallId}: {Reply}", call.Entity, reply.Content);
             return EmergencyDispatcherReplyParser.Parse(reply.Content ?? string.Empty);
         }
 

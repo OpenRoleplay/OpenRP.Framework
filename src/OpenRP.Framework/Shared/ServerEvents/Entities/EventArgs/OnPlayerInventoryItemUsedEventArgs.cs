@@ -1,16 +1,15 @@
-﻿using OpenRP.Framework.Database.Models;
+﻿using OpenRP.Framework.Features.Inventories.Components;
 using SampSharp.Entities.SAMP;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs
 {
+    /// <summary>
+    /// A player chose "Use" on an item in an inventory. Features react to their own item types, for example a radio
+    /// opens its menu. An item with a use limit may already be used up and deleted.
+    /// </summary>
     public class OnPlayerInventoryItemUsedEventArgs : ServerEventArgs
     {
-        public Player? Player { get; set; }
-        public InventoryItemModel? InventoryItem { get; set; }
+        public required Player Player { get; init; }
+        public required InventoryItem InventoryItem { get; init; }
     }
 }

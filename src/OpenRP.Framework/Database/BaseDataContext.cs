@@ -49,6 +49,9 @@ namespace OpenRP.Framework.Database
         public DbSet<PhoneContactModel> PhoneContacts { get; set; }
         public DbSet<PhoneMessageModel> PhoneMessages { get; set; }
         public DbSet<PhoneCallLogModel> PhoneCallLogs { get; set; }
+        public DbSet<RadioModel> Radios { get; set; }
+        public DbSet<RadioFrequencyModel> RadioFrequencies { get; set; }
+        public DbSet<RadioFrequencyFactionModel> RadioFrequencyFactions { get; set; }
 
         // Parameterless Constructor
         public BaseDataContext() : base() { }

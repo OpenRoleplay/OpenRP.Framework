@@ -1,57 +1,41 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OpenRP.Framework.Features.EmergencyCalls.Entities;
 using OpenRP.Framework.Features.EmergencyCalls.Enums;
-using OpenRP.Framework.Features.Permissions.Components;
-using OpenRP.Framework.Features.Players.Extensions;
-using OpenRP.Framework.Shared.Chat.Enums;
-using OpenRP.Framework.Shared.Chat.Helpers;
-using OpenRP.Framework.Shared.Chat.Services;
-using SampSharp.Entities;
-using SampSharp.Entities.SAMP;
-using System.Collections.Generic;
-using System.Linq;
+using OpenRP.Framework.Features.Radios.Enums;
+using OpenRP.Framework.Features.Radios.Services;
 
 namespace OpenRP.Framework.Features.EmergencyCalls.Services
 {
     public class DispatchService : IDispatchService
     {
-        private const string RadioDoText = "Their radio crackles as dispatch comes through.";
-        private static readonly Color RadioColor = new Color(130, 200, 160);
+        private const string DispatchFrequencyName = "911 Dispatch";
 
-        private readonly IEntityManager _entityManager;
-        private readonly IChatService _chatService;
+        private readonly IRadioBroadcastService _radioBroadcastService;
+        private readonly IRadioEditorService _radioEditorService;
+        private readonly EmergencyCallOptions _options;
+        private readonly ILogger<DispatchService> _logger;
 
-        public DispatchService(IEntityManager entityManager, IChatService chatService)
+        public DispatchService(IRadioBroadcastService radioBroadcastService, IRadioEditorService radioEditorService, IOptions<EmergencyCallOptions> options,
+            ILogger<DispatchService> logger)
         {
-            _entityManager = entityManager;
-            _chatService = chatService;
+            _radioBroadcastService = radioBroadcastService;
+            _radioEditorService = radioEditorService;
+            _options = options.Value;
+            _logger = logger;
         }
 
         public void Broadcast(EmergencyServiceType service, string text)
         {
-            List<string> radioLines = ChatLineSplitter.Split($"[Radio] Dispatch ({GetServiceName(service)}): {text}");
-            foreach (Player listener in GetListeners())
-            {
-                _chatService.SendPlayerChatMessage(listener, PlayerChatMessageType.DO, RadioDoText);
-                foreach (string radioLine in radioLines)
-                {
-                    listener.SendClientMessage(RadioColor, radioLine);
-                }
-            }
+            _radioBroadcastService.TransmitFromSystem(_options.DispatchFrequency, $"Dispatch ({GetServiceName(service)})", text);
         }
 
-        private IEnumerable<Player> GetListeners()
+        public void CreateDispatchFrequencyIfMissing()
         {
-            return _entityManager.GetComponents<Player>().Where(CanHearDispatch).ToList();
-        }
-
-        private static bool CanHearDispatch(Player player)
-        {
-            if (!player.IsPlayerPlayingAsCharacter())
+            if (_radioEditorService.CreateFrequencyIfNotExists(_options.DispatchFrequency, DispatchFrequencyName, RadioFrequencyMode.Protected) == null)
             {
-                return false;
+                _logger.LogWarning("The dispatch frequency {Frequency} couldn't be created; 911 broadcasts follow its default rules.", _options.DispatchFrequency);
             }
-            CharacterPermissions? permissions = player.GetPlayerCurrentlyPlayingAsCharacter().GetComponent<CharacterPermissions>();
-            return permissions != null && permissions.DoesCharacterHavePermission(DispatchPermissions.Receive);
         }
 
         private static string GetServiceName(EmergencyServiceType service)

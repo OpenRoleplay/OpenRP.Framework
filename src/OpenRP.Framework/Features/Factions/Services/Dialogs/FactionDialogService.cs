@@ -13,7 +13,8 @@ using OpenRP.Framework.Shared.Dialogs.Extensions;
 namespace OpenRP.Framework.Features.Factions.Services.Dialogs
 {
     /// <summary>
-    /// All /faction menus. One file per flow: the menu, members, ranks and invitations.
+    /// All /faction menus. One file per flow: the menu, members, ranks, invitations and the faction picker for admin
+    /// editors.
     /// </summary>
     public partial class FactionDialogService : IFactionDialogService
     {

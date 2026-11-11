@@ -6,14 +6,14 @@
 
 | Command | Groups | Does |
 |---|---|---|
-| `/phone` | Default | The phone menu. See [The phone menus](phones/menus.md) |
+| `/phone` | Default | The phone menu, also opened by "Use" on the phone in your inventory. See [The phone menus](phones/menus.md) |
 | `/call [number]` | Default | Calls a number, for example `/call 382-0142` or `/call 911` |
 | `/sms [number] [message]` | Default | Sends a text |
 | `/answer`, `/p` | Default | Answers the call ringing on your phone |
 | `/hangup`, `/h` | Default | Ends your call, or declines a ringing one |
 | `/givephone [player]` | Admin | Gives the player a new phone, and tells you its number |
 
-**Talking:** in a call, just talk (or `/low`, `/shout`). People near you hear you as usual, and the other side gets it as `(Phone) <name or number>: text`.
+**Talking:** in a call, just talk (or `/low`, `/shout`). People near you see `Name says (phone): text`, so they know you're on the phone, and the other side gets it as `(Phone) <name or number>: text`.
 
 ## How it works
 
@@ -56,7 +56,7 @@
 
 - **Same server only:** calls only connect to a phone carried on the same server. Texts reach phones on other servers within a minute.
 - **Dropped phones** don't ring. Their calls become missed calls.
-- **No payphones, battery, call costs or radio yet.**
+- **No payphones, battery or call costs yet.** For radios, see [Radios](radios.md).
 
 ## Deep dive
 
@@ -74,6 +74,7 @@
 - **Events:**
   - **Handled:** [`OnPlayerChatMessageSent`](../server-events.md) (speech in a call) and [`OnCharacterSelected`](../server-events.md) (the news on login).
   - **Published:** [`OnPhoneRinging`](../server-events.md#onphoneringing), which opens the answer dialog.
+- **The "(phone)" label:** `PhoneSpeechLabelProvider`, an [`IChatSpeechLabelProvider`](../shared/chat.md), returns "phone" while the player is in a connected call.
 - **Server numbers:** a number below 1000 is an `IServerPhoneNumber`, registered with `AddServerPhoneNumber<T>()`.
   - **What it gets:** an `IServerPhoneLine` for each call, to talk back and hang up.
   - **Example:** [911](emergency-calls.md). A gamemode can add its own, such as a taxi company.

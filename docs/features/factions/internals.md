@@ -11,7 +11,7 @@ If you can open several factions, `/faction` first asks which. Then, depending o
 - **Sub-factions** and their permissions.
 - **Leave,** or choose your active faction.
 
-The code is in `Services/Dialogs/FactionDialogService.*.cs`, one file per flow: Menu, Members, Ranks, Invites and Permissions.
+The code is in `Services/Dialogs/FactionDialogService.*.cs`, one file per flow: Menu, Members, Ranks, Invites, Permissions and Pickers.
 
 ## Components
 
@@ -36,7 +36,7 @@ All five are loaded by [BaseManagers](../../persistence/base-manager.md) and syn
 | `IFactionMembershipService` | Members, leaders, invitations, active faction, granting |
 | `IFactionPermissionService` | What factions and ranks have. Also an `ICharacterPermissionSource` |
 | `IFactionChatService` | `/fooc` |
-| `IFactionDialogService` | The menus |
+| `IFactionDialogService` | The menus, and `OpenFactionPicker` for other features' admin editors (jurisdictions, radio frequencies) |
 | 5 managers | Persistence, with `CreateAndLoad` |
 
 Methods that can fail return an error message, or null.

@@ -29,9 +29,10 @@ public void OnCharacterSelected(OnCharacterSelectedEventArgs args, ISkillService
 | <a id="onjurisdictionplatetagchanged"></a>`OnJurisdictionPlateTagChanged` | a jurisdiction's tags changed, or it moved to another country | [Jurisdictions](features/jurisdictions.md) | [Vehicles](features/vehicles.md) (set plates again) |
 | <a id="onjurisdictiongovernmentchanged"></a>`OnJurisdictionGovernmentChanged` | a jurisdiction got another government of its own (old and new faction id, null = none) | [Jurisdictions](features/jurisdictions.md) | nothing yet: for police, laws and taxes later |
 | <a id="onjurisdictiondeleted"></a>`OnJurisdictionDeleted` | an admin deleted a jurisdiction | [Jurisdictions](features/jurisdictions.md) | [Properties](features/properties.md) and [Vehicles](features/vehicles.md) (have no jurisdiction) |
+| <a id="onradiosloaded"></a>`OnRadiosLoaded` | the radios and frequencies were loaded at startup | [Radios](features/radios.md) | [911](features/emergency-calls.md) (creates the dispatch frequency) |
 | <a id="onphoneringing"></a>`OnPhoneRinging` | a call started ringing on a phone someone carries | [Phones](features/phones.md) | Phones (opens the Answer or Decline dialog) |
-| <a id="onplayerchatmessagesent"></a>`OnPlayerChatMessageSent` | a character's nearby chat was sent: /me, /do, /my, /say, /low or /shout | [Chat](shared/chat.md) | [ActorRoleplay](features/actor-roleplay.md) (actors hear it) |
-| `OnPlayerInventoryItemUsed` | (unused) | nobody | nobody |
+| <a id="onplayerchatmessagesent"></a>`OnPlayerChatMessageSent` | a character's nearby chat was sent: /me, /do, /my, /say, /low or /shout | [Chat](shared/chat.md) | [ActorRoleplay](features/actor-roleplay.md) (actors hear it), [Phones](features/phones.md) (speech in a call) |
+| <a id="onplayerinventoryitemused"></a>`OnPlayerInventoryItemUsed` | a player chose "Use" on an item in an inventory | [Inventories](features/inventories.md) | [Phones](features/phones.md) and [Radios](features/radios.md) (open the menu) |
 
 The event args live in `Shared/ServerEvents/Entities/EventArgs/`. Their properties are mostly `Player`, plus what the event is about (`Account`, `Character`, `CurrencyId`, `FactionId` + `CharacterIds`, `ResourceName`, or the chat `Type`, `Text`, `Position` and `Range`).
 

@@ -26,7 +26,7 @@ services.AddActorRoleplay(options =>
 ## How it works
 
 1. **Hearing.** Every `/me`, `/do` and `/say` publishes [`OnPlayerChatMessageSent`](../server-events.md). AI actors within the message's range (20 m for `/me` and `/do`, 7 m for `/say`) in the same virtual world remember the line as it appeared in chat.
-2. **Waiting.** The actor waits until it has heard nothing for 2 seconds, so a `/me` and a `/say` right after each other get one reply.
+2. **Waiting.** The actor waits until it has heard nothing for 5 seconds, so a `/me` and a `/say` right after each other get one reply. SA-MP doesn't tell the server when someone is typing, so this pause is what gives players time for a follow-up line. The 911 dispatcher waits the same way (`Shared/AI/Helpers/AiReplyTiming`).
 3. **Replying.**
    - The model gets the shared roleplay rules, the actor's prompt, and up to 40 lines it heard and said. Past 40, the oldest 20 go in one go.
    - Its reply is split into `/me`, `/do` and `/say` lines and sent from the actor's position, with a short typing pause between lines.

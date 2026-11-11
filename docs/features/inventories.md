@@ -14,7 +14,7 @@ Picking an item offers, depending on the item:
 - **Open:** for a wallet.
 - **Set As Default:** for wallets.
 - **Wear.**
-- **Use.**
+- **Use:** for any other item. It only uses up an item with a use limit (such as the hotwire tools); other items stay. It publishes [`OnPlayerInventoryItemUsed`](../server-events.md), so a phone or radio opens its menu.
 - **Edit.**
 - **Description.**
 - **Destroy.**
@@ -29,7 +29,6 @@ Picking an item offers, depending on the item:
 ## Known limitations
 
 - **Too much in one class.** `Inventory` mixes state with logic, and is being trimmed when touched.
-- **Unused event.** `OnPlayerInventoryItemUsed` is never published.
 
 ## Deep dive
 

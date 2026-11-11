@@ -17,5 +17,11 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Entities
         /// "none" skips thinking, which is billed as output, the expensive part.
         /// </summary>
         public string? ReasoningEffort { get; set; } = "none";
+
+        /// <summary>
+        /// The radio frequency dispatch broadcasts on, for police, fire and EMS alike. It's created at startup as a
+        /// protected frequency with no factions: anyone with a radio listens, and admins add the factions that may talk.
+        /// </summary>
+        public uint DispatchFrequency { get; set; } = 911;
     }
 }

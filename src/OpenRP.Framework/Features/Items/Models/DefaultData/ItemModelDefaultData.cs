@@ -662,6 +662,34 @@ namespace OpenRP.Framework.Features.Items.Models.DefaultData
                     KeepOnDeath = true,
                     Stackable = false,
                     DropModelId = 330
+                },
+                new ItemModel
+                {
+                    Id = 50,
+                    Name = "Handheld Radio",
+                    Description = "A heavy two-way radio with a rubber antenna and a belt clip. Tune it to a frequency to listen in and talk. Without an earpiece, everyone around you hears it too.",
+                    UseType = ItemType.Radio,
+                    UseValue = "",
+                    Weight = 700,
+                    CanDrop = true,
+                    CanDestroy = false,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 19942
+                },
+                new ItemModel
+                {
+                    Id = 51,
+                    Name = "Radio Earpiece",
+                    Description = "A coiled earpiece for a handheld radio. While you carry it, you can keep radio traffic to yourself.",
+                    UseType = ItemType.RadioEarpiece,
+                    UseValue = "",
+                    Weight = 50,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 19421
                 }
             );
         }

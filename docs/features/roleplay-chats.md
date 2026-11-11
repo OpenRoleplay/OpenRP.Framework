@@ -9,6 +9,7 @@ The chat commands: speech and actions in character (IC), and out-of-character (O
 | plain text, `/say`, `/talk` | `Name says: text` (+ `[accent]`) | 7 units, muffled from 5 |
 | `/low`, `/l` | `Name says quietly: text` | 3 units |
 | `/shout`, `/s` | `Name shouts: text` | 30 units |
+| `/r` | `Name says (radio): text`, and the text goes over your [radio](radios.md) | 7 units, muffled from 5 |
 | `/me` | `* Name text *` | 20 units |
 | `/ame` | `* Name text *` above your head | 20 units |
 | `/do` | `text (( Name ))` | 20 units |
@@ -19,6 +20,8 @@ The chat commands: speech and actions in character (IC), and out-of-character (O
 | `/accent <accent>` | sets your accent; empty removes it | |
 
 All are in the Default group. Players turn OOC and newbie chat off in [`/settings`](account-settings.md).
+
+**In a phone call,** talk, `/low` and `/shout` show what you talk into: `Name says (phone): text`, `Name says quietly (phone): text`, `Name shouts (phone): text`.
 
 ## Known limitations
 

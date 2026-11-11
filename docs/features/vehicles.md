@@ -23,7 +23,7 @@ Without a key: [Hotwire](hotwire.md). Temporary vehicles: `/sv` ([Admins](admins
    - its saved state.
 2. **Keys.** The engine needs a **vehicle key** item for this vehicle in your inventory. It starts about a second after you turn the key, if you're still in the driver's seat.
 3. **Spawned or saved.** Vehicles without saved data are temporary, spawned ones.
-4. **The vehicle editor** (`/createvehicle`, `/editvehicle`) edits every setting and saves at once. "Registered in" picks the vehicle's jurisdiction.
+4. **The vehicle editor** (`/createvehicle`, `/editvehicle`) edits every setting and saves at once. "Registered in" picks the vehicle's jurisdiction. A vehicle that spawns as a random model of a spawn type shows its model as "Random (spawn type #id)". "Radio" installs or removes a [radio](radios.md); a new vehicle gets it when it's saved.
 5. **Plates follow jurisdictions.** When a jurisdiction's tags change, it moves to another country, or it's deleted, the plates of loaded vehicles are set again.
 
 **Why no key for `/park`:** you don't need a key to park a car in real life.
@@ -46,7 +46,7 @@ Without a key: [Hotwire](hotwire.md). Temporary vehicles: `/sv` ([Admins](admins
   - `IVehicleKeyService.HasVehicleKey`;
   - `IVehicleEngineService`: starting and stopping the engine. It's transient, because it saves through `BaseDataContext`.
 - **Plates:** `VehicleHelper.GenerateCarPlate(id, tag)`, with the tag from `IJurisdictionService.GetPlateTag`.
-- **The editor's "Registered in" row** is in its own partial file, `CreateOrUpdateVehicleDialog.Jurisdiction.cs`.
+- **The editor's "Registered in" and "Radio" rows** are in their own partial files, `CreateOrUpdateVehicleDialog.Jurisdiction.cs` and `CreateOrUpdateVehicleDialog.Radio.cs`.
 - **Events:** `VehicleServerSystem` handles `OnJurisdictionsLoaded`, `OnJurisdictionPlateTagChanged` and `OnJurisdictionDeleted`.
 - **Tables:** [`Vehicles` and the model tables](../database.md#vehicles-vehiclemodel).
 

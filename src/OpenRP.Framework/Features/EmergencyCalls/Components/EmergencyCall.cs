@@ -1,5 +1,7 @@
 using OpenRP.Framework.Features.EmergencyCalls.Entities;
+using OpenRP.Framework.Features.Phones.Entities;
 using SampSharp.Entities;
+using System;
 using System.Collections.Generic;
 
 namespace OpenRP.Framework.Features.EmergencyCalls.Components
@@ -13,16 +15,27 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Components
         private readonly string _callerName;
         private readonly string _callerNumber;
         private readonly string _area;
+        private readonly IServerPhoneLine _line;
+        private DateTime _lastCallerLineAt;
         private int _replyCount;
         private int _dispatchCount;
         private bool _isReplying;
         private bool _hasUnansweredLines;
 
-        public EmergencyCall(string callerName, string callerNumber, string area)
+        public EmergencyCall(string callerName, string callerNumber, string area, IServerPhoneLine line)
         {
             _callerName = callerName;
             _callerNumber = callerNumber;
             _area = area;
+            _line = line;
+        }
+
+        /// <summary>
+        /// The phone line of this call, to talk to the caller and hang up. It stops working once the call ended.
+        /// </summary>
+        public IServerPhoneLine GetLine()
+        {
+            return _line;
         }
 
         /// <summary>
@@ -58,6 +71,20 @@ namespace OpenRP.Framework.Features.EmergencyCalls.Components
         {
             _lines.Add(new EmergencyCallLine(false, text));
             _hasUnansweredLines = true;
+            _lastCallerLineAt = DateTime.UtcNow;
+        }
+
+        public bool IsCallerQuietFor(TimeSpan timeSpan)
+        {
+            return DateTime.UtcNow - _lastCallerLineAt >= timeSpan;
+        }
+
+        /// <summary>
+        /// Whether the caller said something new and then paused long enough, while no reply is being written.
+        /// </summary>
+        public bool IsWaitingForReply(TimeSpan quietTime)
+        {
+            return _hasUnansweredLines && !_isReplying && IsCallerQuietFor(quietTime);
         }
 
         public void AddDispatcherLine(string text)

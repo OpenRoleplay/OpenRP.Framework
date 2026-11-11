@@ -1,18 +1,24 @@
-using OpenRP.Framework.Features.EmergencyCalls.Entities;
-using OpenRP.Framework.Features.Permissions.Services;
+using OpenRP.Framework.Features.EmergencyCalls.Services;
 using SampSharp.Entities;
+using System.Collections.Generic;
 
 namespace OpenRP.Framework.Features.EmergencyCalls.Systems
 {
     public class EmergencyCallSystem : ISystem
     {
+        // Replies wait for a pause of a few seconds (AiReplyTiming), so checking twice a second is precise enough.
+        private const int ReplyCheckIntervalInMilliseconds = 500;
+
         /// <summary>
-        /// Creates dispatch.receive, so admins can grant it to a faction with /factionpermission.
+        /// Takes all 911 numbers, so this does nothing on a server without AddEmergencyCalls.
         /// </summary>
-        [Event]
-        public void OnGameModeInit(IPermissionService permissionService)
+        [Timer(ReplyCheckIntervalInMilliseconds)]
+        public void ReplyToQuietCallers(IEnumerable<EmergencyNumber> emergencyNumbers)
         {
-            permissionService.CreatePermissionIfNotExists(DispatchPermissions.Receive, DispatchPermissions.ReceiveDescription);
+            foreach (EmergencyNumber emergencyNumber in emergencyNumbers)
+            {
+                emergencyNumber.ReplyToQuietCallers();
+            }
         }
     }
 }

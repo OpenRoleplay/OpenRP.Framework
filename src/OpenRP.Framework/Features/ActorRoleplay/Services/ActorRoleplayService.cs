@@ -4,6 +4,7 @@ using OpenRP.Framework.Features.ActorRoleplay.Components;
 using OpenRP.Framework.Features.ActorRoleplay.Entities;
 using OpenRP.Framework.Features.ActorRoleplay.Helpers;
 using OpenRP.Framework.Features.Actors.Components;
+using OpenRP.Framework.Shared.AI.Helpers;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Helpers;
 using OpenRP.Framework.Shared.Chat.Services;
@@ -20,7 +21,6 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
     public class ActorRoleplayService : IActorRoleplayService
     {
         // Players often send a /me and a /say right after each other; waiting for a pause answers both at once.
-        private static readonly TimeSpan QuietTimeBeforeReply = TimeSpan.FromSeconds(2);
         private static readonly TimeSpan QuietTimeBeforeForgetting = TimeSpan.FromMinutes(15);
 
         private readonly IEntityManager _entityManager;
@@ -136,7 +136,7 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
                 return;
             }
 
-            if (memory.IsReplying() || !memory.IsQuietFor(QuietTimeBeforeReply))
+            if (memory.IsReplying() || !memory.IsQuietFor(AiReplyTiming.QuietTimeBeforeReply))
             {
                 return;
             }

@@ -25,6 +25,18 @@ namespace OpenRP.Framework.Features.Phones.Systems
             phoneCallService.PassOnSpeech(args.Player, args.Text);
         }
 
+        /// <summary>
+        /// "Use" on a phone in the inventory opens /phone.
+        /// </summary>
+        [ServerEvent]
+        public void OnPlayerInventoryItemUsed(OnPlayerInventoryItemUsedEventArgs args, IPhoneDialogService phoneDialogService)
+        {
+            if (args.InventoryItem.GetItem().IsItemPhone())
+            {
+                phoneDialogService.OpenPhone(args.Player);
+            }
+        }
+
         [ServerEvent]
         public void OnPhoneRinging(OnPhoneRingingEventArgs args, IPhoneService phoneService, IPhoneDialogService phoneDialogService)
         {

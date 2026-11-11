@@ -15,6 +15,8 @@ using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Shared.Dialogs.Helpers;
 using OpenRP.Framework.Shared.Extensions;
+using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
+using OpenRP.Framework.Shared.ServerEvents.Services;
 using SampSharp.ColAndreas.Entities.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
@@ -32,11 +34,13 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
         private IDialogService _dialogService;
         private IChatService _chatService;
         private IDroppedItemService _droppedItemService;
-        public InventoryDialogService(IDialogService dialogService, IChatService chatService, IDroppedItemService droppedItemService)
+        private readonly IServerEventAggregator _serverEventAggregator;
+        public InventoryDialogService(IDialogService dialogService, IChatService chatService, IDroppedItemService droppedItemService, IServerEventAggregator serverEventAggregator)
         {
             _dialogService = dialogService;
             _chatService = chatService;
             _droppedItemService = droppedItemService;
+            _serverEventAggregator = serverEventAggregator;
         }
 
         public void OpenInventory(Player player, Inventory inventory, InventoryArguments inventoryArguments = InventoryArguments.None)
@@ -210,9 +214,12 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
                 }
                 else
                 {
+                    InventoryItem selectedInventoryItem = inventoryOpened.SelectedInventoryItem;
                     actions["Use"] = () =>
                     {
-                        inventoryOpened.OpenedInventory.UseItem(player, inventoryOpened.SelectedInventoryItem);
+                        inventoryOpened.OpenedInventory.UseItem(player, selectedInventoryItem);
+                        // Not awaited: the dispatcher logs each handler's errors itself.
+                        _ = _serverEventAggregator.PublishAsync(new OnPlayerInventoryItemUsedEventArgs { Player = player, InventoryItem = selectedInventoryItem });
                     };
                 }
 

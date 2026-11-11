@@ -50,6 +50,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [Phones](features/phones.md): 1992-style mobile phones: calls, texts, phone book, call log
 - [Players](features/players.md): find a player's account and character
 - [Properties](features/properties.md): buildings, doors and the property editor
+- [Radios](features/radios.md): handheld and vehicle radios on frequencies, earpieces, `/editfrequencies`
 - [RoleplayChats](features/roleplay-chats.md): `/me`, `/do`, talk, OOC
 - [Skills](features/skills.md): character skills
 - [Vehicles](features/vehicles.md): saved vehicles, keys, parking

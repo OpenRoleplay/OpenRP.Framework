@@ -45,7 +45,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                 ContinueAfter(player, error, onBack, onBack);
             }
 
-            OpenFactionPicker(player, "Register a faction", null, Register, onBack);
+            _factionDialogService.OpenFactionPicker(player, "Register a faction", null, Register, onBack);
         }
 
         private void OpenRemoveTaxRegistration(Player player, Jurisdiction jurisdiction, FactionTaxRegistration registration, Action onBack)
