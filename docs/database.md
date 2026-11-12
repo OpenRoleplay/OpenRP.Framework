@@ -111,6 +111,19 @@ See [Phones](features/phones.md).
 
 See [Radios](features/radios.md).
 
+## Banking
+
+| Table | Columns | Notes |
+|---|---|---|
+| `Banks` (`BankModel`) | `Name` (32), `Code` (4, unique), `JurisdictionId` → jurisdictions (restrict), `RunByFactionId` → factions (set null), `MonthlyFee` decimal(18,2) | The code and the jurisdiction's tag are part of every OBAN |
+| `BankAccounts` (`BankAccountModel`) | `Oban` (18, unique), `BankId` (restrict), `CurrencyId` (restrict), `Balance` decimal(18,2), `OwnerType` (Character, Faction, Property, Bank), `OwnerId`, `Name` (32), `ClosedAt`, `NextFeeAt` | The balance only changes through single updates. Owner type Bank is the bank's own account, without a fee |
+| `BankAccountAccess` (`BankAccountAccessModel`) | `BankAccountId` (cascade), `CharacterId` (cascade), `Level` (View, Full) | Unique per account + character |
+| `BankTransactions` (`BankTransactionModel`) | `BankAccountId` (cascade), `Amount` (signed), `BalanceAfter`, `Type`, `OtherOban`, `CharacterId` (set null), `CreatedOn` | An account's history |
+| `BankBranches` (`BankBranchModel`) | `BankId` (cascade), `PropertyId` (cascade, unique) | Tellers only work inside their bank's branches |
+| `BankTellers` (`BankTellerModel`) | `ActorId` (cascade, unique), `BankId` (cascade) | |
+
+See [Banking](features/banking.md).
+
 ## Jurisdictions
 
 | Table | Columns | Notes |
@@ -219,6 +232,7 @@ Persistent vehicles.
 |---|---|
 | `Actors` (`ActorModel`) | `Name` (64), `Skin`, `X/Y/Z/Angle`, `Interior`, `AnimLibrary` and `AnimName` (null = no animation), `AnimSpeed` (default 4.1), `Prompt` (the AI prompt, null = doesn't talk), `InsidePropertyId` → `Properties` (set null; null = outside), `ActorLinkedToMainMenuSceneId` → `MainMenuScenes` (cascade). No longer read: `ActorCharacterId` → `Characters` and `ActorPromptId` → `ActorPrompts`, to be dropped later |
 | `ActorPrompts` (`ActorPromptModel`) | `Prompt`. No longer read: prompts moved to `Actors.Prompt` |
+| `ActorPermissions` (`ActorPermissionModel`) | `ActorId` → actors (cascade), `Permission` (64); unique per actor + permission. What an actor may do, such as `bank.deposit` |
 | `MainMenuScenes` (`MainMenuSceneModel`) | `Name` |
 
 ### Fishing

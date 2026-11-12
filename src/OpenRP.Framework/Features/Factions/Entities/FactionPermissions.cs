@@ -11,6 +11,7 @@ namespace OpenRP.Framework.Features.Factions.Entities
         public const string Remove = "faction.remove";
         public const string SetRank = "faction.setrank";
         public const string ManageRanks = "faction.manageranks";
+        public const string Bank = "faction.bank";
 
         /// <summary>
         /// Every faction permission with the description shown in the rank permissions menu.
@@ -23,6 +24,7 @@ namespace OpenRP.Framework.Features.Factions.Entities
                 { Remove, "Remove members from the faction" },
                 { SetRank, "Change the rank of members" },
                 { ManageRanks, "Create, rename, move and delete ranks" },
+                { Bank, "Use the faction's bank accounts and open new ones" },
             };
         }
     }

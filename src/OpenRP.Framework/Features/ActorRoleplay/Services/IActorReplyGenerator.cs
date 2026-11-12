@@ -19,5 +19,10 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
         /// <paramref name="cacheKey"/> names the conversation, so its requests share one prompt cache.
         /// </summary>
         Task<List<ActorRoleplayLine>> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation = null, string? cacheKey = null);
+
+        /// <summary>
+        /// Like <see cref="GenerateReplyAsync"/>, but the actor may also ask to perform one of these actions.
+        /// </summary>
+        Task<ActorReply> GenerateReplyWithActionsAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, IReadOnlyList<IActorAction> actions, string? cacheKey = null);
     }
 }

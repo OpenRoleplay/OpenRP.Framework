@@ -43,25 +43,40 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Services
 
         public async Task<List<ActorRoleplayLine>> GenerateReplyAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation = null, string? cacheKey = null)
         {
+            string reply = await GetReplyTextAsync(ActorRoleplayPromptBuilder.Build(actorName, actorPrompt, situation), lines, cacheKey);
+            return ActorReplyParser.Parse(reply, actorName);
+        }
+
+        public async Task<ActorReply> GenerateReplyWithActionsAsync(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, IReadOnlyList<IActorAction> actions, string? cacheKey = null)
+        {
+            string reply = await GetReplyTextAsync(ActorRoleplayPromptBuilder.Build(actorName, actorPrompt, null, actions), lines, cacheKey);
+            return new ActorReply(ActorReplyParser.Parse(reply, actorName), actions.Count == 0 ? new List<ActorActionRequest>() : ActorReplyParser.ParseActions(reply));
+        }
+
+        /// <summary>
+        /// The model's raw reply, or an empty one without an API key.
+        /// </summary>
+        private async Task<string> GetReplyTextAsync(string systemPrompt, IReadOnlyList<ActorMemoryLine> lines, string? cacheKey)
+        {
             if (_chatCompletionService == null)
             {
-                return new List<ActorRoleplayLine>();
+                return string.Empty;
             }
 
-            ChatHistory chatHistory = CreateChatHistory(actorName, actorPrompt, lines, situation);
+            ChatHistory chatHistory = CreateChatHistory(systemPrompt, lines);
             ChatMessageContent reply = await _chatCompletionService.GetChatMessageContentAsync(chatHistory,
                 OpenAiChatCompletion.CreateExecutionSettings(_options.ReasoningEffort, cacheKey));
             OpenAiChatCompletion.LogUsage(_logger, UsageFeatureName, reply);
-            return ActorReplyParser.Parse(reply.Content ?? "", actorName);
+            return reply.Content ?? string.Empty;
         }
 
         /// <summary>
         /// The system prompt, then what the actor saw and heard as user messages and its own lines as assistant
         /// messages, with consecutive lines of the same side grouped into one message.
         /// </summary>
-        private static ChatHistory CreateChatHistory(string actorName, string actorPrompt, IReadOnlyList<ActorMemoryLine> lines, string? situation)
+        private static ChatHistory CreateChatHistory(string systemPrompt, IReadOnlyList<ActorMemoryLine> lines)
         {
-            ChatHistory chatHistory = new ChatHistory(ActorRoleplayPromptBuilder.Build(actorName, actorPrompt, situation));
+            ChatHistory chatHistory = new ChatHistory(systemPrompt);
 
             int index = 0;
             while (index < lines.Count)

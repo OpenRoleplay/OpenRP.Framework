@@ -54,6 +54,8 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
             actionsDialog.SetTitle(TitleType.Children, PropertiesTitle, property.GetName());
             int renameRow = actionsDialog.AddRow("Rename");
             int jurisdictionRow = actionsDialog.AddRow($"Jurisdiction: {ChatColor.Highlight}{GetJurisdictionName(property)}");
+            string? branchOf = _bankService.GetBankOfBranch(property.GetId())?.Name;
+            int? branchRow = AddRowIf(actionsDialog, branchOf != null, $"Branch of {ChatColor.Highlight}{branchOf}{ChatColor.LightGray} (set in /editbanks)");
             int addDoorRow = actionsDialog.AddRow("Add a door here");
             int? goToRow = AddRowIf(actionsDialog, doors.Count > 0, "Go to");
             int deleteRow = actionsDialog.AddRow("Delete");
@@ -72,6 +74,8 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
                     OpenRenameProperty(player, property, reopenActions);
                 else if (response.ItemIndex == jurisdictionRow)
                     OpenSetPropertyJurisdiction(player, property, reopenActions);
+                else if (response.ItemIndex == branchRow)
+                    reopenActions();
                 else if (response.ItemIndex == addDoorRow)
                     OpenAddDoor(player, property, reopenActions);
                 else if (response.ItemIndex == goToRow)

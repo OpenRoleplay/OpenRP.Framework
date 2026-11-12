@@ -31,6 +31,7 @@ See [The property editor](properties/editor.md).
 5. **On every startup,** the properties are exported as seed-data code. See [Default data export](properties/default-data.md).
 6. **[Actors](actors.md) can be inside a property too,** in its virtual world. Deleting a property publishes `OnPropertyDeleted`, and the actors inside it move outside.
 7. **A property can lie in one [jurisdiction](jurisdictions.md),** where it would pay property tax. Pick the most specific one, for example the city. Deleting the jurisdiction leaves the property without one.
+8. **A property can be a bank branch,** set in `/editbanks`. Its menu then shows "Branch of …", and the bank's tellers only work inside its branches (see [Banking](banking.md)).
    - **Why not the owner's:** property tax goes to where the building stands, not to where its owner is registered.
 
 ## Known limitations

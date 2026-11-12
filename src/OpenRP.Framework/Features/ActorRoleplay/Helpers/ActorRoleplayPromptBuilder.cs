@@ -1,3 +1,6 @@
+using OpenRP.Framework.Features.ActorRoleplay.Entities;
+using System.Text;
+
 namespace OpenRP.Framework.Features.ActorRoleplay.Helpers
 {
     /// <summary>
@@ -7,6 +10,7 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Helpers
     public static class ActorRoleplayPromptBuilder
     {
         public const int MaxReplyLines = 3;
+        public const int MaxActions = 1;
 
         private static readonly string SharedRules =
             $"""
@@ -39,9 +43,11 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Helpers
             """;
 
         /// <summary>
-        /// The system prompt for the actor with this name and description, and optionally the situation it's in.
+        /// The system prompt for the actor with this name and description, optionally the situation it's in, and the
+        /// actions it may perform. Everything after the shared rules is the same for every request of this actor, so it
+        /// stays cached too.
         /// </summary>
-        public static string Build(string actorName, string actorPrompt, string? situation = null)
+        public static string Build(string actorName, string actorPrompt, string? situation = null, IReadOnlyList<IActorAction>? actions = null)
         {
             string prompt = $"""
                 {SharedRules}
@@ -51,7 +57,31 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Helpers
                 {actorPrompt}
                 """;
 
-            return String.IsNullOrWhiteSpace(situation) ? prompt : $"{prompt}\n\n### The situation\n{situation}";
+            if (!String.IsNullOrWhiteSpace(situation))
+            {
+                prompt = $"{prompt}\n\n### The situation\n{situation}";
+            }
+            return actions == null || actions.Count == 0 ? prompt : $"{prompt}\n\n{BuildActions(actions)}";
+        }
+
+        /// <summary>
+        /// The actions the actor may perform, with the line that performs one.
+        /// </summary>
+        private static string BuildActions(IReadOnlyList<IActorAction> actions)
+        {
+            StringBuilder text = new StringBuilder();
+            text.AppendLine("### What you can do");
+            text.AppendLine("Besides talking, you can do these things for the person in front of you, by adding one extra line:");
+            text.AppendLine("/action <name> <their name exactly as it appears in chat> <detail, if any>");
+            foreach (IActorAction action in actions)
+            {
+                string detail = action.DetailDescription == null ? string.Empty : $" Detail: {action.DetailDescription}.";
+                text.AppendLine($"- {action.Name}: {action.Description}{detail}");
+            }
+            text.AppendLine("Only do something when they clearly ask for it, at most one /action per reply, and still say something.");
+            text.AppendLine("Each action opens a form for them, so don't ask for numbers or amounts yourself.");
+            text.Append("If they ask for something that isn't listed, politely say you can't help with that here.");
+            return text.ToString();
         }
     }
 }

@@ -11,7 +11,7 @@ using OpenRP.Framework.Shared.Dialogs.Extensions;
 namespace OpenRP.Framework.Features.Actors.Services.Dialogs
 {
     /// <summary>
-    /// The /editactors menus. One file per flow: the list of actors, and one actor's menu.
+    /// The /editactors menus. One file per flow: the list of actors, one actor's menu, and its permissions.
     /// </summary>
     public partial class ActorDialogService : IActorDialogService
     {
@@ -20,9 +20,12 @@ namespace OpenRP.Framework.Features.Actors.Services.Dialogs
         private readonly IDialogService _dialogService;
         private readonly IActorEditorService _actorEditorService;
         private readonly IPropertyEditorService _propertyEditorService;
+        private readonly IActorPermissionService _actorPermissionService;
 
-        public ActorDialogService(IDialogService dialogService, IActorEditorService actorEditorService, IPropertyEditorService propertyEditorService)
+        public ActorDialogService(IDialogService dialogService, IActorEditorService actorEditorService, IPropertyEditorService propertyEditorService,
+            IActorPermissionService actorPermissionService)
         {
+            _actorPermissionService = actorPermissionService;
             _dialogService = dialogService;
             _actorEditorService = actorEditorService;
             _propertyEditorService = propertyEditorService;

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Factions.Components;
 using OpenRP.Framework.Features.Jurisdictions.Components;
+using OpenRP.Framework.Features.Jurisdictions.Entities;
 using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using OpenRP.Framework.Shared.ServerEvents.Services;
 using System;
@@ -19,10 +20,13 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services
         private readonly IFactionTaxRegistrationManager _factionTaxRegistrationManager;
         private readonly IServerEventAggregator _serverEventAggregator;
         private readonly ILogger<JurisdictionEditorService> _logger;
+        private readonly List<IJurisdictionDeletionGuard> _deletionGuards;
 
         public JurisdictionEditorService(IJurisdictionService jurisdictionService, IJurisdictionManager jurisdictionManager,
-            IFactionTaxRegistrationManager factionTaxRegistrationManager, IServerEventAggregator serverEventAggregator, ILogger<JurisdictionEditorService> logger)
+            IFactionTaxRegistrationManager factionTaxRegistrationManager, IServerEventAggregator serverEventAggregator, ILogger<JurisdictionEditorService> logger,
+            IEnumerable<IJurisdictionDeletionGuard> deletionGuards)
         {
+            _deletionGuards = deletionGuards.ToList();
             _jurisdictionService = jurisdictionService;
             _jurisdictionManager = jurisdictionManager;
             _factionTaxRegistrationManager = factionTaxRegistrationManager;
@@ -141,6 +145,13 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services
             if (_jurisdictionService.GetChildJurisdictions(jurisdiction).Count > 0)
             {
                 return "Other jurisdictions lie in this one. Move or delete them first.";
+            }
+
+            // Other features, such as banks, may depend on this jurisdiction.
+            string? guardError = _deletionGuards.Select(guard => guard.GetDeletionError(jurisdiction)).FirstOrDefault(error => error != null);
+            if (guardError != null)
+            {
+                return guardError;
             }
 
             // The database removes these too, but loaded registrations would stay in memory until the next sync.

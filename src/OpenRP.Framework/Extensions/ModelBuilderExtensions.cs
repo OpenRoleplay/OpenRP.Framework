@@ -17,6 +17,7 @@ using OpenRP.Framework.Features.Permissions.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.DefaultData;
 using OpenRP.Framework.Features.Phones.Models.Configurations;
 using OpenRP.Framework.Features.Radios.Models.Configurations;
+using OpenRP.Framework.Features.Banking.Models.Configurations;
 using OpenRP.Framework.Features.Properties.Models.Configurations;
 using OpenRP.Framework.Features.Vehicles.Models.Configurations;
 using System;
@@ -48,6 +49,7 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new FactionPermissionModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new ActorModelConfiguration());
+            modelBuilder.ApplyConfiguration(new ActorPermissionModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new FishLootModelConfiguration());
 
@@ -76,6 +78,13 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new RadioModelConfiguration());
             modelBuilder.ApplyConfiguration(new RadioFrequencyModelConfiguration());
             modelBuilder.ApplyConfiguration(new RadioFrequencyFactionModelConfiguration());
+
+            modelBuilder.ApplyConfiguration(new BankModelConfiguration());
+            modelBuilder.ApplyConfiguration(new BankAccountModelConfiguration());
+            modelBuilder.ApplyConfiguration(new BankAccountAccessModelConfiguration());
+            modelBuilder.ApplyConfiguration(new BankTransactionModelConfiguration());
+            modelBuilder.ApplyConfiguration(new BankBranchModelConfiguration());
+            modelBuilder.ApplyConfiguration(new BankTellerModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new PropertyModelConfiguration());
             modelBuilder.ApplyConfiguration(new PropertyDoorModelConfiguration());

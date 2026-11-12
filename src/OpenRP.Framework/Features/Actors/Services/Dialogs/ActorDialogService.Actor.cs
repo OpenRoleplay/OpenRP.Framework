@@ -28,6 +28,7 @@ namespace OpenRP.Framework.Features.Actors.Services.Dialogs
             int animationRow = actionsDialog.AddRow($"Animation {ChatColor.LightGray}({actor.GetAnimationText() ?? "none"})");
             int worldRow = actionsDialog.AddRow($"Virtual world {ChatColor.LightGray}({GetWhereText(actor)})");
             int promptRow = actionsDialog.AddRow($"AI prompt {ChatColor.LightGray}({(actor.HasActorPrompt() ? "view" : "none")})");
+            int permissionsRow = actionsDialog.AddRow($"Permissions {ChatColor.LightGray}({GetPermissionCount(actor)} on)");
             int deleteRow = actionsDialog.AddRow("Delete");
 
             void OnActionChosen(ListDialogResponse response)
@@ -49,6 +50,8 @@ namespace OpenRP.Framework.Features.Actors.Services.Dialogs
                     OpenVirtualWorldChoice(player, actor, reopenActions);
                 else if (response.ItemIndex == promptRow)
                     ShowPrompt(player, actor, 0, reopenActions);
+                else if (response.ItemIndex == permissionsRow)
+                    OpenPermissions(player, actor, reopenActions);
                 else if (response.ItemIndex == deleteRow)
                     OpenDeleteActor(player, actor, onBack, reopenActions);
             }

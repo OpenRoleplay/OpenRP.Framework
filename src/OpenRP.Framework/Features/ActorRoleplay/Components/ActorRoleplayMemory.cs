@@ -11,6 +11,8 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Components
     public class ActorRoleplayMemory : Component
     {
         private readonly List<ActorMemoryLine> _lines = new List<ActorMemoryLine>();
+        // Who spoke to the actor lately, newest last, so an /action can find the player it's for.
+        private readonly List<ActorSpeaker> _speakers = new List<ActorSpeaker>();
         private DateTime _lastHeardAt = DateTime.UtcNow;
         private bool _isReplying;
 
@@ -21,6 +23,24 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Components
         {
             AddLine(new ActorMemoryLine(false, text));
             _lastHeardAt = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Remembers who said something, replacing their earlier entry.
+        /// </summary>
+        public void AddSpeaker(EntityId player, string name)
+        {
+            _speakers.RemoveAll(speaker => speaker.Player == player);
+            _speakers.Add(new ActorSpeaker(player, name, DateTime.UtcNow));
+        }
+
+        /// <summary>
+        /// The players who spoke to the actor within this time, newest first.
+        /// </summary>
+        public List<ActorSpeaker> GetRecentSpeakers(TimeSpan within)
+        {
+            DateTime since = DateTime.UtcNow - within;
+            return _speakers.Where(speaker => speaker.HeardAt >= since).Reverse().ToList();
         }
 
         /// <summary>

@@ -20,6 +20,7 @@ namespace OpenRP.Framework.Database
         public DbSet<ItemModel> Items { get; set; }
         public DbSet<ActorModel> Actors { get; set; }
         public DbSet<ActorPromptModel> ActorPrompts { get; set; }
+        public DbSet<ActorPermissionModel> ActorPermissions { get; set; }
         public DbSet<CurrencyModel> Currencies { get; set; }
         public DbSet<CurrencyUnitModel> CurrencyUnits { get; set; }
         public DbSet<PermissionModel> Permissions { get; set; }
@@ -52,6 +53,12 @@ namespace OpenRP.Framework.Database
         public DbSet<RadioModel> Radios { get; set; }
         public DbSet<RadioFrequencyModel> RadioFrequencies { get; set; }
         public DbSet<RadioFrequencyFactionModel> RadioFrequencyFactions { get; set; }
+        public DbSet<BankModel> Banks { get; set; }
+        public DbSet<BankAccountModel> BankAccounts { get; set; }
+        public DbSet<BankAccountAccessModel> BankAccountAccess { get; set; }
+        public DbSet<BankTransactionModel> BankTransactions { get; set; }
+        public DbSet<BankBranchModel> BankBranches { get; set; }
+        public DbSet<BankTellerModel> BankTellers { get; set; }
 
         // Parameterless Constructor
         public BaseDataContext() : base() { }

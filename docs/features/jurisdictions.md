@@ -20,7 +20,7 @@ See [The jurisdiction editor](jurisdictions/editor.md).
 
 1. **A tree.** A jurisdiction without a parent is a country. Any depth is allowed: country, state, county, city.
    - **No loops:** a jurisdiction can't be moved into itself or into a place inside it.
-   - **Deleting** is refused while other jurisdictions lie in it.
+   - **Deleting** is refused while other jurisdictions lie in it, or while another feature depends on it, such as a [bank](banking.md). Features add that check with `services.AddJurisdictionDeletionGuard<T>()` (an `IJurisdictionDeletionGuard`).
 2. **Three tags,** like ISO country codes: 2, 3 and 4 letters, for example `SA`, `SAN` and `USSA`. Every jurisdiction has all three, cities too, and no two jurisdictions share a tag of the same length.
    - **Why:** tags identify a place in short text, such as licence plates now and bank account numbers later.
 3. **Currency, inherited.** A jurisdiction without a currency of its own uses its nearest parent's.

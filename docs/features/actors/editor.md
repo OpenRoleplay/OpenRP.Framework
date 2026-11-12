@@ -17,6 +17,7 @@
 - **Animation:** none (just stand), a preset, or custom (library and name).
 - **Virtual world:** outside (the shared world), or inside any property. Puts you at the actor afterwards, so you still see it.
 - **AI prompt:** read-only, over pages. Prompts are changed in the database (`Actors.Prompt`).
+- **Permissions:** every permission features offer for actors, such as `bank.deposit`, switched on or off by picking it. All are off by default. See [Banking tellers](../banking/tellers.md).
 - **Delete:** asks first.
 
 Names are 1 to 64 characters.

@@ -1,4 +1,5 @@
 using OpenRP.Framework.Features.Jurisdictions.Services;
+using OpenRP.Framework.Features.Banking.Services;
 using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
 using OpenRP.Framework.Features.Properties.Components;
 using OpenRP.Framework.Shared;
@@ -23,10 +24,12 @@ namespace OpenRP.Framework.Features.Properties.Services.Dialogs
         private readonly IPropertyEditorService _propertyEditorService;
         private readonly IJurisdictionService _jurisdictionService;
         private readonly IJurisdictionDialogService _jurisdictionDialogService;
+        private readonly IBankService _bankService;
 
         public PropertyDialogService(IDialogService dialogService, IPropertyService propertyService, IPropertyEditorService propertyEditorService,
-            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService)
+            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, IBankService bankService)
         {
+            _bankService = bankService;
             _dialogService = dialogService;
             _propertyService = propertyService;
             _propertyEditorService = propertyEditorService;

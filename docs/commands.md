@@ -20,6 +20,12 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 | `/gotopos [x] [y] [z] <interior> <virtual world>` | Admin | Teleport to a position, for example into a GTA interior. | [Admins](features/admins.md) |
 | `/tprel [player] [distance] [direction]` | Admin | Move a player a distance forward, back, left, right, up or down, keeping their interior and virtual world. | [Admins](features/admins.md) |
 
+## Admin > Bank
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/editbanks` | Admin | Create banks and set their fee, branches, tellers and property accounts, or look up an OBAN. | [Banking](features/banking.md) |
+
 ## Admin > Factions
 
 | Command | Groups | Description | Feature |
@@ -60,6 +66,12 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 |---|---|---|---|
 | `/editproperties` | Admin | Create properties, add and link their doors, and manage them. | [Properties](features/properties.md) |
 | `/editactors` | Admin | Create actors, and move and change them: name, skin, animation and which property they're in. | [Actors](features/actors.md) |
+
+## Bank
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/bank` | Default | Open the bank menu at the teller you're standing at. | [Banking](features/banking.md) |
 
 ## Character
 

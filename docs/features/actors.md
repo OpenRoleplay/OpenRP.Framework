@@ -17,6 +17,7 @@ See [The actor editor](actors/editor.md).
 3. **Virtual worlds.** An actor is in its [main menu](main-menu.md) scene's virtual world, the virtual world of the property it's inside, or outside (0).
    - **Why:** an actor in a house's interior should only be seen by visitors of that house, not by everyone using the same GTA interior.
 4. **AI prompts.** An actor with a prompt [answers players](actor-roleplay.md) in the world, or takes part in [conversations](actor-conversations.md) in a main menu scene.
+5. **Permissions.** An actor can do nothing beyond talking until an admin gives it permissions in `/editactors`, such as a [bank teller's](banking/tellers.md). Features offer them with `services.AddActorPermission(name, description)`, and check them with `IActorPermissionService.HasPermission`.
 5. **Staying on the floor.** About 1.5 seconds after an actor streams in for a player, its position and animation are sent again.
    - **Why:** an actor standing on mapping (a porch, an interior floor) can reach a player before the mapping does. The game then drops the actor to the ground below, until its position is sent again.
 6. **Deleting a property** moves the actors inside it outside, through the `OnPropertyDeleted` [server event](../server-events.md).

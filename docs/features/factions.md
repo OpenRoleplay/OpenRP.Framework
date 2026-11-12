@@ -24,7 +24,7 @@ Player organisations, such as police, gangs, companies and governments. Each fac
 4. **Invitations.** With `faction.invite`, you invite a player at a rank below your own. They have **60 seconds** to accept.
    - **Why:** an invitation is meant to be answered on the spot, in person.
 5. **Permissions.**
-   - **What every faction has:** `faction.invite`, `faction.remove`, `faction.setrank`, `faction.manageranks`, `/fo` and `/fooc`.
+   - **What every faction has:** `faction.invite`, `faction.remove`, `faction.setrank`, `faction.manageranks`, `faction.bank` (use and open the faction's [bank accounts](banking/accounts.md)), `/fo` and `/fooc`.
    - **What leaders have:** everything their faction has.
    - **How it reaches members:** members get their rank's permissions, as command permissions, effective at once.
 

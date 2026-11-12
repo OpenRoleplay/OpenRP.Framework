@@ -18,5 +18,13 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Extensions
                 .AddSingleton<IActorReplyGenerator, ActorReplyGenerator>()
                 .AddSingleton<IActorRoleplayService, ActorRoleplayService>();
         }
+
+        /// <summary>
+        /// Lets AI actors with its permission perform this action for the players they talk with.
+        /// </summary>
+        public static IServiceCollection AddActorAction(this IServiceCollection services, Func<IServiceProvider, IActorAction> createAction)
+        {
+            return services.AddSingleton(createAction);
+        }
     }
 }

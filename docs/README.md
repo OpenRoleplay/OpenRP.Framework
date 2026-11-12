@@ -24,6 +24,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [Accounts](features/accounts.md): register, log in, one login per account
 - [AccountSettings](features/account-settings.md): chat toggles and `/settings`
 - [Actors](features/actors.md): non-player characters in the world, created and edited in-game with `/editactors`
+- [Banking](features/banking.md): banks, accounts with OBANs, AI bank tellers, `/bank` and `/editbanks`
 - [ActorConversations](features/actor-conversations.md): AI conversations between actors
 - [ActorRoleplay](features/actor-roleplay.md): AI actors that answer players' /me, /do and /say
 - [Admins](features/admins.md): admin and tester commands

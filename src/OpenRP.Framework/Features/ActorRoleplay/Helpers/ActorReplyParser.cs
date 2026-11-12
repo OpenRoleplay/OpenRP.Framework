@@ -22,6 +22,31 @@ namespace OpenRP.Framework.Features.ActorRoleplay.Helpers
                 .ToList();
         }
 
+        /// <summary>
+        /// The reply's "/action name rest" lines, at most <see cref="ActorRoleplayPromptBuilder.MaxActions"/>.
+        /// </summary>
+        public static List<ActorActionRequest> ParseActions(string reply)
+        {
+            return reply
+                .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Select(ParseActionLine)
+                .OfType<ActorActionRequest>()
+                .Take(ActorRoleplayPromptBuilder.MaxActions)
+                .ToList();
+        }
+
+        private static ActorActionRequest? ParseActionLine(string line)
+        {
+            const string ActionPrefix = "/action ";
+            if (!line.StartsWith(ActionPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            string[] parts = line[ActionPrefix.Length..].Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length == 2 ? new ActorActionRequest(parts[0].ToLowerInvariant(), parts[1].Trim()) : null;
+        }
+
         private static ActorRoleplayLine? ParseLine(string line, string actorName)
         {
             if (!RoleplayCommandLine.TryParse(line, out PlayerChatMessageType type, out string text))

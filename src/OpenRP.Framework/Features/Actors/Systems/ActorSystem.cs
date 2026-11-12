@@ -10,22 +10,28 @@ namespace OpenRP.Framework.Features.Actors.Systems
         private const int SpawnPoseRefreshCheckIntervalInMilliseconds = 500;
         private const int SyncIntervalInMilliseconds = 60000;
 
+        /// <summary>
+        /// Actors go first, because permissions belong to an actor.
+        /// </summary>
         [Event]
-        public void OnGameModeInit(IActorManager actorManager)
+        public void OnGameModeInit(IActorManager actorManager, IActorPermissionManager actorPermissionManager)
         {
             actorManager.LoadAll();
+            actorPermissionManager.LoadAll();
         }
 
         [Timer(SyncIntervalInMilliseconds)]
-        public void ProcessChanges(IActorManager actorManager)
+        public void ProcessChanges(IActorManager actorManager, IActorPermissionManager actorPermissionManager)
         {
             actorManager.ProcessChanges();
+            actorPermissionManager.ProcessChanges();
         }
 
         [Event]
-        public void OnGameModeExit(IActorManager actorManager)
+        public void OnGameModeExit(IActorManager actorManager, IActorPermissionManager actorPermissionManager)
         {
             actorManager.SaveNow();
+            actorPermissionManager.SaveNow();
         }
 
         [Event]
