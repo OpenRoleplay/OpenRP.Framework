@@ -28,9 +28,11 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
         private readonly ICurrencyService _currencyService;
         private readonly IFactionService _factionService;
         private readonly IFactionDialogService _factionDialogService;
+        private readonly IJurisdictionSettingService _jurisdictionSettingService;
 
         public JurisdictionDialogService(IDialogService dialogService, IJurisdictionService jurisdictionService,
-            IJurisdictionEditorService jurisdictionEditorService, ICurrencyService currencyService, IFactionService factionService, IFactionDialogService factionDialogService)
+            IJurisdictionEditorService jurisdictionEditorService, ICurrencyService currencyService, IFactionService factionService, IFactionDialogService factionDialogService,
+            IJurisdictionSettingService jurisdictionSettingService)
         {
             _dialogService = dialogService;
             _jurisdictionService = jurisdictionService;
@@ -38,6 +40,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
             _currencyService = currencyService;
             _factionService = factionService;
             _factionDialogService = factionDialogService;
+            _jurisdictionSettingService = jurisdictionSettingService;
         }
 
         /// <summary>

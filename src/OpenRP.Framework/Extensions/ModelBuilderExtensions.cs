@@ -69,6 +69,7 @@ namespace OpenRP.Framework.Extensions
 
             modelBuilder.ApplyConfiguration(new JurisdictionModelConfiguration());
             modelBuilder.ApplyConfiguration(new FactionTaxRegistrationModelConfiguration());
+            modelBuilder.ApplyConfiguration(new JurisdictionSettingModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new PhoneModelConfiguration());
             modelBuilder.ApplyConfiguration(new PhoneContactModelConfiguration());

@@ -1,6 +1,6 @@
 # Jurisdictions
 
-Places with their own rules: countries, and the states and cities in them. A jurisdiction has tags, a currency and a governing faction, and factions can be registered there for taxes. Properties lie in one, and vehicles are registered in one. Admins build them with `/editjurisdictions`.
+Places with their own rules: countries, and the states and cities in them. A jurisdiction has tags, a currency and a governing faction, and factions can be registered there for taxes. Properties lie in one, and vehicles are registered in one. Admins build them with `/editjurisdictions`, and government leaders set their [settings](jurisdictions/settings.md) with `/government`.
 
 **Why:** factions describe organisations, but nothing described the places they act in. Jurisdictions give the game "United States of San Andreas", its tags and currency, who is in charge there, and who pays taxes to it.
 
@@ -9,6 +9,7 @@ Places with their own rules: countries, and the states and cities in them. A jur
 | Command | Groups | Does |
 |---|---|---|
 | `/editjurisdictions` | Admin | The jurisdiction editor |
+| `/government` | Default | Change the settings of the jurisdictions your faction governs |
 
 To add a city:
 1. `/editjurisdictions`, pick the country, and choose "Create a sub-jurisdiction".
@@ -34,22 +35,27 @@ See [The jurisdiction editor](jurisdictions/editor.md).
 
 **Deleting a jurisdiction** removes its tax registrations, and its properties and vehicles have none afterwards ([`OnJurisdictionDeleted`](../server-events.md#onjurisdictiondeleted)).
 
+## Settings
+
+A jurisdiction can have its own value for a setting, such as the [bank account fee cap](banking.md). Without one, it inherits its parent's value, or the default applies. Government leaders change settings with `/government`, and admins with `/editjurisdictions`. A country can bind its sub-jurisdictions to its values. See [Jurisdiction settings](jurisdictions/settings.md).
+
 ## Known limitations
 
 - **Storage only:** no tax collection, laws, citizenship or borders yet.
-- **Admins only:** government leaders can't change their jurisdictions in-game yet.
+- **Admins only for the rest:** government leaders can change settings, but only admins can rename, retag, move or delete a jurisdiction, or change its currency, government or tax registrations.
 - **Plates of other servers:** a tag change made on another server reaches this server's data within a minute, but plates only follow at the next restart or vehicle edit.
 
 ## Deep dive
 
 - **Code:** `Features/Jurisdictions/`.
-- **Components:** `Jurisdiction` and `FactionTaxRegistration`, loaded by their [BaseManagers](../persistence/base-manager.md) at startup and synced every 60 seconds.
+- **Components:** `Jurisdiction`, `FactionTaxRegistration` and `JurisdictionSetting`, loaded by their [BaseManagers](../persistence/base-manager.md) at startup and synced every 60 seconds.
 - **Services:**
   - `IJurisdictionService`: reading: the tree, `GetCountry`, `GetGovernment`, `GetCurrencyId`, `GetJurisdictionsGovernedBy`, `GetTaxJurisdictions` and `GetPlateTag`;
+  - `IJurisdictionSettingService`: the value of each setting in effect, and who may change it (see [Jurisdiction settings](jurisdictions/settings.md));
   - `IJurisdictionEditorService`: every change; methods that can fail return an error message, or null;
   - `IJurisdictionDialogService`: the menus, and `OpenJurisdictionPicker` for other features' editors.
 - **Events:** `OnJurisdictionsLoaded` and `OnJurisdictionPlateTagChanged` make [Vehicles](vehicles.md) set their plates again. **Why at startup:** vehicles may spawn before the jurisdictions are loaded.
-- **Tables:** [`Jurisdictions` and `FactionTaxRegistrations`](../database.md#jurisdictions).
+- **Tables:** [`Jurisdictions`, `FactionTaxRegistrations` and `JurisdictionSettings`](../database.md#jurisdictions).
 - **Seed data:** the Framework seeds none. The official server seeds United States of San Andreas (`SA`/`SAN`/`USSA`, San Andreas Dollar) and Caeroyna (`CR`/`CRY`/`CAER`, Caeroyna Ruble).
 
-Want more? → [The jurisdiction editor](jurisdictions/editor.md) · [Factions](factions.md) · [Properties](properties.md)
+Want more? → [The jurisdiction editor](jurisdictions/editor.md) · [Jurisdiction settings](jurisdictions/settings.md) · [Factions](factions.md) · [Properties](properties.md)

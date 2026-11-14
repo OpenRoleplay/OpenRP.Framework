@@ -55,6 +55,7 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
             int parentRow = actionsDialog.AddRow($"Lies in: {ChatColor.Highlight}{GetParentLabel(jurisdiction)}");
             int governmentRow = actionsDialog.AddRow($"Governed by: {ChatColor.Highlight}{GetGovernmentLabel(jurisdiction)}");
             int taxRegistrationsRow = actionsDialog.AddRow($"Tax registrations ({_jurisdictionService.GetTaxRegistrations(jurisdiction).Count})");
+            int settingsRow = actionsDialog.AddRow("Settings");
             int createChildRow = actionsDialog.AddRow("Create a sub-jurisdiction");
             int deleteRow = actionsDialog.AddRow("Delete");
 
@@ -75,6 +76,8 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                     OpenSetGovernment(player, jurisdiction, reopenActions);
                 else if (response.ItemIndex == taxRegistrationsRow)
                     OpenTaxRegistrations(player, jurisdiction, reopenActions);
+                else if (response.ItemIndex == settingsRow)
+                    OpenJurisdictionSettings(player, jurisdiction, reopenActions);
                 else if (response.ItemIndex == createChildRow)
                     OpenCreateJurisdiction(player, jurisdiction, reopenActions);
                 else if (response.ItemIndex == deleteRow)

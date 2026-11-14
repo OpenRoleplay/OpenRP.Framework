@@ -83,7 +83,8 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
             }
 
             string currencyName = _currencyService.GetCurrencies().FirstOrDefault(currency => currency.Id == currencyId)?.Name ?? "the local currency";
-            string fee = bank.MonthlyFee > 0 ? $"The fee is {Highlight(FormatMoney(currencyId.Value, bank.MonthlyFee))} every 30 days, taken from the balance." : "There's no monthly fee.";
+            decimal chargedFee = Math.Min(bank.MonthlyFee, _bankService.GetMaxMonthlyFee(bank));
+            string fee = chargedFee > 0 ? $"The fee is {Highlight(FormatMoney(currencyId.Value, chargedFee))} every 30 days, taken from the balance." : "There's no monthly fee.";
             string question = $"Open the account {Highlight(name)} at {bank.Name} for {ownerLabel}?\n\nIt holds {currencyName}. {fee}";
             ShowConfirmation(player, "Bank", "Open an account", question, () => DoOpenAccount(player, teller, bank, ownerType, ownerId, name, onBack), onBack);
         }

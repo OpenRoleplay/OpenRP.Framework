@@ -13,28 +13,31 @@ namespace OpenRP.Framework.Features.Jurisdictions.Systems
         /// Vehicles may have been created before this ran, so their plates are told to look again.
         /// </summary>
         [Event]
-        public void OnGameModeInit(IJurisdictionManager jurisdictionManager, IFactionTaxRegistrationManager factionTaxRegistrationManager, IServerEventAggregator serverEventAggregator)
+        public void OnGameModeInit(IJurisdictionManager jurisdictionManager, IFactionTaxRegistrationManager factionTaxRegistrationManager, IJurisdictionSettingManager jurisdictionSettingManager, IServerEventAggregator serverEventAggregator)
         {
             jurisdictionManager.LoadAll();
             factionTaxRegistrationManager.LoadAll();
+            jurisdictionSettingManager.LoadAll();
 
             // Not awaited: the dispatcher logs each handler's errors itself.
             _ = serverEventAggregator.PublishAsync(new OnJurisdictionsLoadedEventArgs());
         }
 
         /// <summary>
-        /// Registrations go first: deleting a jurisdiction deletes its registrations in the database as well.
+        /// Settings and registrations go first: deleting a jurisdiction deletes its settings and registrations in the database as well.
         /// </summary>
         [Timer(SyncIntervalInMilliseconds)]
-        public void ProcessChanges(IJurisdictionManager jurisdictionManager, IFactionTaxRegistrationManager factionTaxRegistrationManager)
+        public void ProcessChanges(IJurisdictionManager jurisdictionManager, IFactionTaxRegistrationManager factionTaxRegistrationManager, IJurisdictionSettingManager jurisdictionSettingManager)
         {
+            jurisdictionSettingManager.ProcessChanges();
             factionTaxRegistrationManager.ProcessChanges();
             jurisdictionManager.ProcessChanges();
         }
 
         [Event]
-        public void OnGameModeExit(IJurisdictionManager jurisdictionManager, IFactionTaxRegistrationManager factionTaxRegistrationManager)
+        public void OnGameModeExit(IJurisdictionManager jurisdictionManager, IFactionTaxRegistrationManager factionTaxRegistrationManager, IJurisdictionSettingManager jurisdictionSettingManager)
         {
+            jurisdictionSettingManager.SaveNow();
             factionTaxRegistrationManager.SaveNow();
             jurisdictionManager.SaveNow();
         }

@@ -28,7 +28,7 @@ An account belongs to one owner, holds money in its bank's local currency, and i
 - **Currency:** an account holds its bank's local currency. Deposits and withdrawals only take or give cash in that currency, and transfers only go between accounts in the same currency.
 - **Amounts** are above 0, with at most 2 decimals.
 - **Withdrawals and transfers** need the money to be there. An account never goes below 0 by spending.
-- **Monthly fee:** every 30 days after opening, the bank's fee (at most 100) goes from the account to the bank's own account in the same currency.
+- **Monthly fee:** every 30 days after opening, the bank's fee (at most its fee cap, 100 unless a government has set another) goes from the account to the bank's own account in the same currency.
   - **If the balance can't cover it,** the account goes negative, but never below -1000. A fee that would go further is only charged down to -1000.
   - **While negative,** nothing can be withdrawn or transferred out. Deposits and incoming transfers pay it back.
   - **Why only the fee:** spending into the negative would create money from nothing, with no way to collect the debt. A negative balance from fees can't be spent.

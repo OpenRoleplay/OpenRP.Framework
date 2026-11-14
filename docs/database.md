@@ -130,8 +130,9 @@ See [Banking](features/banking.md).
 |---|---|---|
 | `Jurisdictions` (`JurisdictionModel`) | `Name` (64), `TwoLetterTag` (2), `ThreeLetterTag` (3), `FourLetterTag` (4), `ParentJurisdictionId` → `Jurisdictions` (restrict), `CurrencyId` → `Currencies` (set null), `GovernmentFactionId` → `Factions` (set null) | A tree; no parent = a country. Each tag is required and unique. Null currency or government = the parent's |
 | `FactionTaxRegistrations` (`FactionTaxRegistrationModel`) | `FactionId` → factions (cascade), `JurisdictionId` → jurisdictions (cascade) | Where a faction pays taxes. Unique per faction + jurisdiction |
+| `JurisdictionSettings` (`JurisdictionSettingModel`) | `JurisdictionId` → jurisdictions (cascade), `Key` (64), `Value` (64, null = inherits), `BindsSubJurisdictions` | One row per jurisdiction and setting key. A row with neither a value nor a binding is removed. Unique per jurisdiction + key |
 
-See [Jurisdictions](features/jurisdictions.md).
+See [Jurisdictions](features/jurisdictions.md) and [Jurisdiction settings](features/jurisdictions/settings.md).
 
 ## Items, inventories and money
 

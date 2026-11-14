@@ -158,6 +158,12 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 |---|---|---|---|
 | `/fish` | Default | Command to start fishing. | [Fishing](features/fishing.md) |
 
+## Jurisdictions
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/government` | Default | Change the settings of the jurisdictions your faction governs. | [Jurisdiction settings](features/jurisdictions/settings.md) |
+
 ## Phone
 
 | Command | Groups | Description | Feature |

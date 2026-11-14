@@ -3,12 +3,12 @@ using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Actors.Components;
 using OpenRP.Framework.Features.Banking.Entities;
 using OpenRP.Framework.Features.Banking.Enums;
+using OpenRP.Framework.Features.Banking.Helpers;
 using OpenRP.Framework.Features.Factions.Components;
 using OpenRP.Framework.Features.Jurisdictions.Components;
 using OpenRP.Framework.Features.Jurisdictions.Services;
 using OpenRP.Framework.Features.Properties.Components;
 using System;
-using System.Globalization;
 using System.Linq;
 
 namespace OpenRP.Framework.Features.Banking.Services
@@ -73,13 +73,15 @@ namespace OpenRP.Framework.Features.Banking.Services
 
         public string? SetMonthlyFee(BankModel bank, string feeText)
         {
-            if (!decimal.TryParse(feeText.Trim().TrimStart('$'), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal fee)
-                || fee < 0 || fee > BankingRules.MaxMonthlyFee || decimal.Round(fee, 2) != fee)
+            decimal maxMonthlyFee = _bankService.GetMaxMonthlyFee(bank);
+            decimal? fee = BankAmounts.ParseFee(feeText, maxMonthlyFee);
+            if (fee == null)
             {
-                return $"The fee is an amount from 0 to {BankingRules.MaxMonthlyFee:0}, with at most 2 decimals.";
+                return $"The fee is an amount from 0 to {_bankService.FormatFee(bank, maxMonthlyFee)}, with at most 2 decimals.";
             }
 
-            _database.Use(db => db.Banks.Where(row => row.Id == bank.Id).ExecuteUpdate(setters => setters.SetProperty(row => row.MonthlyFee, fee)));
+            decimal monthlyFee = fee.Value;
+            _database.Use(db => db.Banks.Where(row => row.Id == bank.Id).ExecuteUpdate(setters => setters.SetProperty(row => row.MonthlyFee, monthlyFee)));
             return null;
         }
 

@@ -33,7 +33,8 @@ A teller only does what an admin allowed it to (see [Tellers](banking/tellers.md
 3. **Accounts** have one owner (a character, a faction or a property), and others can get view-only or full access. See [Accounts](banking/accounts.md).
 4. **The form does the work.** The teller only opens it. You type and confirm amounts and OBANs yourself, and every check runs again on each step: the teller is still there, you still have access, the money is there.
    - **Why:** whatever a player says to the AI, it can't move money, choose an amount or act for someone else.
-5. **Fees:** an account costs its bank's monthly fee (at most 100) every 30 days, paid into the bank's own account.
+5. **Fees:** an account costs its bank's monthly fee every 30 days, paid into the bank's own account. The fee is held to the bank's fee cap, which comes from its jurisdiction and is 100 unless a government has set another. See [Jurisdiction settings](jurisdictions/settings.md).
+   - **Why:** a government can lower the cap after a bank has set its fee. The bank's own fee isn't rewritten, so raising the cap again brings it back.
 
 ## When the territory changes country
 
@@ -55,7 +56,6 @@ A bank's city can be annexed or become independent ("Lies in" in `/editjurisdict
 
 - **No ATMs, cheques, cards, interest or loans.**
 - **Local currency only,** and no currency exchange.
-- **The fee cap** is fixed at 100; governments can't set it yet.
 - **Property accounts** are opened by admins, because properties have no owners yet.
 - **No payroll** or automatic payments.
 

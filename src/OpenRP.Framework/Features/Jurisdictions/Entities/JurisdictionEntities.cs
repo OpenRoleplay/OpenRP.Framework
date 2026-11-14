@@ -10,6 +10,8 @@ namespace OpenRP.Framework.Features.Jurisdictions.Entities
 
         public static readonly Guid FactionTaxRegistrationType = new Guid("89E2188C-0C54-49B9-922C-8D1F1298895E");
 
+        public static readonly Guid JurisdictionSettingType = new Guid("66348A08-D2C4-4977-A51A-DBB2513A0425");
+
         public static EntityId GetJurisdictionId(int jurisdictionId)
         {
             return RowEntityIds.Get(JurisdictionType, jurisdictionId);

@@ -46,6 +46,7 @@ namespace OpenRP.Framework.Database
         public DbSet<AccountSettingsModel> AccountSettings { get; set; }
         public DbSet<JurisdictionModel> Jurisdictions { get; set; }
         public DbSet<FactionTaxRegistrationModel> FactionTaxRegistrations { get; set; }
+        public DbSet<JurisdictionSettingModel> JurisdictionSettings { get; set; }
         public DbSet<PhoneModel> Phones { get; set; }
         public DbSet<PhoneContactModel> PhoneContacts { get; set; }
         public DbSet<PhoneMessageModel> PhoneMessages { get; set; }
