@@ -244,8 +244,15 @@ Table `FishLoot`, with the `DbSet` named `FishSpecies` (`FishLootModel`). Column
 - `OddsToCatch`: 1 in N;
 - `ItemId` → `Items`.
 
-## Models without a table
+## Maps
 
-`MapModel` (`Name`) exists, but has no `DbSet`, so it isn't part of the database. See [Maps](features/maps.md).
+| Table | Columns | Notes |
+|---|---|---|
+| `Maps` (`MapModel`) | `Name` (64, unique), `IsLoaded` | Loaded maps come back after a restart. Only a loaded map's objects are in the game |
+| `MapObjects` (`MapObjectModel`) | `MapId` → `Maps` (cascade), `ModelId` (negative = custom model), `X/Y/Z`, `RotX/RotY/RotZ`, `VirtualWorld`, `Interior` (-1 = everywhere), `Description` (64) | Each object has its own world and interior. The columns have no database default: new objects get -1 from the model |
+| `MapObjectMaterials` (`MapObjectMaterialModel`) | `MapObjectId` → `MapObjects` (cascade), `MaterialIndex` (0 to 15), `Type` (Texture or Text), `ModelId`, `TxdName` (64), `TextureName` (64), `Color` (ARGB, 0 = original colour), `Text` (256), `MaterialSize`, `FontFace` (64), `FontSize`, `Bold`, `FontColor`, `BackColor`, `Alignment` (0 left, 1 centre, 2 right) | Unique per object + material index. Texture columns are used for textures, text columns for text |
+| `MapRemovedBuildings` (`MapRemovedBuildingModel`) | `MapId` → `Maps` (cascade), `ModelId`, `X/Y/Z`, `Radius` | A GTA building removed for the players of a map |
+
+See [Maps](features/maps.md).
 
 Want more? → [Persistence](persistence.md) · [Glossary](glossary.md)

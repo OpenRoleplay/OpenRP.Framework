@@ -32,6 +32,10 @@ namespace OpenRP.Framework.Database
         public DbSet<CharacterPreferencesModel> CharacterPreferences { get; set; }
         public DbSet<PropertyModel> Properties { get; set; }
         public DbSet<PropertyDoorModel> PropertyDoors { get; set; }
+        public DbSet<MapModel> Maps { get; set; }
+        public DbSet<MapObjectModel> MapObjects { get; set; }
+        public DbSet<MapObjectMaterialModel> MapObjectMaterials { get; set; }
+        public DbSet<MapRemovedBuildingModel> MapRemovedBuildings { get; set; }
         public DbSet<MainMenuSceneModel> MainMenuScenes { get; set; }
         public DbSet<FactionModel> Factions { get; set; }
         public DbSet<FactionRankModel> FactionRanks { get; set; }

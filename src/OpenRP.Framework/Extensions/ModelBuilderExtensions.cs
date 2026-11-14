@@ -13,6 +13,7 @@ using OpenRP.Framework.Features.Inventories.Models.DefaultData;
 using OpenRP.Framework.Features.Items.Models.Configurations;
 using OpenRP.Framework.Features.Items.Models.DefaultData;
 using OpenRP.Framework.Features.Jurisdictions.Models.Configurations;
+using OpenRP.Framework.Features.Maps.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.DefaultData;
 using OpenRP.Framework.Features.Phones.Models.Configurations;
@@ -89,6 +90,11 @@ namespace OpenRP.Framework.Extensions
 
             modelBuilder.ApplyConfiguration(new PropertyModelConfiguration());
             modelBuilder.ApplyConfiguration(new PropertyDoorModelConfiguration());
+
+            modelBuilder.ApplyConfiguration(new MapModelConfiguration());
+            modelBuilder.ApplyConfiguration(new MapObjectModelConfiguration());
+            modelBuilder.ApplyConfiguration(new MapObjectMaterialModelConfiguration());
+            modelBuilder.ApplyConfiguration(new MapRemovedBuildingModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new VehicleModelConfiguration());
             modelBuilder.ApplyConfiguration(new VehicleModelDefaultColorConfiguration());
