@@ -1,685 +1,371 @@
-﻿using OpenRP.Framework.Features.Vehicles.Components;
-using OpenRP.Framework.Shared.Chat.Enums;
-using OpenRP.Framework.Shared.Dialogs.Helpers;
-using OpenRP.Framework.Shared;
-using SampSharp.Entities.SAMP;
-using SampSharp.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenRP.Framework.Shared.Chat.Extensions;
-using OpenRP.Framework.Features.Vehicles.Services;
-using OpenRP.Framework.Database;
+﻿using OpenRP.Framework.Database;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Jurisdictions.Services;
 using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
 using OpenRP.Framework.Features.Radios.Services;
+using OpenRP.Framework.Features.Vehicles.Components;
+using OpenRP.Framework.Features.Vehicles.Services;
+using OpenRP.Framework.Shared;
+using OpenRP.Framework.Shared.Chat.Enums;
+using OpenRP.Framework.Shared.Chat.Extensions;
 using OpenRP.Framework.Shared.Dialogs.Extensions;
+using OpenRP.Framework.Shared.Dialogs.Helpers;
+using SampSharp.Entities;
+using SampSharp.Entities.SAMP;
+using System;
+using System.Collections.Generic;
 
 namespace OpenRP.Framework.Features.Vehicles.Dialogs
 {
+    /// <summary>
+    /// The vehicle editor. It edits a copy of the vehicle's data: nothing reaches the database or the live vehicle until
+    /// Save. Cancel, or closing the dialog, throws the copy away.
+    /// </summary>
     public partial class CreateOrUpdateVehicleDialog
     {
-        public static void Open(Player player, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, IRadioService radioService, IRadioEditorService radioEditorService, BaseDataContext context, CreateOrUpdateVehicleDataComponent createOrUpdateVehicleDataComponent)
+        private readonly Player _player;
+        private readonly IDialogService _dialogService;
+        private readonly IEntityManager _entityManager;
+        private readonly IVehicleManager _vehicleManager;
+        private readonly IJurisdictionService _jurisdictionService;
+        private readonly IJurisdictionDialogService _jurisdictionDialogService;
+        private readonly IRadioService _radioService;
+        private readonly IRadioEditorService _radioEditorService;
+        private readonly IVehicleKeyService _vehicleKeyService;
+        private readonly BaseDataContext _context;
+        private readonly CreateOrUpdateVehicleDataComponent _component;
+
+        private CreateOrUpdateVehicleDialog(Player player, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager,
+            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, IRadioService radioService,
+            IRadioEditorService radioEditorService, IVehicleKeyService vehicleKeyService, BaseDataContext context, CreateOrUpdateVehicleDataComponent component)
         {
-            if (createOrUpdateVehicleDataComponent != null)
+            _player = player;
+            _dialogService = dialogService;
+            _entityManager = entityManager;
+            _vehicleManager = vehicleManager;
+            _jurisdictionService = jurisdictionService;
+            _jurisdictionDialogService = jurisdictionDialogService;
+            _radioService = radioService;
+            _radioEditorService = radioEditorService;
+            _vehicleKeyService = vehicleKeyService;
+            _context = context;
+            _component = component;
+        }
+
+        /// <summary>
+        /// The data being edited. Every row changes this copy.
+        /// </summary>
+        private VehicleModel Data => _component.CreateOrUpdateVehicleData;
+
+        public static void Open(Player player, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, IRadioService radioService, IRadioEditorService radioEditorService, IVehicleKeyService vehicleKeyService, BaseDataContext context, CreateOrUpdateVehicleDataComponent createOrUpdateVehicleDataComponent)
+        {
+            CreateOrUpdateVehicleDialog editor = new CreateOrUpdateVehicleDialog(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, vehicleKeyService, context, createOrUpdateVehicleDataComponent);
+            editor.ShowEditor();
+        }
+
+        /// <summary>
+        /// Shows the rows. It's shown again after every change, so the rows always show the copy.
+        /// </summary>
+        private void ShowEditor()
+        {
+            string dialogName = DialogHelper.GetTitle(_component.EditedVehicle == null
+                ? "Vehicle Creator"
+                : $"Vehicle Editor{ChatColor.CornflowerBlue} -> {ChatColor.White}{_vehicleManager.DescribeModel(Data)}");
+
+            List<string> dialogColumnHeaders = new List<string>
             {
-                // Set the dialog title based on whether we're editing or creating
-                StringBuilder dialogNameBuilder = new StringBuilder();
-                if (createOrUpdateVehicleDataComponent.EditedVehicle == null)
+                ChatColor.CornflowerBlue + "Key",
+                ChatColor.CornflowerBlue + "Value"
+            };
+
+            TablistDialog dialog = new TablistDialog(dialogName, "Edit", "Cancel", dialogColumnHeaders.ToArray());
+            foreach (List<string> row in GetEditorRows())
+            {
+                dialog.Add(row.ToArray());
+            }
+
+            _dialogService.ShowIgnoringDisconnect(_player, dialog, HandleRowChosen);
+        }
+
+        /// <summary>
+        /// The rows in the order of their indexes in <see cref="HandleRowChosen"/>.
+        /// </summary>
+        private List<List<string>> GetEditorRows()
+        {
+            List<List<string>> rows = new List<List<string>>();
+
+            // Values can be empty, so they're never assumed to be set.
+            void AddRow(string key, object? value)
+            {
+                rows.Add(new List<string>
                 {
-                    dialogNameBuilder.Append("Vehicle Creator");
-                }
-                else
-                {
-                    dialogNameBuilder.Append("Vehicle Editor");
-                    dialogNameBuilder.Append(ChatColor.CornflowerBlue + " -> " + ChatColor.White);
-                    dialogNameBuilder.Append(createOrUpdateVehicleDataComponent.EditedVehicle.Model.ToString());
-                }
+                    ChatColor.White + key,
+                    ChatColor.CornflowerBlue + (value?.ToString() ?? "None")
+                });
+            }
 
-                string dialogName = DialogHelper.GetTitle(dialogNameBuilder.ToString());
+            AddRow("Model ID", _vehicleManager.DescribeModel(Data));
+            AddRow("Position (X, Y, Z) + Heading", $"({Data.X}, {Data.Y}, {Data.Z}) + ({Data.Rotation})");
+            AddRow("Color 1", Data.Color1);
+            AddRow("Color 2", Data.Color2);
+            AddRow("Engine On", Data.IsEngineOn);
+            AddRow("Lights On", Data.AreLightsOn);
+            AddRow("Alarm On", Data.IsAlarmOn);
+            AddRow("Doors Locked", Data.AreDoorsLocked);
+            AddRow("Bonnet Open", Data.IsBonnetOpen);
+            AddRow("Boot Open", Data.IsBootOpen);
+            AddRow("Driver Door Open", Data.IsDriverDoorOpen);
+            AddRow("Passenger Door Open", Data.IsPassengerDoorOpen);
+            AddRow("Back Left Door Open", Data.IsBackLeftDoorOpen);
+            AddRow("Back Right Door Open", Data.IsBackRightDoorOpen);
+            AddRow("Driver Window Closed", Data.IsDriverWindowClosed);
+            AddRow("Passenger Window Closed", Data.IsPassengerWindowClosed);
+            AddRow("Back Left Window Closed", Data.IsBackLeftWindowClosed);
+            AddRow("Back Right Window Closed", Data.IsBackRightWindowClosed);
+            AddRow("Current Health", Data.CurrentHealth);
+            AddRow("Max Health", Data.MaxHealth);
+            AddRow("Registered in", GetRegisteredInLabel());
+            AddRow("Radio", GetRadioLabel());
+            AddRow("Owner", GetOwnerLabel());
+            AddRow("Server vehicle", Data.ServerVehicle ? "Yes" : "No");
+            AddRow("Virtual world and interior", $"{Data.VirtualWorld} and {Data.Interior}");
+            AddRow("Give key", GetGiveKeyLabel());
+            AddRow("Save", string.Empty);
+            return rows;
+        }
 
-                // Fill dialog headers
-                List<string> dialogColumnHeaders = new List<string>
-                {
-                    ChatColor.CornflowerBlue + "Key",
-                    ChatColor.CornflowerBlue + "Value"
-                };
+        private void HandleRowChosen(TablistDialogResponse response)
+        {
+            if (response.Response != DialogResponse.LeftButton)
+            {
+                return;
+            }
 
-                // Prepare rows for each vehicle property
-                List<List<string>> dialogRows = new List<List<string>>();
+            switch (response.ItemIndex)
+            {
+                case 0: // Model ID
+                    AskForModelId();
+                    break;
 
-                // Values can be empty (a random vehicle has no ModelId), so they're never assumed to be set.
-                void AddRow(string key, object? value)
-                {
-                    dialogRows.Add(new List<string>
-                    {
-                        ChatColor.White + key,
-                        ChatColor.CornflowerBlue + (value?.ToString() ?? "None")
-                    });
-                }
+                case 1: // Position + heading
+                    AskForPosition();
+                    break;
 
-                AddRow("Model ID", GetModelLabel(createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData));
-                AddRow("Position (X, Y, Z) + Rotation (Z)", $"({createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.X}, {createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Y}, {createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Z}) + ({createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Rotation})");
-                AddRow("Color 1", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Color1);
-                AddRow("Color 2", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Color2);
-                AddRow("Engine On", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsEngineOn);
-                AddRow("Lights On", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.AreLightsOn);
-                AddRow("Alarm On", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsAlarmOn);
-                AddRow("Doors Locked", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.AreDoorsLocked);
-                AddRow("Bonnet Open", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBonnetOpen);
-                AddRow("Boot Open", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBootOpen);
-                AddRow("Driver Door Open", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsDriverDoorOpen);
-                AddRow("Passenger Door Open", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsPassengerDoorOpen);
-                AddRow("Back Left Door Open", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackLeftDoorOpen);
-                AddRow("Back Right Door Open", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackRightDoorOpen);
-                AddRow("Driver Window Closed", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsDriverWindowClosed);
-                AddRow("Passenger Window Closed", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsPassengerWindowClosed);
-                AddRow("Back Left Window Closed", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackLeftWindowClosed);
-                AddRow("Back Right Window Closed", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackRightWindowClosed);
-                AddRow("Current Health", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.CurrentHealth);
-                AddRow("Max Health", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.MaxHealth);
-                AddRow("Registered in", GetRegisteredInLabel(jurisdictionService, createOrUpdateVehicleDataComponent));
-                AddRow("Radio", GetRadioLabel(radioService, createOrUpdateVehicleDataComponent));
-                AddRow("Save", string.Empty);
+                case 2: // Color 1
+                    AskForInteger("Edit Color 1", Data.Color1, color => Data.Color1 = color, "You have entered an invalid color.");
+                    break;
 
-                // Create the dialog
-                TablistDialog dialog = new TablistDialog(
-                    dialogName,
-                    "Edit",
-                    "Cancel",
-                    dialogColumnHeaders.ToArray());
+                case 3: // Color 2
+                    AskForInteger("Edit Color 2", Data.Color2, color => Data.Color2 = color, "You have entered an invalid color.");
+                    break;
 
-                foreach (List<string> rows in dialogRows)
-                {
-                    dialog.Add(rows.ToArray());
-                }
+                case 4:
+                    ToggleProperty("Engine On", () => Data.IsEngineOn, value => Data.IsEngineOn = value);
+                    break;
 
-                // Dialog Response
-                void DialogHandler(TablistDialogResponse r)
-                {
-                    if (r.Response != DialogResponse.LeftButton)
-                    {
-                        return;
-                    }
+                case 5:
+                    ToggleProperty("Lights On", () => Data.AreLightsOn, value => Data.AreLightsOn = value);
+                    break;
 
-                    int index = r.ItemIndex;
+                case 6:
+                    ToggleProperty("Alarm On", () => Data.IsAlarmOn, value => Data.IsAlarmOn = value);
+                    break;
 
-                    switch (index)
-                    {
-                        case 0: // Model ID
-                            OpenInputDialog(player, dialogService, "Edit Model ID", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.ModelId.ToString(), value =>
-                            {
-                                bool invalidId = false;
-                                if (int.TryParse(value, out int result))
-                                {
-                                    if (result >= 400 && result <= 611)
-                                    {
-                                        //createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.ModelId = result;
+                case 7:
+                    ToggleProperty("Doors Locked", () => Data.AreDoorsLocked, value => Data.AreDoorsLocked = value);
+                    break;
 
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    }
-                                    else
-                                    {
-                                        invalidId = true;
-                                    }
-                                }
-                                else
-                                {
-                                    invalidId = true;
-                                }
+                case 8:
+                    ToggleProperty("Bonnet Open", () => Data.IsBonnetOpen, value => Data.IsBonnetOpen = value);
+                    break;
 
-                                if (invalidId)
-                                {
-                                    OpenMessageDialog(player, dialogService, "Invalid Id", "You have entered an invalid id. Make sure the id is valid and between 400 and 611.",
-                                    () => // Left button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    },
-                                    () => // Right button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    });
-                                }
-                            });
-                            break;
+                case 9:
+                    ToggleProperty("Boot Open", () => Data.IsBootOpen, value => Data.IsBootOpen = value);
+                    break;
 
-                        case 1: // Position
-                            Vector3 newPosition;
-                            float newRotation;
-                            if (player.InAnyVehicle)
-                            {
-                                // Retrieve the VehicleComponent
-                                Vehicle vehiclePlayerIsIn = entityManager.GetComponent<Vehicle>(player.Vehicle);
-                                newPosition = vehiclePlayerIsIn.Position;
-                                newRotation = vehiclePlayerIsIn.Rotation.Z;
-                            }
-                            else
-                            {
-                                newPosition = player.Position;
-                                newRotation = player.Angle;
-                            }
+                case 10:
+                    ToggleProperty("Driver Door Open", () => Data.IsDriverDoorOpen, value => Data.IsDriverDoorOpen = value);
+                    break;
 
-                            OpenMessageDialog(player, dialogService, "Edit Position + Rotation", $"Are you sure that you want to change the position of the vehicle to {newPosition.X}, {newPosition.Y}, {newPosition.Z} with rotation {newRotation}?",
-                            () => // Left button
-                            {
-                                createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.X = newPosition.X;
-                                createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Y = newPosition.Y;
-                                createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Z = newPosition.Z;
-                                createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Rotation = newRotation;
+                case 11:
+                    ToggleProperty("Passenger Door Open", () => Data.IsPassengerDoorOpen, value => Data.IsPassengerDoorOpen = value);
+                    break;
 
-                                Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                            },
-                            () => // Right button
-                            {
-                                Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                            });
-                            break;
+                case 12:
+                    ToggleProperty("Back Left Door Open", () => Data.IsBackLeftDoorOpen, value => Data.IsBackLeftDoorOpen = value);
+                    break;
 
-                        case 2: // Color 1
-                            OpenInputDialog(player, dialogService, "Edit Color 1", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Color1.ToString(), value =>
-                            {
-                                bool invalidColor = false;
-                                if (int.TryParse(value, out int result))
-                                {
-                                    createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Color1 = result;
+                case 13:
+                    ToggleProperty("Back Right Door Open", () => Data.IsBackRightDoorOpen, value => Data.IsBackRightDoorOpen = value);
+                    break;
 
-                                    if (createOrUpdateVehicleDataComponent.EditedVehicle != null)
-                                    {
-                                        vehicleManager.UpdateVehicle(createOrUpdateVehicleDataComponent.EditedVehicle, createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData);
-                                    }
+                case 14:
+                    ToggleProperty("Driver Window Closed", () => Data.IsDriverWindowClosed, value => Data.IsDriverWindowClosed = value);
+                    break;
 
-                                    Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                }
-                                else
-                                {
-                                    invalidColor = true;
-                                }
+                case 15:
+                    ToggleProperty("Passenger Window Closed", () => Data.IsPassengerWindowClosed, value => Data.IsPassengerWindowClosed = value);
+                    break;
 
-                                if (invalidColor)
-                                {
-                                    OpenMessageDialog(player, dialogService, "Invalid Color", "You have entered an invalid Color.",
-                                    () => // Left button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    },
-                                    () => // Right button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    });
-                                }
-                            });
-                            break;
+                case 16:
+                    ToggleProperty("Back Left Window Closed", () => Data.IsBackLeftWindowClosed, value => Data.IsBackLeftWindowClosed = value);
+                    break;
 
-                        case 3: // Color 2
-                            OpenInputDialog(player, dialogService, "Edit Color 2", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Color2.ToString(), value =>
-                            {
-                                bool invalidColor = false;
-                                if (int.TryParse(value, out int result))
-                                {
-                                    createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.Color2 = result;
+                case 17:
+                    ToggleProperty("Back Right Window Closed", () => Data.IsBackRightWindowClosed, value => Data.IsBackRightWindowClosed = value);
+                    break;
 
-                                    if (createOrUpdateVehicleDataComponent.EditedVehicle != null)
-                                    {
-                                        vehicleManager.UpdateVehicle(createOrUpdateVehicleDataComponent.EditedVehicle, createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData);
-                                    }
+                case 18: // Current health
+                    AskForFloat("Edit Current Vehicle Health", Data.CurrentHealth, health => Data.CurrentHealth = health, "You have entered an invalid vehicle health.");
+                    break;
 
-                                    Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                }
-                                else
-                                {
-                                    invalidColor = true;
-                                }
+                case 19: // Max health
+                    AskForFloat("Edit Max Vehicle Health", Data.MaxHealth, health => Data.MaxHealth = health, "You have entered an invalid vehicle health.");
+                    break;
 
-                                if (invalidColor)
-                                {
-                                    OpenMessageDialog(player, dialogService, "Invalid Color", "You have entered an invalid Color.",
-                                    () => // Left button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    },
-                                    () => // Right button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    });
-                                }
-                            });
-                            break;
+                case 20: // Registered in
+                    OpenRegisteredIn();
+                    break;
 
-                        case 4: // Engine On/Off
+                case 21: // Radio
+                    ToggleRadio();
+                    break;
 
-                            createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsEngineOn = !createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsEngineOn;
+                case 22: // Owner
+                    AskForOwner();
+                    break;
 
-                            // Show a confirmation message
-                            string engineStatus = createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsEngineOn ? "on" : "off";
-                            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"Vehicle engine turned {engineStatus}.");
+                case 23: // Server vehicle
+                    ToggleServerVehicle();
+                    break;
 
-                            // Re-open the main dialog after the change
-                            Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                            break;
+                case 24: // Virtual world and interior
+                    AskForWorldAndInterior();
+                    break;
 
-                        case 5: // Lights On/Off
+                case 25: // Give key
+                    GiveKey();
+                    break;
 
-                            createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.AreLightsOn = !createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.AreLightsOn;
+                case 26: // Save
+                    SaveVehicleData();
+                    break;
 
-                            // Show a confirmation message
-                            string lightStatus = createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.AreLightsOn ? "on" : "off";
-                            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"Vehicle lights turned {lightStatus}.");
-
-                            // Re-open the main dialog after the change
-                            Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                            break;
-
-                        case 6: // Alarm On/Off
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Alarm On",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsAlarmOn,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsAlarmOn = value
-                            );
-                            break;
-
-                        case 7: // Doors Locked/Unlocked
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Are Doors Locked",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.AreDoorsLocked,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.AreDoorsLocked = value
-                            );
-                            break;
-
-                        case 8: // Bonnet Open/Closed
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Bonnet Open",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBonnetOpen,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBonnetOpen = value
-                            );
-                            break;
-
-                        case 9: // Boot Open/Closed
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Boot Open",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBootOpen,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBootOpen = value
-                            );
-                            break;
-
-                        case 10: // Driver Door Open/Closed
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Driver Door Open",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsDriverDoorOpen,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsDriverDoorOpen = value
-                            );
-                            break;
-
-                        case 11: // Passenger Door Open/Closed
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Passenger Door Open",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsPassengerDoorOpen,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsPassengerDoorOpen = value
-                            );
-                            break;
-
-                        case 12: // Back Left Door Open/Closed
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Back Left Door Open",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackLeftDoorOpen,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackLeftDoorOpen = value
-                            );
-                            break;
-
-                        case 13: // Back Right Door Open/Closed
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Back Right Door Open",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackRightDoorOpen,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackRightDoorOpen = value
-                            );
-                            break;
-
-                        case 14: // Driver Window Closed/Open
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Driver Window Closed",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsDriverWindowClosed,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsDriverWindowClosed = value
-                            );
-                            break;
-
-                        case 15: // Passenger Window Closed/Open
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Passenger Window Closed",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsPassengerWindowClosed,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsPassengerWindowClosed = value
-                            );
-                            break;
-
-                        case 16: // Back Left Window Closed/Open
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Back Left Window Closed",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackLeftWindowClosed,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackLeftWindowClosed = value
-                            );
-                            break;
-
-                        case 17: // Back Right Window Closed/Open
-                            ToggleProperty(
-                                player,
-                                createOrUpdateVehicleDataComponent,
-                                dialogService,
-                                entityManager,
-                                vehicleManager,
-                                jurisdictionService,
-                                jurisdictionDialogService,
-                                radioService,
-                                radioEditorService,
-                                context,
-                                "Is Back Right Window Closed",
-                                () => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackRightWindowClosed,
-                                value => createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.IsBackRightWindowClosed = value
-                            );
-                            break;
-
-                        case 18: // Current Vehicle Health
-                            OpenInputDialog(player, dialogService, "Edit Current Vehicle Health", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.CurrentHealth.ToString(), value =>
-                            {
-                                bool invalidHealth = false;
-                                if (float.TryParse(value, out float result))
-                                {
-                                    createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.CurrentHealth = result;
-
-                                    Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                }
-                                else
-                                {
-                                    invalidHealth = true;
-                                }
-
-                                if (invalidHealth)
-                                {
-                                    OpenMessageDialog(player, dialogService, "Invalid Vehicle Health", "You have entered an invalid Vehicle Health.",
-                                    () => // Left button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    },
-                                    () => // Right button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    });
-                                }
-                            });
-                            break;
-
-                        case 19: // mAX Vehicle Health
-                            OpenInputDialog(player, dialogService, "Edit Max Vehicle Health", createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.MaxHealth.ToString(), value =>
-                            {
-                                bool invalidHealth = false;
-                                if (float.TryParse(value, out float result))
-                                {
-                                    createOrUpdateVehicleDataComponent.CreateOrUpdateVehicleData.MaxHealth = result;
-
-                                    Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                }
-                                else
-                                {
-                                    invalidHealth = true;
-                                }
-
-                                if (invalidHealth)
-                                {
-                                    OpenMessageDialog(player, dialogService, "Invalid Vehicle Health", "You have entered an invalid Vehicle Health.",
-                                    () => // Left button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    },
-                                    () => // Right button
-                                    {
-                                        Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                                    });
-                                }
-                            });
-                            break;
-
-                        case 20: // Registered in
-                            OpenRegisteredIn(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                            break;
-
-                        case 21: // Radio
-                            ToggleRadio(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, createOrUpdateVehicleDataComponent);
-                            break;
-
-                        case 22: // Save Vehicle Data
-                            SaveVehicleData(createOrUpdateVehicleDataComponent, vehicleManager, context);
-                            InstallRadioAfterSave(player, radioEditorService, createOrUpdateVehicleDataComponent);
-                            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "Vehicle data has been saved successfully.");
-                            break;
-
-                        default:
-                            player.SendClientMessage(ChatColor.Red + "This field is not yet editable.");
-                            break;
-                    }
-                };
-
-                // Show the dialog to the player
-                dialogService.ShowIgnoringDisconnect(player, dialog, DialogHandler);
+                default:
+                    _player.SendClientMessage(ChatColor.Red + "This field is not yet editable.");
+                    ShowEditor();
+                    break;
             }
         }
 
         /// <summary>
-        /// The vehicle's fixed model, or the spawn type a random model is picked from when it spawns.
+        /// Moves the copy to the position and heading of the admin, or of their vehicle when they're in one.
         /// </summary>
-        private static string GetModelLabel(VehicleModel vehicleData)
+        private void AskForPosition()
         {
-            if (vehicleData.ModelId.HasValue)
+            Vector3 position;
+            float heading;
+            if (_player.InAnyVehicle)
             {
-                return $"#{vehicleData.ModelId.Value}";
+                Vehicle vehiclePlayerIsIn = _entityManager.GetComponent<Vehicle>(_player.Vehicle);
+                position = vehiclePlayerIsIn.Position;
+                heading = vehiclePlayerIsIn.Angle;
             }
-            return vehicleData.ModelSpawnTypeId.HasValue ? $"Random (spawn type #{vehicleData.ModelSpawnTypeId.Value})" : "None";
+            else
+            {
+                position = _player.Position;
+                heading = _player.Angle;
+            }
+
+            OpenMessageDialog("Edit Position + Heading", $"Are you sure that you want to change the position of the vehicle to {position.X}, {position.Y}, {position.Z} with heading {heading}?",
+                () =>
+                {
+                    Data.X = position.X;
+                    Data.Y = position.Y;
+                    Data.Z = position.Z;
+                    Data.Rotation = heading;
+                    ShowEditor();
+                },
+                ShowEditor);
         }
 
-        private static void OpenInputDialog(Player player, IDialogService dialogService, string title, string defaultValue, Action<string> onInput, Action onReturn = null)
+        private void AskForInteger(string title, int currentValue, Action<int> setValue, string invalidText)
+        {
+            OpenInputDialog(title, currentValue.ToString(), value =>
+            {
+                if (!int.TryParse(value, out int result))
+                {
+                    OpenMessageDialog("Invalid Value", invalidText, ShowEditor, ShowEditor);
+                    return;
+                }
+
+                setValue(result);
+                ShowEditor();
+            }, ShowEditor);
+        }
+
+        private void AskForFloat(string title, float currentValue, Action<float> setValue, string invalidText)
+        {
+            OpenInputDialog(title, currentValue.ToString(), value =>
+            {
+                if (!float.TryParse(value, out float result))
+                {
+                    OpenMessageDialog("Invalid Value", invalidText, ShowEditor, ShowEditor);
+                    return;
+                }
+
+                setValue(result);
+                ShowEditor();
+            }, ShowEditor);
+        }
+
+        /// <summary>
+        /// Flips a yes or no property of the copy. It reaches the vehicle when the editor is saved.
+        /// </summary>
+        private void ToggleProperty(string propertyName, Func<bool> getProperty, Action<bool> setProperty)
+        {
+            bool newValue = !getProperty();
+            setProperty(newValue);
+            _player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"{propertyName} is now {(newValue ? "Yes" : "No")}. It takes effect when you save.");
+            ShowEditor();
+        }
+
+        private void OpenInputDialog(string title, string defaultValue, Action<string> onInput, Action onReturn, string prompt = "Enter new value:")
         {
             InputDialog inputDialog = new InputDialog()
             {
                 Caption = ChatColor.CornflowerBlue + title,
-                Content = ChatColor.White + $"Enter new value:",
+                Content = ChatColor.White + prompt,
                 Button1 = "Edit",
                 Button2 = "Cancel"
             };
 
-            void DialogHandler(InputDialogResponse r)
+            _dialogService.ShowIgnoringDisconnect(_player, inputDialog, response =>
             {
-                string value = r.InputText;
-
-                if (value == null)
+                if (response.Response != DialogResponse.LeftButton)
                 {
-                    value = defaultValue;
+                    onReturn();
+                    return;
                 }
-
-                if (r.Response == DialogResponse.LeftButton)
-                {
-                    onInput?.Invoke(value);
-                }
-                else
-                {
-                    onReturn?.Invoke();
-                }
-            };
-
-            dialogService.ShowIgnoringDisconnect(player, inputDialog, DialogHandler);
+                onInput(response.InputText ?? defaultValue);
+            });
         }
 
-        private static void OpenMessageDialog(Player player, IDialogService dialogService, string title, string content, Action onInput, Action onReturn)
+        private void OpenMessageDialog(string title, string content, Action onInput, Action onReturn)
         {
             MessageDialog messageDialog = new MessageDialog(ChatColor.CornflowerBlue + title, ChatColor.White + content, "Edit", "Cancel");
 
-            void DialogHandler(MessageDialogResponse r)
+            _dialogService.ShowIgnoringDisconnect(_player, messageDialog, response =>
             {
-                if (r.Response == DialogResponse.LeftButton)
+                if (response.Response == DialogResponse.LeftButton)
                 {
-                    onInput?.Invoke();
+                    onInput();
                 }
                 else
                 {
-                    onReturn?.Invoke();
+                    onReturn();
                 }
-            };
-
-            dialogService.ShowIgnoringDisconnect(player, messageDialog, DialogHandler);
-        }
-
-        private static void ToggleProperty(Player player, CreateOrUpdateVehicleDataComponent component, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, IRadioService radioService, IRadioEditorService radioEditorService, BaseDataContext context, string propertyName, Func<bool> getProperty, Action<bool> setProperty)
-        {
-            // Get the current value of the property
-            bool currentValue = getProperty();
-
-            // Toggle the value
-            bool newValue = !currentValue;
-
-            // Set the new value
-            setProperty(newValue);
-
-            // Show a confirmation message
-            player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"{propertyName} is now {newValue.ToString()}.");
-
-            if (component.EditedVehicle != null)
-            {
-                vehicleManager.UpdateVehicle(component.EditedVehicle, component.CreateOrUpdateVehicleData);
-            }
-
-            // Re-open the main dialog after the change
-            Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, component);
-        }
-
-        private static void SaveVehicleData(CreateOrUpdateVehicleDataComponent component, IVehicleManager vehicleManager, BaseDataContext context)
-        {
-            var vehicleData = component.CreateOrUpdateVehicleData;
-
-            if (vehicleData.Id == 0)
-            {
-                // Insert new vehicle data
-                context.Vehicles.Add(vehicleData);
-            }
-            else
-            {
-                // Update existing vehicle data
-                context.Vehicles.Update(vehicleData);
-                if (component.EditedVehicle != null)
-                {
-                    vehicleManager.UpdateVehicle(component.EditedVehicle, vehicleData);
-                }
-            }
-
-            context.SaveChanges();
-            vehicleManager.LoadAndUnloadVehicles();
+            });
         }
     }
 }

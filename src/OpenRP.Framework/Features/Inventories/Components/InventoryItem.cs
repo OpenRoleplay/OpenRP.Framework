@@ -19,7 +19,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
     {
         private const string InventoryKey = "INVENTORY";
         private const string SkinKey = "SKIN";
-        private const string VehicleIdKey = "VEHICLE_ID";
+        public const string VehicleIdKey = "VEHICLE_ID";
         private const string PhoneIdKey = "PHONE_ID";
         private const string RadioIdKey = "RADIO_ID";
 

@@ -208,15 +208,16 @@ Persistent vehicles.
 
 | Column | Type | Meaning |
 |---|---|---|
-| `ModelId` | ulong? | → `VehicleModels` (set null) |
+| `ModelId` | ulong? | → `VehicleModels` (set null). The `Id` of the model row, not the GTA model id (that is `VehicleModels.ModelId`) |
 | `ModelSpawnTypeId` | ulong? | → `VehicleModelSpawnTypes` (set null). Spawn with a random model of this type |
 | `X`, `Y`, `Z`, `Rotation` | float | Parking spot |
 | `Color1`, `Color2` | int | |
 | `IsEngineOn`, `AreLightsOn`, `IsAlarmOn`, `AreDoorsLocked`, `IsBonnetOpen`, `IsBootOpen` | bool | State |
 | `Is…DoorOpen`, `Is…WindowClosed` | bool | Per door and window |
 | `CurrentHealth`, `MaxHealth` | float | |
-| `ServerVehicle` | bool | Belongs to the server, not a player |
+| `ServerVehicle` | bool | Belongs to the server, not a player. No database default |
 | `OwnerCharacterId` | ulong? | → `Characters` |
+| `VirtualWorld`, `Interior` | int | The virtual world and the GTA interior the vehicle is in. Default 0 |
 | `JurisdictionId` | ulong? | → `Jurisdictions` (set null). Where it's registered; its plate starts with that country's tag. Null = none, an `SA` plate |
 | `LoadedAs` | int? | |
 

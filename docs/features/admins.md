@@ -1,6 +1,6 @@
 # Admins
 
-Admin and tester commands that don't belong to another feature. Other admin tools live with their feature: `/createfaction` in [Factions](factions.md), `/editproperties` in [Properties](properties.md), `/createvehicle` in [Vehicles](vehicles.md).
+Admin and tester commands that don't belong to another feature. Other admin tools live with their feature: `/createfaction` in [Factions](factions.md), `/editproperties` in [Properties](properties.md), `/createvehicle`, `/deletevehicle` and `/repairvehicle` in [Vehicles](vehicles.md).
 
 ## How to use it
 
@@ -19,7 +19,7 @@ Admin and tester commands that don't belong to another feature. Other admin tool
 ## Known limitations
 
 - **No moderation tools yet:** no kick, ban, mute, spectate, reports or admin chat.
-- **Temporary vehicles.** `/sv` vehicles aren't saved and have no key.
+- **Temporary vehicles.** `/sv` vehicles aren't saved and have no key, and `/deletevehicle` refuses them.
 - **No `/help` group.** `/setweathertime` and `/testerkit` appear ungrouped in `/help`.
 
 ## Deep dive

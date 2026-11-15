@@ -1,13 +1,6 @@
-using OpenRP.Framework.Database;
-using OpenRP.Framework.Features.Jurisdictions.Services;
-using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
 using OpenRP.Framework.Features.Radios.Components;
-using OpenRP.Framework.Features.Radios.Services;
-using OpenRP.Framework.Features.Vehicles.Components;
-using OpenRP.Framework.Features.Vehicles.Services;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Extensions;
-using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 
 namespace OpenRP.Framework.Features.Vehicles.Dialogs
@@ -18,57 +11,56 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
     /// </summary>
     public partial class CreateOrUpdateVehicleDialog
     {
-        private static void ToggleRadio(Player player, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager, IJurisdictionService jurisdictionService,
-            IJurisdictionDialogService jurisdictionDialogService, IRadioService radioService, IRadioEditorService radioEditorService, BaseDataContext context, CreateOrUpdateVehicleDataComponent component)
+        private void ToggleRadio()
         {
-            ulong vehicleId = component.CreateOrUpdateVehicleData.Id;
+            ulong vehicleId = Data.Id;
             if (vehicleId == 0)
             {
-                component.InstallRadioOnSave = !component.InstallRadioOnSave;
-                player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, component.InstallRadioOnSave ? "A radio will be installed when you save." : "No radio will be installed.");
+                _component.InstallRadioOnSave = !_component.InstallRadioOnSave;
+                _player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, _component.InstallRadioOnSave ? "A radio will be installed when you save." : "No radio will be installed.");
             }
-            else if (radioService.GetVehicleRadio(vehicleId) == null)
+            else if (_radioService.GetVehicleRadio(vehicleId) == null)
             {
-                string? error = radioEditorService.InstallVehicleRadio(vehicleId);
-                player.SendPlayerInfoMessage(error == null ? PlayerInfoMessageType.INFO : PlayerInfoMessageType.ERROR, error ?? "A radio is installed in this vehicle, tuned to 1000.");
+                string? error = _radioEditorService.InstallVehicleRadio(vehicleId);
+                _player.SendPlayerInfoMessage(error == null ? PlayerInfoMessageType.INFO : PlayerInfoMessageType.ERROR, error ?? "A radio is installed in this vehicle, tuned to 1000.");
             }
             else
             {
-                radioEditorService.RemoveVehicleRadio(vehicleId);
-                player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "The radio is removed from this vehicle.");
+                _radioEditorService.RemoveVehicleRadio(vehicleId);
+                _player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "The radio is removed from this vehicle.");
             }
 
-            Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, component);
+            ShowEditor();
         }
 
         /// <summary>
         /// Installs the radio chosen for a new vehicle, now that saving gave it an id.
         /// </summary>
-        private static void InstallRadioAfterSave(Player player, IRadioEditorService radioEditorService, CreateOrUpdateVehicleDataComponent component)
+        private void InstallRadioAfterSave()
         {
-            ulong vehicleId = component.CreateOrUpdateVehicleData.Id;
-            if (!component.InstallRadioOnSave || vehicleId == 0)
+            ulong vehicleId = Data.Id;
+            if (!_component.InstallRadioOnSave || vehicleId == 0)
             {
                 return;
             }
 
-            component.InstallRadioOnSave = false;
-            string? error = radioEditorService.InstallVehicleRadio(vehicleId);
+            _component.InstallRadioOnSave = false;
+            string? error = _radioEditorService.InstallVehicleRadio(vehicleId);
             if (error != null)
             {
-                player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, error);
+                _player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, error);
             }
         }
 
-        private static string GetRadioLabel(IRadioService radioService, CreateOrUpdateVehicleDataComponent component)
+        private string GetRadioLabel()
         {
-            ulong vehicleId = component.CreateOrUpdateVehicleData.Id;
+            ulong vehicleId = Data.Id;
             if (vehicleId == 0)
             {
-                return component.InstallRadioOnSave ? "Installed when saved" : "None";
+                return _component.InstallRadioOnSave ? "Installed when saved" : "None";
             }
 
-            Radio? radio = radioService.GetVehicleRadio(vehicleId);
+            Radio? radio = _radioService.GetVehicleRadio(vehicleId);
             if (radio == null)
             {
                 return "None";

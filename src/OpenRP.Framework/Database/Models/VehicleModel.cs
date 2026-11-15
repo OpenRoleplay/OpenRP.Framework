@@ -33,6 +33,9 @@ namespace OpenRP.Framework.Database.Models
         public int? LoadedAs { get; set; }
         // Where the vehicle is registered; its plate starts with that country's tag. Null for none (an SA plate).
         public ulong? JurisdictionId { get; set; }
+        // The virtual world and interior the vehicle is in. Applied when it spawns and when it's saved.
+        public int VirtualWorld { get; set; }
+        public int Interior { get; set; }
 
         // Navigational Properties
         public JurisdictionModel? Jurisdiction { get; set; }
@@ -67,6 +70,23 @@ namespace OpenRP.Framework.Database.Models
             OwnerCharacter = null;
             OwnerCharacterId = null;
             LoadedAs = null;
+            VirtualWorld = 0;
+            Interior = 0;
+        }
+
+        /// <summary>
+        /// A shallow copy, so an editor can change its own copy and leave the loaded data alone. The navigational
+        /// properties are left out: they belong to the context that loaded the row, and saving the copy through another
+        /// context would attach that stale graph.
+        /// </summary>
+        public VehicleModel Clone()
+        {
+            VehicleModel copy = (VehicleModel)MemberwiseClone();
+            copy.Jurisdiction = null;
+            copy.OwnerCharacter = null;
+            copy.ModelSpawnType = null;
+            copy.Model = null;
+            return copy;
         }
     }
 }
