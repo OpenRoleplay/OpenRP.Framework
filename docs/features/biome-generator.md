@@ -11,6 +11,8 @@ The generator that places them is closed-source and lives in the official gamemo
 1. **Regions.** The map is split into **biome types** (regions), such as `RedCounty`, `Desert` or `Fogbelt`.
 2. **Biomes.** Each region has one or more **biomes**, such as "Oak Forest" or "Desert Cactus". Each has a spawn frequency (0–255).
 3. **One spot.** For each spot, the biome picks what to place by weighted chance; usually "Nothing" is the most likely. A **generator** then builds that object: model, rotation, colour.
+4. **Saving to the World map.** The official gamemode's `/generateworld` doesn't spawn the objects. It saves them to a map named World, through the bulk service. Each run replaces the World's objects, so the world loads at startup, and admins can edit it with `/editmaps`. Each object's stream distance comes from its model's size, with a per-model override, capped at 300 m. Hemp and birch trees work because they are map objects: spawn handlers give them their behaviour. See [Maps](maps.md).
+   - **Why:** objects placed at runtime are gone after a restart, and each run gave a different world. Saved in a map, the world is the same after a restart and can be edited.
 
 ## How to add one
 
@@ -18,7 +20,7 @@ The generator that places them is closed-source and lives in the official gamemo
 |---|---|
 | An object | Implement `IBiomeObjectGenerator` with a new `ObjectType`, and register it in `AddBiomeGenerator()` |
 | A biome | Implement `IBiome` with `[Biome(frequency, name, BiomeType)]` and a `WeightedRandom` of object types, and register it |
-| A harvestable object | Also register a [harvestable model](harvestables.md) for its model id |
+| A harvestable object | Also register a [harvestable model](harvestables.md) for its model id. Its objects then become plants on any map |
 
 ## Deep dive
 

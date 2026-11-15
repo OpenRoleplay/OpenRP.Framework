@@ -17,14 +17,20 @@ namespace OpenRP.Framework.Features.Maps.Systems
         /// </summary>
         [Event]
         public bool OnPlayerSelectDynamicObject(Player player, DynamicObject dynamicObject, int modelId, Vector3 position,
-            IMapService mapService, IMapEditingService mapEditingService, IMapDialogService mapDialogService)
+            IMapService mapService, IMapEditingService mapEditingService, IMapBusyTracker mapBusyTracker, IMapDialogService mapDialogService)
         {
             if (!mapEditingService.IsEditing(player))
             {
                 return false;
             }
 
-            mapDialogService.OnObjectClicked(player, mapService.GetMapObject(dynamicObject));
+            MapObject? mapObject = mapService.GetMapObject(dynamicObject);
+            if (IsMapBusy(mapObject, mapBusyTracker))
+            {
+                return false;
+            }
+
+            mapDialogService.OnObjectClicked(player, mapObject);
             return true;
         }
 
@@ -33,16 +39,24 @@ namespace OpenRP.Framework.Features.Maps.Systems
         /// </summary>
         [Event]
         public bool OnPlayerEditDynamicObject(Player player, DynamicObject dynamicObject, EditObjectResponse response, Vector3 position, Vector3 rotation,
-            IMapService mapService, IMapEditingService mapEditingService, IMapDialogService mapDialogService)
+            IMapService mapService, IMapEditingService mapEditingService, IMapBusyTracker mapBusyTracker, IMapDialogService mapDialogService)
         {
             MapObject? mapObject = mapService.GetMapObject(dynamicObject);
-            if (mapObject == null || !mapEditingService.IsEditing(player))
+            if (mapObject == null || !mapEditingService.IsEditing(player) || IsMapBusy(mapObject, mapBusyTracker))
             {
                 return false;
             }
 
             mapDialogService.OnObjectEdited(player, mapObject, response, position, rotation);
             return true;
+        }
+
+        /// <summary>
+        /// A busy map (being replaced or deleted) owns its objects, so clicks and edits of them are ignored until it's done.
+        /// </summary>
+        private static bool IsMapBusy(MapObject? mapObject, IMapBusyTracker mapBusyTracker)
+        {
+            return mapBusyTracker.GetReason(mapObject?.GetMap()) != null;
         }
     }
 }

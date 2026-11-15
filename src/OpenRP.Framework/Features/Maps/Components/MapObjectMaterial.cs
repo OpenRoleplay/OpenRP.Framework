@@ -1,14 +1,14 @@
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Maps.Enums;
-using OpenRP.Framework.Shared.BaseManager.Entities;
 using SampSharp.Entities;
 
 namespace OpenRP.Framework.Features.Maps.Components
 {
     /// <summary>
-    /// What one material slot of a map object shows, either a texture or text. A child entity of the object.
+    /// What one material slot of a map object shows, either a texture or text. A child entity of the object. Only the map
+    /// store changes its state.
     /// </summary>
-    public class MapObjectMaterial : Component, IBaseDataComponent, IChangeable, IDeletable
+    public class MapObjectMaterial : Component
     {
         /// <summary>
         /// Objects have 16 material slots, 0 to 15.
@@ -16,32 +16,10 @@ namespace OpenRP.Framework.Features.Maps.Components
         public const int MaxMaterialIndex = 15;
 
         private readonly MapObjectMaterialModel _materialModel;
-        private bool _hasChanges;
-        private bool _isDeleted;
 
         public MapObjectMaterial(MapObjectMaterialModel materialModel)
         {
             _materialModel = materialModel;
-        }
-
-        public bool HasChanges()
-        {
-            return _hasChanges;
-        }
-
-        public void ProcessChanges(bool processChanges = true)
-        {
-            _hasChanges = processChanges;
-        }
-
-        public bool IsDeleted()
-        {
-            return _isDeleted;
-        }
-
-        public void ProcessDeletion(bool processDeletion = true)
-        {
-            _isDeleted = processDeletion;
         }
 
         public MapObjectMaterialModel GetRawMapObjectMaterialModel()
@@ -127,7 +105,7 @@ namespace OpenRP.Framework.Features.Maps.Components
         /// <summary>
         /// Replaces what the slot shows with the content of another material. The slot index and the object stay.
         /// </summary>
-        public void CopyContentFrom(MapObjectMaterialModel content)
+        internal void CopyContentFrom(MapObjectMaterialModel content)
         {
             _materialModel.Type = content.Type;
             _materialModel.ModelId = content.ModelId;
@@ -142,15 +120,6 @@ namespace OpenRP.Framework.Features.Maps.Components
             _materialModel.FontColor = content.FontColor;
             _materialModel.BackColor = content.BackColor;
             _materialModel.Alignment = content.Alignment;
-            ProcessChanges();
-        }
-
-        /// <summary>
-        /// The object this material belongs to, or null when it has none.
-        /// </summary>
-        public MapObject? GetObject()
-        {
-            return GetComponentInParent<MapObject>();
         }
     }
 }

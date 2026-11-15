@@ -1,7 +1,7 @@
 using OpenRP.Framework.Features.Maps.Components;
+using OpenRP.Framework.Features.Maps.Entities;
 using OpenRP.Framework.Features.Maps.Enums;
 using System.Globalization;
-using System.Linq;
 
 namespace OpenRP.Framework.Features.Maps.Helpers
 {
@@ -36,11 +36,22 @@ namespace OpenRP.Framework.Features.Maps.Helpers
         }
 
         /// <summary>
+        /// The stream distance in metres, marked as the default when the object has none of its own.
+        /// </summary>
+        public static string GetStreamDistanceText(MapObject mapObject)
+        {
+            float? streamDistance = mapObject.GetStreamDistanceSetting();
+            return streamDistance == null
+                ? $"{FormatNumber(MapLimits.DefaultStreamDistance)} (default)"
+                : FormatNumber(streamDistance.Value);
+        }
+
+        /// <summary>
         /// What the material slot shows, or a dash when nothing is set there.
         /// </summary>
         public static string GetMaterialLabel(MapObject mapObject, int materialIndex)
         {
-            MapObjectMaterial? material = mapObject.GetMaterials().FirstOrDefault(candidate => candidate.GetMaterialIndex() == materialIndex);
+            MapObjectMaterial? material = mapObject.GetMaterial(materialIndex);
             return material == null ? NoValue : GetMaterialContent(material);
         }
 

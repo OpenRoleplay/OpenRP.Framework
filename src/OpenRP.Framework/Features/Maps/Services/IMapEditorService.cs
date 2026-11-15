@@ -1,10 +1,11 @@
 using OpenRP.Framework.Features.Maps.Components;
+using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Maps.Services
 {
     /// <summary>
     /// Creating, changing and deleting maps, their objects, materials and removed buildings, for the admin tools.
-    /// Changes show in the game right away and are saved with the next map sync. Methods that can fail return the
+    /// Each change is saved to the database right away, and then shows in the game. Methods that can fail return the
     /// reason, or null when the change was made.
     /// </summary>
     public interface IMapEditorService
@@ -17,20 +18,23 @@ namespace OpenRP.Framework.Features.Maps.Services
         string? RenameMap(Map map, string name);
 
         /// <summary>
-        /// Deletes the map with its objects, materials and removed buildings. Its objects leave the game, and every
-        /// admin editing the map stops editing it.
+        /// Deletes the map with its objects, materials and removed buildings. Every admin editing the map stops editing it,
+        /// its objects leave the game, and the rows are deleted from the database off the main thread. Returns once the
+        /// map is gone from the game.
         /// </summary>
-        string? DeleteMap(Map map);
+        Task<string?> DeleteMapAsync(Map map);
 
         /// <summary>
-        /// Puts the map's objects in the game, and removes its buildings for every online player.
+        /// Puts the map's objects in the game, and removes its buildings for every online player. Returns once the objects
+        /// are in the game.
         /// </summary>
-        string? LoadMap(Map map);
+        Task<string?> LoadMap(Map map);
 
         /// <summary>
-        /// Takes the map's objects out of the game. Its removed buildings stay removed until players reconnect.
+        /// Takes the map's objects out of the game. Its removed buildings stay removed until players reconnect. Returns
+        /// once the objects are out of the game.
         /// </summary>
-        string? UnloadMap(Map map);
+        Task<string?> UnloadMap(Map map);
 
         /// <summary>
         /// Adds an object to the map. Model 0 is refused; negative models are custom models. The virtual world and
@@ -41,8 +45,8 @@ namespace OpenRP.Framework.Features.Maps.Services
         string? DeleteObject(MapObject mapObject);
 
         /// <summary>
-        /// Adds a copy of the object at the same place, with the same materials. When a material can't be copied, the
-        /// copy is kept and the error says so.
+        /// Adds a copy of the object at the same place, with copies of its materials, in one save. The copy is kept or
+        /// dropped as a whole.
         /// </summary>
         string? DuplicateObject(MapObject mapObject, out MapObject? copy);
 
@@ -63,6 +67,12 @@ namespace OpenRP.Framework.Features.Maps.Services
         /// Sets the description, up to 64 characters. Empty clears it.
         /// </summary>
         string? SetObjectDescription(MapObject mapObject, string? description);
+
+        /// <summary>
+        /// Sets the distance in metres the object is streamed in at, from 1 to 1000. Null means the default, 300. The
+        /// object is respawned, because the streamer can't change the distance of an object that's streamed in.
+        /// </summary>
+        string? SetObjectStreamDistance(MapObject mapObject, float? streamDistance);
 
         /// <summary>
         /// Shows a texture on a material slot. The input is "model txd texture [ARGB colour]", and the slot is 0 to 15.

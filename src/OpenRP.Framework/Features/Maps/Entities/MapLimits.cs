@@ -10,6 +10,18 @@ namespace OpenRP.Framework.Features.Maps.Entities
         public const int DescriptionMaxLength = 64;
 
         /// <summary>
+        /// How far, in metres, an object is streamed in when it has no distance of its own.
+        /// </summary>
+        public const float DefaultStreamDistance = 300f;
+
+        /// <summary>
+        /// The shortest and the longest stream distance an object can be given, in metres.
+        /// </summary>
+        public const float MinStreamDistance = 1f;
+
+        public const float MaxStreamDistance = 1000f;
+
+        /// <summary>
         /// The virtual world and interior that mean "everywhere". Nothing below it is a world or interior.
         /// </summary>
         public const int EverywhereValue = -1;

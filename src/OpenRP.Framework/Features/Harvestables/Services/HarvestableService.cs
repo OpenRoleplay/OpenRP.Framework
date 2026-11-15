@@ -59,6 +59,15 @@ namespace OpenRP.Framework.Features.Harvestables.Services
             return true;
         }
 
+        public void RemoveHarvestable(EntityId entityId)
+        {
+            foreach (HarvestablePlant plant in GetPlantsOnEntity(entityId))
+            {
+                DestroyPlantLabels(plant);
+                plant.Destroy();
+            }
+        }
+
         public bool CreateHarvestable(int modelId, Vector3 position, Vector3 rotation)
         {
             if (!IsHarvestableModel(modelId))
@@ -116,7 +125,8 @@ namespace OpenRP.Framework.Features.Harvestables.Services
             harvesting.Destroy();
             player.ClearAnimations();
 
-            if (!_entityManager.Exists(plant.Entity) || !plant.HasHarvestsLeft())
+            // The plant's component is destroyed when its object despawned or was moved during the harvest.
+            if (!plant.IsComponentAlive || !plant.HasHarvestsLeft())
             {
                 player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "There was nothing left to harvest.");
                 return;
@@ -152,6 +162,22 @@ namespace OpenRP.Framework.Features.Harvestables.Services
         private static HarvestablePlant? GetNearbyPlant(IHarvestableModel harvestableModel, Player player)
         {
             return harvestableModel.GetPlants().FirstOrDefault(plant => plant.IsPlayerNearby(player));
+        }
+
+        private List<HarvestablePlant> GetPlantsOnEntity(EntityId entityId)
+        {
+            return _harvestableModels.SelectMany(model => model.GetPlants()).Where(plant => plant.Entity == entityId).ToList();
+        }
+
+        /// <summary>
+        /// The labels are children of the plant's entity. They're copied first, because destroying one changes the entity tree.
+        /// </summary>
+        private static void DestroyPlantLabels(HarvestablePlant plant)
+        {
+            foreach (DynamicTextLabel label in plant.GetComponentsInChildren<DynamicTextLabel>().ToList())
+            {
+                label.DestroyEntity();
+            }
         }
 
         /// <summary>

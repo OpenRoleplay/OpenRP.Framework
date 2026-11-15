@@ -2,32 +2,31 @@ using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Maps.Components;
 using OpenRP.Framework.Features.Maps.Entities;
+using OpenRP.Framework.Features.Maps.Enums;
 using OpenRP.Framework.Features.Maps.Helpers;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Maps.Services
 {
     public class MapEditorService : IMapEditorService
     {
-        private const string JustDeletedNameMessage = "A map with that name was just deleted. Wait a minute for it to be saved, then try again.";
+        private const string MapGoneMessage = "That map no longer exists.";
 
+        private readonly IMapStore _mapStore;
         private readonly IMapService _mapService;
         private readonly IMapEditingService _mapEditingService;
-        private readonly IMapManager _mapManager;
-        private readonly IMapObjectManager _mapObjectManager;
-        private readonly IMapObjectMaterialManager _mapObjectMaterialManager;
-        private readonly IMapRemovedBuildingManager _mapRemovedBuildingManager;
+        private readonly IMapBusyTracker _mapBusyTracker;
         private readonly ILogger<MapEditorService> _logger;
 
-        public MapEditorService(IMapService mapService, IMapEditingService mapEditingService, IMapManager mapManager, IMapObjectManager mapObjectManager,
-            IMapObjectMaterialManager mapObjectMaterialManager, IMapRemovedBuildingManager mapRemovedBuildingManager, ILogger<MapEditorService> logger)
+        public MapEditorService(IMapStore mapStore, IMapService mapService, IMapEditingService mapEditingService,
+            IMapBusyTracker mapBusyTracker, ILogger<MapEditorService> logger)
         {
+            _mapStore = mapStore;
             _mapService = mapService;
             _mapEditingService = mapEditingService;
-            _mapManager = mapManager;
-            _mapObjectManager = mapObjectManager;
-            _mapObjectMaterialManager = mapObjectMaterialManager;
-            _mapRemovedBuildingManager = mapRemovedBuildingManager;
+            _mapBusyTracker = mapBusyTracker;
             _logger = logger;
         }
 
@@ -41,13 +40,17 @@ namespace OpenRP.Framework.Features.Maps.Services
                 return nameError;
             }
 
-            (Map? createdMap, string? createError) = TryCreate(() => _mapManager.CreateAndLoad(new MapModel { Name = trimmedName }), "map");
+            (Map? createdMap, string? createError) = TryWrite(() => _mapStore.CreateMap(trimmedName), "map");
             map = createdMap;
             return createError;
         }
 
         public string? RenameMap(Map map, string name)
         {
+            if (GetBusyMessage(map) is string busyMessage)
+            {
+                return busyMessage;
+            }
             string trimmedName = name.Trim();
             string? nameError = GetMapNameError(trimmedName, map);
             if (nameError != null)
@@ -55,35 +58,68 @@ namespace OpenRP.Framework.Features.Maps.Services
                 return nameError;
             }
 
-            map.SetName(trimmedName);
-            return null;
+            return TryWrite(() => _mapStore.RenameMap(map, trimmedName), "map");
         }
 
-        public string? DeleteMap(Map map)
+        public async Task<string?> DeleteMapAsync(Map map)
         {
-            _mapService.DespawnMap(map);
+            if (!map.IsComponentAlive)
+            {
+                return MapGoneMessage;
+            }
+            if (GetBusyMessage(map) is string busyMessage)
+            {
+                return busyMessage;
+            }
+
+            _mapBusyTracker.Set(map, MapBusyReason.Deleting);
+            try
+            {
+                return await DeleteMapWhileDeletingAsync(map);
+            }
+            finally
+            {
+                _mapBusyTracker.Clear(map);
+            }
+        }
+
+        private async Task<string?> DeleteMapWhileDeletingAsync(Map map)
+        {
             _mapEditingService.StopEditingMap(map);
-            foreach (MapObject mapObject in map.GetObjects())
+            bool wasLoaded = map.IsLoaded();
+            await _mapService.DespawnMapAsync(map);
+
+            string? error = await TryWriteAsync(() => _mapStore.DeleteMapAsync(map), "map");
+            if (error != null && wasLoaded)
             {
-                MarkObjectDeleted(mapObject);
+                // The map is still there, so its objects go back in the game.
+                await _mapService.SpawnMapAsync(map);
             }
-            foreach (MapRemovedBuilding removal in map.GetRemovedBuildings())
-            {
-                removal.ProcessDeletion();
-            }
-            map.ProcessDeletion();
-            return null;
+            return error;
         }
 
-        public string? LoadMap(Map map)
+        public async Task<string?> LoadMap(Map map)
         {
+            if (GetBusyMessage(map) is string busyMessage)
+            {
+                return busyMessage;
+            }
             if (map.IsLoaded())
             {
                 return $"{map.GetName()} is loaded already.";
             }
 
-            map.SetIsLoaded(true);
-            _mapService.SpawnMap(map);
+            string? error = TryWrite(() => _mapStore.SetMapLoaded(map, true), "map");
+            if (error != null)
+            {
+                return error;
+            }
+
+            await _mapService.SpawnMapAsync(map);
+            if (!map.IsComponentAlive)
+            {
+                return MapGoneMessage;
+            }
             foreach (MapRemovedBuilding removal in map.GetRemovedBuildings())
             {
                 _mapService.ApplyRemovedBuilding(removal);
@@ -91,101 +127,185 @@ namespace OpenRP.Framework.Features.Maps.Services
             return null;
         }
 
-        public string? UnloadMap(Map map)
+        public async Task<string?> UnloadMap(Map map)
         {
+            if (GetBusyMessage(map) is string busyMessage)
+            {
+                return busyMessage;
+            }
             if (!map.IsLoaded())
             {
                 return $"{map.GetName()} isn't loaded.";
             }
 
-            map.SetIsLoaded(false);
-            _mapService.DespawnMap(map);
+            string? error = TryWrite(() => _mapStore.SetMapLoaded(map, false), "map");
+            if (error != null)
+            {
+                return error;
+            }
+
+            await _mapService.DespawnMapAsync(map);
             return null;
         }
 
         public string? AddObject(Map map, int modelId, Vector3 position, int virtualWorld, int interior, string? description, out MapObject? mapObject)
         {
             mapObject = null;
+            if (GetBusyMessage(map) is string busyMessage)
+            {
+                return busyMessage;
+            }
             string? valuesError = GetObjectValuesError(modelId, virtualWorld, interior, description);
             if (valuesError != null)
             {
                 return valuesError;
             }
 
-            // Creating the object spawns it when its map is loaded, see OnComponentLoaded.
-            (MapObject? createdObject, string? createError) = TryCreate(() => _mapObjectManager.CreateAndLoad(
+            (MapObject? createdObject, string? createError) = TryWrite(() => _mapStore.CreateObject(map,
                 CreateObjectModel(map.GetId(), modelId, position, Vector3.Zero, virtualWorld, interior, description)), "object");
             mapObject = createdObject;
-            return createdObject == null ? createError : null;
+            if (createdObject != null)
+            {
+                _mapService.RespawnObject(createdObject);
+            }
+            return createError;
         }
 
         public string? DeleteObject(MapObject mapObject)
         {
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
+            {
+                return busyMessage;
+            }
             _mapService.DespawnObject(mapObject);
-            MarkObjectDeleted(mapObject);
-            return null;
+            try
+            {
+                _mapStore.DeleteObject(mapObject);
+                return null;
+            }
+            catch (MapRowMissingException ex)
+            {
+                return ForgetMissingObject(mapObject, ex);
+            }
+            catch (Exception ex)
+            {
+                // The object is still there, so it goes back in the game.
+                _mapService.RespawnObject(mapObject);
+                return GetSaveFailure(ex, "object");
+            }
+        }
+
+        /// <summary>
+        /// The row is gone, so the object can't be saved or shown again. It's forgotten rather than respawned, and the
+        /// message says why the delete didn't happen.
+        /// </summary>
+        private string ForgetMissingObject(MapObject mapObject, MapRowMissingException ex)
+        {
+            _logger.LogWarning(ex, "Map object {MapObjectId} was already deleted elsewhere. Forgetting it.", mapObject.GetId());
+            _mapStore.ForgetObject(mapObject);
+            return ex.Message;
         }
 
         public string? DuplicateObject(MapObject mapObject, out MapObject? copy)
         {
-            (MapObject? createdCopy, string? createError) = TryCreate(() => CreateObjectCopy(mapObject), "object");
-            copy = createdCopy;
-            if (createdCopy == null)
+            copy = null;
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
             {
-                return createError;
+                return busyMessage;
             }
-            return CopyMaterials(mapObject, createdCopy);
+            Map? map = mapObject.GetMap();
+            if (map == null)
+            {
+                return MapGoneMessage;
+            }
+
+            (MapObject? createdCopy, string? createError) = TryWrite(() => _mapStore.CreateObject(map, CreateCopyModel(mapObject)), "object");
+            copy = createdCopy;
+            if (createdCopy != null)
+            {
+                _mapService.RespawnObject(createdCopy);
+            }
+            return createError;
         }
 
         public string? MoveObject(MapObject mapObject, Vector3 position, Vector3 rotation)
         {
-            mapObject.SetPosition(position);
-            mapObject.SetRotation(rotation);
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
+            {
+                return busyMessage;
+            }
+            string? error = TryWrite(() => _mapStore.MoveObject(mapObject, position, rotation), "object");
+            // Whether or not the save worked, the streamer object goes where the object is saved.
             _mapService.MoveSpawnedObject(mapObject);
-            return null;
+            return error;
         }
 
         public string? SetObjectModel(MapObject mapObject, int modelId)
         {
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
+            {
+                return busyMessage;
+            }
             string? modelError = GetModelIdError(modelId);
             if (modelError != null)
             {
                 return modelError;
             }
 
-            mapObject.SetModelId(modelId);
-            _mapService.RespawnObject(mapObject);
-            return null;
+            return WriteAndRespawn(mapObject, () => _mapStore.SetObjectModel(mapObject, modelId), "object");
         }
 
         public string? SetObjectWorld(MapObject mapObject, int virtualWorld, int interior)
         {
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
+            {
+                return busyMessage;
+            }
             string? worldError = GetWorldError(virtualWorld, interior);
             if (worldError != null)
             {
                 return worldError;
             }
 
-            mapObject.SetVirtualWorld(virtualWorld);
-            mapObject.SetInterior(interior);
-            _mapService.RespawnObject(mapObject);
-            return null;
+            return WriteAndRespawn(mapObject, () => _mapStore.SetObjectWorld(mapObject, virtualWorld, interior), "object");
         }
 
         public string? SetObjectDescription(MapObject mapObject, string? description)
         {
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
+            {
+                return busyMessage;
+            }
             string? descriptionError = GetDescriptionError(description);
             if (descriptionError != null)
             {
                 return descriptionError;
             }
 
-            mapObject.SetDescription(NormalizeDescription(description));
-            return null;
+            return TryWrite(() => _mapStore.SetObjectDescription(mapObject, NormalizeDescription(description)), "object");
+        }
+
+        public string? SetObjectStreamDistance(MapObject mapObject, float? streamDistance)
+        {
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
+            {
+                return busyMessage;
+            }
+            string? distanceError = GetStreamDistanceError(streamDistance);
+            if (distanceError != null)
+            {
+                return distanceError;
+            }
+
+            return WriteAndRespawn(mapObject, () => _mapStore.SetObjectStreamDistance(mapObject, streamDistance), "object");
         }
 
         public string? SetTexture(MapObject mapObject, int materialIndex, string input)
         {
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
+            {
+                return busyMessage;
+            }
             (MapObjectMaterialModel? texture, string? parseError) = MapInputParser.ParseTexture(input);
             if (texture == null)
             {
@@ -198,6 +318,10 @@ namespace OpenRP.Framework.Features.Maps.Services
 
         public string? SetMaterialText(MapObject mapObject, string input)
         {
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
+            {
+                return busyMessage;
+            }
             (MapObjectMaterialModel? text, string? parseError) = MapInputParser.ParseMaterialText(input);
             if (text == null)
             {
@@ -209,52 +333,58 @@ namespace OpenRP.Framework.Features.Maps.Services
 
         public string? ClearMaterial(MapObject mapObject, int materialIndex)
         {
+            if (GetBusyMessage(mapObject.GetMap()) is string busyMessage)
+            {
+                return busyMessage;
+            }
             string? indexError = GetMaterialIndexError(materialIndex);
             if (indexError != null)
             {
                 return indexError;
             }
 
-            MapObjectMaterial? material = mapObject.GetMaterialRow(materialIndex);
-            if (material == null || material.IsDeleted())
+            MapObjectMaterial? material = mapObject.GetMaterial(materialIndex);
+            if (material == null)
             {
                 return $"Nothing is set at material index {materialIndex}.";
             }
 
-            material.ProcessDeletion();
-            _mapService.RespawnObject(mapObject);
-            return null;
+            return WriteAndRespawn(mapObject, () => _mapStore.DeleteMaterial(material), "material");
         }
 
         public string? AddRemovedBuilding(Map map, string input, Vector3 origin, out MapRemovedBuilding? removal)
         {
             removal = null;
+            if (GetBusyMessage(map) is string busyMessage)
+            {
+                return busyMessage;
+            }
             (MapRemovedBuildingModel? removalModel, string? parseError) = MapInputParser.ParseRemovedBuilding(input, origin);
             if (removalModel == null)
             {
                 return parseError;
             }
 
-            removalModel.MapId = map.GetId();
-            // Applying the removal to the players when its map is loaded happens in OnComponentLoaded, see MapRemovedBuildingManager.
-            (MapRemovedBuilding? createdRemoval, string? createError) = TryCreate(() => _mapRemovedBuildingManager.CreateAndLoad(removalModel), "removed building");
+            (MapRemovedBuilding? createdRemoval, string? createError) = TryWrite(() => _mapStore.CreateRemovedBuilding(map, removalModel), "removed building");
             removal = createdRemoval;
-            if (createdRemoval == null)
+            if (createdRemoval != null && map.IsLoaded())
             {
-                return createError;
+                _mapService.ApplyRemovedBuilding(createdRemoval);
             }
-            return null;
+            return createError;
         }
 
         public string? DeleteRemovedBuilding(MapRemovedBuilding removal)
         {
-            removal.ProcessDeletion();
-            return null;
+            if (GetBusyMessage(removal.GetComponentInParent<Map>()) is string busyMessage)
+            {
+                return busyMessage;
+            }
+            return TryWrite(() => _mapStore.DeleteRemovedBuilding(removal), "removed building");
         }
 
         /// <summary>
-        /// Writes the content to the slot. The slot's own row is reused when there is one, even a deleted one, because
-        /// a second row for the same slot would break the database's unique index.
+        /// Writes the content to the slot, replacing what the slot showed, or adds it when the slot is empty.
         /// </summary>
         private string? SetMaterialContent(MapObject mapObject, MapObjectMaterialModel content)
         {
@@ -264,77 +394,84 @@ namespace OpenRP.Framework.Features.Maps.Services
                 return indexError;
             }
 
-            MapObjectMaterial? existingMaterial = mapObject.GetMaterialRow(content.MaterialIndex);
-            if (existingMaterial == null)
-            {
-                // Creating the material's row respawns the object, see OnComponentLoaded.
-                return TryCreateMaterial(mapObject, content, out string? createError) ? null : createError;
-            }
-
-            existingMaterial.ProcessDeletion(false);
-            existingMaterial.CopyContentFrom(content);
-            _mapService.RespawnObject(mapObject);
-            return null;
-        }
-
-        private bool TryCreateMaterial(MapObject mapObject, MapObjectMaterialModel content, out string? error)
-        {
-            content.MapObjectId = mapObject.GetId();
-            (MapObjectMaterial? material, error) = TryCreate(() => _mapObjectMaterialManager.CreateAndLoad(content), "material");
-            return material != null;
+            return WriteAndRespawn(mapObject, () => _mapStore.SetMaterialContent(mapObject, content), "material");
         }
 
         /// <summary>
-        /// The copy goes where the original is, with the same model, world and description. Its materials are copied separately.
+        /// Saves the change, then respawns the object so the game shows it. Nothing is respawned when the save failed.
         /// </summary>
-        private MapObject CreateObjectCopy(MapObject source)
+        private string? WriteAndRespawn(MapObject mapObject, Action write, string thing)
         {
-            // Creating the copy spawns it when its map is loaded, see OnComponentLoaded.
-            return _mapObjectManager.CreateAndLoad(CreateObjectModel(source.GetMapId(), source.GetModelId(), source.GetPosition(),
-                source.GetRotation(), source.GetVirtualWorld(), source.GetInterior(), source.GetDescription()));
+            string? error = TryWrite(write, thing);
+            if (error == null)
+            {
+                _mapService.RespawnObject(mapObject);
+            }
+            return error;
         }
 
         /// <summary>
-        /// Copies the original's materials onto the copy, so the copy looks the same before any change. The copy row is
-        /// already saved, so when a material fails, the error says the copy exists without all of its materials.
+        /// Runs the write. A row that's gone or a failed save becomes the reason the change didn't happen.
         /// </summary>
-        private string? CopyMaterials(MapObject source, MapObject copy)
-        {
-            foreach (MapObjectMaterial material in source.GetMaterials())
-            {
-                MapObjectMaterialModel materialCopy = CreateMaterialCopy(material.GetRawMapObjectMaterialModel(), copy.GetId());
-                (MapObjectMaterial? createdMaterial, string? createError) = TryCreate(() => _mapObjectMaterialManager.CreateAndLoad(materialCopy), "material");
-                if (createdMaterial == null)
-                {
-                    return $"The copy was made, but without all of its materials, so set the missing ones on it. {createError}";
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Marks the object and its materials deleted. The rows go at the next save.
-        /// </summary>
-        private static void MarkObjectDeleted(MapObject mapObject)
-        {
-            foreach (MapObjectMaterial material in mapObject.GetMaterials())
-            {
-                material.ProcessDeletion();
-            }
-            mapObject.ProcessDeletion();
-        }
-
-        private (T? Component, string? Error) TryCreate<T>(Func<T> create, string thing) where T : class
+        private string? TryWrite(Action write, string thing)
         {
             try
             {
-                return (create(), null);
+                write();
+                return null;
+            }
+            catch (MapRowMissingException ex)
+            {
+                return ex.Message;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to save a {Thing}.", thing);
-                return (null, $"The {thing} couldn't be saved. Another server may have changed the same data at the same time; try again in a minute.");
+                return GetSaveFailure(ex, thing);
             }
+        }
+
+        private (T? Result, string? Error) TryWrite<T>(Func<T> write, string thing) where T : class
+        {
+            T? result = null;
+            string? error = TryWrite(WriteResult, thing);
+            return (result, error);
+
+            void WriteResult()
+            {
+                result = write();
+            }
+        }
+
+        private async Task<string?> TryWriteAsync(Func<Task> write, string thing)
+        {
+            try
+            {
+                await write();
+                return null;
+            }
+            catch (MapRowMissingException ex)
+            {
+                return ex.Message;
+            }
+            catch (Exception ex)
+            {
+                return GetSaveFailure(ex, thing);
+            }
+        }
+
+        /// <summary>
+        /// Why the map can't be changed right now, or null when it can. A busy map refuses every change to it.
+        /// </summary>
+        private string? GetBusyMessage(Map? map)
+        {
+            MapBusyReason? reason = _mapBusyTracker.GetReason(map);
+            return reason == null ? null : MapBusyMessages.For(reason.Value);
+        }
+
+        private string GetSaveFailure(Exception ex, string thing)
+        {
+            _logger.LogError(ex, "Failed to save a {Thing}.", thing);
+            return $"The {thing} couldn't be saved.";
         }
 
         private static MapObjectModel CreateObjectModel(ulong mapId, int modelId, Vector3 position, Vector3 rotation,
@@ -356,11 +493,25 @@ namespace OpenRP.Framework.Features.Maps.Services
             };
         }
 
-        private static MapObjectMaterialModel CreateMaterialCopy(MapObjectMaterialModel source, ulong mapObjectId)
+        /// <summary>
+        /// The copy goes where the original is, with the same model, world, description and stream distance, and with copies
+        /// of its materials.
+        /// </summary>
+        private static MapObjectModel CreateCopyModel(MapObject source)
+        {
+            MapObjectModel copy = CreateObjectModel(source.GetMapId(), source.GetModelId(), source.GetPosition(), source.GetRotation(),
+                source.GetVirtualWorld(), source.GetInterior(), source.GetDescription());
+            copy.StreamDistance = source.GetStreamDistanceSetting();
+            copy.Materials = source.GetMaterials()
+                .Select(material => CreateMaterialCopy(material.GetRawMapObjectMaterialModel()))
+                .ToList();
+            return copy;
+        }
+
+        private static MapObjectMaterialModel CreateMaterialCopy(MapObjectMaterialModel source)
         {
             return new MapObjectMaterialModel
             {
-                MapObjectId = mapObjectId,
                 MaterialIndex = source.MaterialIndex,
                 Type = source.Type,
                 ModelId = source.ModelId,
@@ -390,14 +541,12 @@ namespace OpenRP.Framework.Features.Maps.Services
             }
 
             // The map being renamed may keep its own name.
-            Map? sameNameMap = _mapService.FindMapByName(trimmedName);
+            Map? sameNameMap = _mapStore.FindMapByName(trimmedName);
             if (sameNameMap != null && sameNameMap.GetId() != renamedMap?.GetId())
             {
                 return $"A map named {sameNameMap.GetName()} exists already.";
             }
-
-            // A deleted map keeps its name in the database until the next save, so the name can't be reused before then.
-            return _mapService.FindDeletedMapByName(trimmedName) == null ? null : JustDeletedNameMessage;
+            return null;
         }
 
         private static string? GetObjectValuesError(int modelId, int virtualWorld, int interior, string? description)
@@ -428,6 +577,22 @@ namespace OpenRP.Framework.Features.Maps.Services
             return NormalizeDescription(description)?.Length > MapLimits.DescriptionMaxLength
                 ? $"The description can be at most {MapLimits.DescriptionMaxLength} characters long."
                 : null;
+        }
+
+        /// <summary>
+        /// Null means the default distance, which needs no check. The comparisons are written so that NaN is refused too.
+        /// </summary>
+        private static string? GetStreamDistanceError(float? streamDistance)
+        {
+            if (streamDistance == null)
+            {
+                return null;
+            }
+
+            float distance = streamDistance.Value;
+            return distance >= MapLimits.MinStreamDistance && distance <= MapLimits.MaxStreamDistance
+                ? null
+                : $"The stream distance must be from {MapLimits.MinStreamDistance} to {MapLimits.MaxStreamDistance} metres.";
         }
 
         private static string? GetMaterialIndexError(int materialIndex)

@@ -1,5 +1,8 @@
+using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Features.FlyMode.Services;
 using OpenRP.Framework.Features.Maps.Components;
+using OpenRP.Framework.Features.Maps.Enums;
+using OpenRP.Framework.Features.Maps.Helpers;
 using OpenRP.Framework.Shared.Dialogs;
 using OpenRP.Framework.Shared.Dialogs.Enums;
 using OpenRP.Framework.Shared.Dialogs.Extensions;
@@ -8,6 +11,7 @@ using OpenRP.OpenMp.Streamer;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Maps.Services.Dialogs
 {
@@ -20,23 +24,31 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
         private const string NotPossibleTitle = "Not possible";
         private const string MapGoneMessage = "That map no longer exists.";
         private const string ObjectGoneMessage = "That object no longer exists.";
+        private const string ChangeFailedMessage = "The change couldn't be finished. Check the server log.";
 
         private readonly IDialogService _dialogService;
         private readonly IMapService _mapService;
+        private readonly IMapStore _mapStore;
         private readonly IMapEditorService _mapEditorService;
         private readonly IMapEditingService _mapEditingService;
+        private readonly IMapBusyTracker _mapBusyTracker;
         private readonly IFlyModeService _flyModeService;
         private readonly IStreamerService _streamerService;
+        private readonly ILogger<MapDialogService> _logger;
 
-        public MapDialogService(IDialogService dialogService, IMapService mapService, IMapEditorService mapEditorService,
-            IMapEditingService mapEditingService, IFlyModeService flyModeService, IStreamerService streamerService)
+        public MapDialogService(IDialogService dialogService, IMapService mapService, IMapStore mapStore, IMapEditorService mapEditorService,
+            IMapEditingService mapEditingService, IMapBusyTracker mapBusyTracker, IFlyModeService flyModeService, IStreamerService streamerService,
+            ILogger<MapDialogService> logger)
         {
             _dialogService = dialogService;
             _mapService = mapService;
+            _mapStore = mapStore;
             _mapEditorService = mapEditorService;
             _mapEditingService = mapEditingService;
+            _mapBusyTracker = mapBusyTracker;
             _flyModeService = flyModeService;
             _streamerService = streamerService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -44,7 +56,7 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
         /// </summary>
         private bool EnsureMapExists(Player player, Map map)
         {
-            if (IsAlive(map))
+            if (map.IsComponentAlive)
             {
                 return true;
             }
@@ -53,26 +65,31 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
         }
 
         /// <summary>
+        /// Shows that the map is busy (being replaced, being deleted or locked) and goes back to the map list. Returns false
+        /// while it is, so the caller stops. Used by the flows that start an edit session or read the map's objects.
+        /// </summary>
+        private bool EnsureMapNotBusy(Player player, Map map)
+        {
+            MapBusyReason? reason = _mapBusyTracker.GetReason(map);
+            if (reason == null)
+            {
+                return true;
+            }
+            ShowMessage(player, NotPossibleTitle, MapBusyMessages.For(reason.Value), () => OpenMapList(player));
+            return false;
+        }
+
+        /// <summary>
         /// Shows that the object was deleted and goes back to the editor. Returns false when the object is gone, so the caller stops.
         /// </summary>
         private bool EnsureObjectExists(Player player, MapObject mapObject)
         {
-            if (IsAlive(mapObject))
+            if (mapObject.IsComponentAlive)
             {
                 return true;
             }
             ShowMessage(player, NotPossibleTitle, ObjectGoneMessage, () => OpenMapEditor(player));
             return false;
-        }
-
-        private static bool IsAlive(Map map)
-        {
-            return map.IsComponentAlive && !map.IsDeleted();
-        }
-
-        private static bool IsAlive(MapObject mapObject)
-        {
-            return mapObject.IsComponentAlive && !mapObject.IsDeleted();
         }
 
         /// <summary>
@@ -87,6 +104,34 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
             }
 
             ShowMessage(player, NotPossibleTitle, error, onAfterError);
+        }
+
+        /// <summary>
+        /// Waits for work that talks to the database or the game, then continues like <see cref="ContinueAfter"/>. A failure
+        /// is logged and shown as a message. Nothing is shown when the player left while the work ran.
+        /// </summary>
+        private void ContinueAfterAsync(Player player, Func<Task<string?>> work, Action onSuccess, Action onAfterError)
+        {
+            _ = ContinueAfterWorkAsync(player, work, onSuccess, onAfterError);
+        }
+
+        private async Task ContinueAfterWorkAsync(Player player, Func<Task<string?>> work, Action onSuccess, Action onAfterError)
+        {
+            string? error;
+            try
+            {
+                error = await work();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "A map change failed.");
+                error = ChangeFailedMessage;
+            }
+
+            if (player.IsComponentAlive)
+            {
+                ContinueAfter(player, error, onSuccess, onAfterError);
+            }
         }
 
         private void ShowMessage(Player player, string title, string text, Action onClose)

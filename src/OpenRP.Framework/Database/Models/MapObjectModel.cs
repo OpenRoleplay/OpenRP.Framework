@@ -23,6 +23,9 @@ namespace OpenRP.Framework.Database.Models
         // A note for the editors, so the objects of a map can be told apart.
         public string? Description { get; set; }
 
+        // Metres. Null means the default, see MapLimits.DefaultStreamDistance.
+        public float? StreamDistance { get; set; }
+
         // Navigational Properties
         public MapModel? Map { get; set; }
         public List<MapObjectMaterialModel> Materials { get; set; } = new();

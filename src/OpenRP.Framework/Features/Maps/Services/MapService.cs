@@ -1,11 +1,15 @@
+using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Features.Maps.Components;
+using OpenRP.Framework.Features.Maps.Entities;
 using OpenRP.Framework.Features.Maps.Enums;
+using OpenRP.Framework.Features.Maps.Helpers;
 using OpenRP.OpenMp.Streamer;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Maps.Services
 {
@@ -13,40 +17,41 @@ namespace OpenRP.Framework.Features.Maps.Services
     {
         private readonly IEntityManager _entityManager;
         private readonly IStreamerService _streamerService;
+        private readonly IMapStore _mapStore;
+        private readonly IMapObjectSpawnHandler[] _spawnHandlers;
+        private readonly ILogger<MapService> _logger;
 
-        // Set by SpawnLoadedMaps. Until then, the startup load is still running and spawns everything itself.
-        private bool _hasSpawnedLoadedMaps;
-
-        // Kept apart from the objects, because a loaded map with no objects is spawned too.
+        // Kept apart from the objects, because a loaded map with no objects is spawned too. A map is in this set while its
+        // objects are being spawned or are spawned.
         private readonly HashSet<ulong> _spawnedMapIds = new HashSet<ulong>();
 
-        public MapService(IEntityManager entityManager, IStreamerService streamerService)
+        // The handlers that take each model, filled the first time the model spawns. Cached per model, because checking
+        // every handler for each of the ~400k objects would be slow.
+        private readonly Dictionary<int, IMapObjectSpawnHandler[]> _spawnHandlersByModelId = new Dictionary<int, IMapObjectSpawnHandler[]>();
+
+        public MapService(IEntityManager entityManager, IStreamerService streamerService, IMapStore mapStore,
+            IEnumerable<IMapObjectSpawnHandler> spawnHandlers, ILogger<MapService> logger)
         {
             _entityManager = entityManager;
             _streamerService = streamerService;
+            _mapStore = mapStore;
+            _spawnHandlers = spawnHandlers.ToArray();
+            _logger = logger;
         }
 
         public IReadOnlyList<Map> GetMaps()
         {
-            return GetLiveMaps()
-                .OrderBy(map => map.GetName(), StringComparer.OrdinalIgnoreCase)
-                .ToList();
+            return _mapStore.GetMaps();
         }
 
         public Map? GetMap(ulong id)
         {
-            return GetLiveMaps().FirstOrDefault(map => map.GetId() == id);
+            return _mapStore.GetMap(id);
         }
 
         public Map? FindMapByName(string name)
         {
-            return GetLiveMaps().FirstOrDefault(map => string.Equals(map.GetName(), name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public Map? FindDeletedMapByName(string name)
-        {
-            return _entityManager.GetComponents<Map>()
-                .FirstOrDefault(map => map.IsDeleted() && string.Equals(map.GetName(), name, StringComparison.OrdinalIgnoreCase));
+            return _mapStore.FindMapByName(name);
         }
 
         public void SpawnLoadedMaps()
@@ -55,32 +60,53 @@ namespace OpenRP.Framework.Features.Maps.Services
             {
                 SpawnMap(map);
             }
-            _hasSpawnedLoadedMaps = true;
         }
 
         public void SpawnMap(Map map)
         {
             DespawnMap(map);
-            foreach (MapObject mapObject in map.GetObjects())
-            {
-                SpawnObject(mapObject);
-            }
             _spawnedMapIds.Add(map.GetId());
+            foreach (MapObject mapObject in _mapStore.GetObjects(map))
+            {
+                SpawnIfOnLoadedMap(mapObject);
+            }
+        }
+
+        public async Task SpawnMapAsync(Map map, IProgress<int>? progress = null)
+        {
+            await DespawnMapAsync(map);
+            _spawnedMapIds.Add(map.GetId());
+            List<MapObject> mapObjects = _mapStore.GetObjects(map).ToList();
+            await MapSlices.RunAsync(mapObjects, SpawnIfOnLoadedMap, progress);
         }
 
         public void DespawnMap(Map map)
         {
-            DestroyDynamicObjects(map);
+            if (!_spawnedMapIds.Remove(map.GetId()))
+            {
+                return;
+            }
+            foreach (MapObject mapObject in _mapStore.GetObjects(map))
+            {
+                DespawnObject(mapObject);
+            }
+        }
+
+        public async Task DespawnMapAsync(Map map)
+        {
+            if (!_spawnedMapIds.Contains(map.GetId()))
+            {
+                return;
+            }
+            List<MapObject> mapObjects = _mapStore.GetObjects(map).ToList();
+            await MapSlices.RunAsync(mapObjects, DespawnObject);
             _spawnedMapIds.Remove(map.GetId());
         }
 
         public void RespawnObject(MapObject mapObject)
         {
             DespawnObject(mapObject);
-            if (IsOnLoadedMap(mapObject))
-            {
-                SpawnObject(mapObject);
-            }
+            SpawnIfOnLoadedMap(mapObject);
         }
 
         public void DespawnObject(MapObject mapObject)
@@ -97,38 +123,7 @@ namespace OpenRP.Framework.Features.Maps.Services
             }
             dynamicObject.Position = mapObject.GetPosition();
             dynamicObject.Rotation = mapObject.GetRotation();
-        }
-
-        public void RespawnChangedObject(MapObject mapObject)
-        {
-            if (_hasSpawnedLoadedMaps)
-            {
-                RespawnObject(mapObject);
-            }
-        }
-
-        /// <summary>
-        /// A map that was loaded or unloaded on another server is spawned or despawned to match. A map whose objects are
-        /// already in the state its flag asks for is left alone. A map that gets spawned also applies its removed
-        /// buildings to the online players, as if it were loaded here.
-        /// </summary>
-        public void SyncChangedMap(Map map)
-        {
-            if (!_hasSpawnedLoadedMaps)
-            {
-                return;
-            }
-
-            bool isSpawned = _spawnedMapIds.Contains(map.GetId());
-            if (map.IsLoaded() && !isSpawned)
-            {
-                SpawnMap(map);
-                ApplyMapRemovedBuildings(map);
-            }
-            else if (!map.IsLoaded() && isSpawned)
-            {
-                DespawnMap(map);
-            }
+            NotifyMoved(mapObject, dynamicObject);
         }
 
         public DynamicObject? GetDynamicObject(MapObject mapObject)
@@ -157,60 +152,100 @@ namespace OpenRP.Framework.Features.Maps.Services
             }
         }
 
-        /// <summary>
-        /// A removed building that was loaded or changed from the database is applied to every online player when its map
-        /// is loaded. Does nothing until SpawnLoadedMaps has run.
-        /// </summary>
-        public void ApplyChangedRemovedBuilding(MapRemovedBuilding removal)
-        {
-            if (_hasSpawnedLoadedMaps && IsOnLoadedMap(removal))
-            {
-                ApplyRemovedBuilding(removal);
-            }
-        }
-
-        /// <summary>
-        /// Maps marked deleted stay in memory until the next save, but are already gone from the game.
-        /// </summary>
-        private IEnumerable<Map> GetLiveMaps()
-        {
-            return _entityManager.GetComponents<Map>().Where(map => !map.IsDeleted());
-        }
-
         private IEnumerable<MapRemovedBuilding> GetLoadedRemovedBuildings()
         {
             return GetMaps().Where(map => map.IsLoaded()).SelectMany(map => map.GetRemovedBuildings());
         }
 
-        private void ApplyMapRemovedBuildings(Map map)
+        /// <summary>
+        /// Spawns the object when its map is loaded and it isn't spawned yet. The check on every object lets a slice spawn
+        /// stop short when its map was unloaded or its object deleted meanwhile.
+        /// </summary>
+        private void SpawnIfOnLoadedMap(MapObject mapObject)
         {
-            foreach (MapRemovedBuilding removal in map.GetRemovedBuildings())
+            if (mapObject.IsComponentAlive && IsOnLoadedMap(mapObject) && GetDynamicObject(mapObject) == null)
             {
-                ApplyRemovedBuilding(removal);
+                SpawnObject(mapObject);
             }
         }
 
         private static bool IsOnLoadedMap(MapObject mapObject)
         {
             Map? map = mapObject.GetMap();
-            return !mapObject.IsDeleted() && map != null && !map.IsDeleted() && map.IsLoaded();
-        }
-
-        private static bool IsOnLoadedMap(MapRemovedBuilding removal)
-        {
-            Map? map = removal.GetMap();
-            return !removal.IsDeleted() && map != null && !map.IsDeleted() && map.IsLoaded();
+            return map != null && map.IsLoaded();
         }
 
         private void SpawnObject(MapObject mapObject)
         {
             DynamicObject dynamicObject = _streamerService.CreateDynamicObject(
                 mapObject.GetModelId(), mapObject.GetPosition(), mapObject.GetRotation(),
-                mapObject.GetVirtualWorld(), mapObject.GetInterior(), parent: mapObject.Entity);
+                mapObject.GetVirtualWorld(), mapObject.GetInterior(), streamDistance: mapObject.GetStreamDistance(),
+                parent: mapObject.Entity);
 
             foreach (MapObjectMaterial material in mapObject.GetMaterials())
             {
                 ApplyMaterial(dynamicObject, material);
+            }
+            NotifySpawned(mapObject, dynamicObject);
+        }
+
+        /// <summary>
+        /// Tells the handlers of the object's model that its streamer object now exists, so they can attach behaviour to it.
+        /// </summary>
+        private void NotifySpawned(MapObject mapObject, DynamicObject dynamicObject)
+        {
+            foreach (IMapObjectSpawnHandler handler in GetSpawnHandlers(mapObject.GetModelId()))
+            {
+                RunHandler(handler, mapObject, () => handler.OnMapObjectSpawned(mapObject, dynamicObject));
+            }
+        }
+
+        private void NotifyMoved(MapObject mapObject, DynamicObject dynamicObject)
+        {
+            foreach (IMapObjectSpawnHandler handler in GetSpawnHandlers(mapObject.GetModelId()))
+            {
+                RunHandler(handler, mapObject, () => handler.OnMapObjectMoved(mapObject, dynamicObject));
+            }
+        }
+
+        private IMapObjectSpawnHandler[] GetSpawnHandlers(int modelId)
+        {
+            if (!_spawnHandlersByModelId.TryGetValue(modelId, out IMapObjectSpawnHandler[]? handlers))
+            {
+                handlers = _spawnHandlers.Where(handler => TryHandlesModel(handler, modelId)).ToArray();
+                _spawnHandlersByModelId[modelId] = handlers;
+            }
+            return handlers;
+        }
+
+        /// <summary>
+        /// A handler that throws while it checks the model is treated as not handling it, so the spawns go on.
+        /// </summary>
+        private bool TryHandlesModel(IMapObjectSpawnHandler handler, int modelId)
+        {
+            try
+            {
+                return handler.Handles(modelId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Map object spawn handler {Handler} failed while checking model {ModelId}.", handler.GetType().Name, modelId);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// One handler's call. A handler that throws is logged, and the other handlers and the spawns still go on.
+        /// </summary>
+        private void RunHandler(IMapObjectSpawnHandler handler, MapObject mapObject, Action callHandler)
+        {
+            try
+            {
+                callHandler();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Map object spawn handler {Handler} failed on map object {MapObjectId}.", handler.GetType().Name, mapObject.GetId());
             }
         }
 

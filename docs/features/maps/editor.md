@@ -1,6 +1,6 @@
 # The map editor
 
-`/editmaps` (Admin) creates and changes maps in-game. Changes show in the game at once. They're saved as described in [Maps](../maps.md#how-it-works). A dialog for a map or object that has been deleted says so, and goes back.
+`/editmaps` (Admin) creates and changes maps in-game. Changes show in the game at once and are saved to the database at once, see [Maps](../maps.md#how-it-works). A dialog for a map or object that has been deleted says so, and goes back.
 
 ## Map list
 
@@ -10,8 +10,6 @@
 |---|---|
 | **Create map** | Asks for a name of 1 to 64 characters, unique ignoring case. The new map is unloaded. |
 | A map | Shows its name, its number of objects and its state, Loaded or Unloaded. Opens the map menu. |
-
-A deleted map's name can be used again once the deletion is saved, which takes up to a minute. Until then, Create map and Rename say: "A map with that name was just deleted. Wait a minute for it to be saved, then try again."
 
 ## Map menu
 
@@ -24,7 +22,11 @@ Opened from the list, or from **Map menu** in the editor.
 | **Teleport to map** | Puts you just above the map's first object (the lowest ID). It uses that object's world and interior, unless they're -1. While you fly, you land there instead, and your health, armour, skin and weapons are restored. |
 | **Rename** | Takes a new name, with the same rules as create. |
 | **Removed buildings** | See [Removed buildings](#removed-buildings). |
-| **Delete** | Asks first. Deletes the map with its objects, materials and removed buildings. Every admin who is editing it stops editing. |
+| **Delete** | Asks first. Deletes the map with its objects, materials and removed buildings, in the database and in the game. A big map can take a while. Every admin who is editing it stops editing. While the database delete runs, regeneration and changes are refused with "This map is being deleted." |
+
+While the official world generator replaces a map's objects, the map is being regenerated. Every change to it is refused with "This map is being regenerated.": load, unload, rename, delete, every change in the editor, edit objects, teleport, select (click), nearest object, object list, search by model and move. Clicks and moves on its objects are ignored.
+
+If the database part of a regeneration succeeds but putting the objects into the game fails, the map stays locked until the server restarts. While it's locked, every change to it is refused with "This map is locked after a failed regeneration. Restart the server first." See [Bulk replace](internals.md#bulk-replace).
 
 ## Editor menu
 
@@ -50,13 +52,14 @@ Opened when you pick an object.
 |---|---|
 | **Move / rotate** | Moves the object with the game's edit mode. Final saves the new place and rotation, and the object moves in place. Cancel keeps the old one and reopens this menu. The map must be loaded. The editor first streams in the objects near you. If the object still isn't streamed in, you get "That object isn't streamed in near you yet. Move closer and try again." |
 | **Model** | Changes the model ID. |
-| **Duplicate** | Adds a copy in the same place, with the same materials, and puts the copy in move mode. |
+| **Duplicate** | Adds a copy in the same place, with the same materials and stream distance, and puts the copy in move mode. |
 | **Textures** | Material slots 0 to 15. Each slot has **Set texture** and **Clear**. |
 | **Material text** | Puts text on a slot. |
 | **World and interior** | Your own world and interior, everywhere (-1 -1), or two numbers you enter. |
 | **Description** | Up to 64 characters. An empty entry clears it. |
+| **Stream distance** | How far, in metres, the object is streamed in: a number from 1 to 1000. Empty means the default, 300. Changing it respawns the object. |
 | **Delete** | Asks first. |
-| **Info** | The ID, model, position, rotation, world, interior, description and materials. |
+| **Info** | The ID, model, position, rotation, world, interior, description, stream distance and materials. |
 
 **Textures** take `model txd texture [ARGB colour]`, for example `3374 ce_farmxref sw_barnwood1 0x00000000`. The colour is optional. Leaving it out keeps the texture's own colour.
 

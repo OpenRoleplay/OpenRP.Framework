@@ -30,6 +30,29 @@ namespace OpenRP.Framework.Features.Maps.Helpers
         }
 
         /// <summary>
+        /// Reads a stream distance in metres. Empty means the default, which reads as null. The editor checks the range, so
+        /// a number that's out of range still parses.
+        /// </summary>
+        public static bool TryParseStreamDistance(string text, out float? streamDistance)
+        {
+            string trimmed = text.Trim();
+            if (trimmed.Length == 0)
+            {
+                streamDistance = null;
+                return true;
+            }
+
+            if (float.TryParse(trimmed, NumberStyles.Float, CultureInfo.InvariantCulture, out float distance) && float.IsFinite(distance))
+            {
+                streamDistance = distance;
+                return true;
+            }
+
+            streamDistance = null;
+            return false;
+        }
+
+        /// <summary>
         /// Splits "model description" at the first space. The description is null when nothing follows the model.
         /// </summary>
         public static (string ModelText, string? Description) SplitModelAndDescription(string input)

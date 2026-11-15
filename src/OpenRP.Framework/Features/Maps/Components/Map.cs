@@ -1,5 +1,4 @@
 ﻿using OpenRP.Framework.Database.Models;
-using OpenRP.Framework.Shared.BaseManager.Entities;
 using SampSharp.Entities;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,42 +6,16 @@ using System.Linq;
 namespace OpenRP.Framework.Features.Maps.Components
 {
     /// <summary>
-    /// A named set of map objects and removed buildings. Its objects and removals are child entities.
+    /// A named set of map objects. Its removed buildings are child entities. Its objects are root entities that point
+    /// back to it, see <see cref="MapObject"/>. Only the map store changes its state.
     /// </summary>
-    public class Map : Component, IBaseDataComponent, IChangeable, IDeletable
+    public class Map : Component
     {
         private readonly MapModel _cachedMapModel;
-        private bool _hasChanges;
-        private bool _isDeleted;
 
         public Map(MapModel mapModel)
         {
             _cachedMapModel = mapModel;
-        }
-
-        public bool HasChanges()
-        {
-            return _hasChanges;
-        }
-
-        public void ProcessChanges(bool processChanges = true)
-        {
-            _hasChanges = processChanges;
-        }
-
-        public bool IsDeleted()
-        {
-            return _isDeleted;
-        }
-
-        public void ProcessDeletion(bool processDeletion = true)
-        {
-            _isDeleted = processDeletion;
-        }
-
-        public MapModel GetRawMapModel()
-        {
-            return _cachedMapModel;
         }
 
         public ulong GetId()
@@ -55,10 +28,9 @@ namespace OpenRP.Framework.Features.Maps.Components
             return _cachedMapModel.Name;
         }
 
-        public void SetName(string name)
+        internal void SetName(string name)
         {
             _cachedMapModel.Name = name;
-            ProcessChanges();
         }
 
         /// <summary>
@@ -69,26 +41,17 @@ namespace OpenRP.Framework.Features.Maps.Components
             return _cachedMapModel.IsLoaded;
         }
 
-        public void SetIsLoaded(bool isLoaded)
+        internal void SetIsLoaded(bool isLoaded)
         {
             _cachedMapModel.IsLoaded = isLoaded;
-            ProcessChanges();
         }
 
         /// <summary>
-        /// The objects of this map that aren't deleted.
-        /// </summary>
-        public List<MapObject> GetObjects()
-        {
-            return GetComponentsInChildren<MapObject>().Where(mapObject => !mapObject.IsDeleted()).ToList();
-        }
-
-        /// <summary>
-        /// The removed buildings of this map that aren't deleted.
+        /// The removed buildings of this map.
         /// </summary>
         public List<MapRemovedBuilding> GetRemovedBuildings()
         {
-            return GetComponentsInChildren<MapRemovedBuilding>().Where(removal => !removal.IsDeleted()).ToList();
+            return GetComponentsInChildren<MapRemovedBuilding>().ToList();
         }
     }
 }

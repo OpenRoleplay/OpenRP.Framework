@@ -14,6 +14,8 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
     public partial class MapDialogService
     {
         private static readonly string DescriptionPrompt = $"Enter the description, up to {MapLimits.DescriptionMaxLength} characters. Leave it empty to clear it.";
+        private static readonly string StreamDistancePrompt = $"Enter a stream distance from {MapLimits.MinStreamDistance} to {MapLimits.MaxStreamDistance} metres, or leave empty for the default ({MapLimits.DefaultStreamDistance}).";
+        private const string StreamDistanceNotNumberMessage = "Enter a number of metres, for example 75, or leave it empty for the default.";
         private const string ModelNotNumberMessage = "Enter a whole model ID, not 0.";
         private const string WorldInputPrompt = "Enter the virtual world and the interior, separated by a space, for example 0 0. Use -1 -1 for everywhere.";
         private const string WorldInputNotNumbersMessage = "Enter two whole numbers: the virtual world, then the interior.";
@@ -72,6 +74,7 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
             actions[objectDialog.AddRow("Material text")] = () => OpenMaterialTextInput(player, mapObject);
             actions[objectDialog.AddRow(MapDialogText.GetWorldLabel(mapObject))] = () => OpenWorldChoices(player, mapObject);
             actions[objectDialog.AddRow($"Description: {MapDialogText.GetDescriptionOrDash(mapObject)}")] = () => OpenDescriptionInput(player, mapObject);
+            actions[objectDialog.AddRow($"Stream distance: {MapDialogText.GetStreamDistanceText(mapObject)}")] = () => OpenStreamDistanceInput(player, mapObject);
             actions[objectDialog.AddRow("Delete")] = () => OpenDeleteObject(player, mapObject, map);
             actions[objectDialog.AddRow("Info")] = () => ShowObjectInfo(player, mapObject);
             ShowActionList(player, objectDialog, actions, () => OpenEditorMenu(player, map));
@@ -83,6 +86,12 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
         private void StartMovingObject(Player player, MapObject mapObject)
         {
             if (!EnsureObjectExists(player, mapObject))
+            {
+                return;
+            }
+
+            Map? map = mapObject.GetMap();
+            if (map != null && !EnsureMapNotBusy(player, map))
             {
                 return;
             }
@@ -176,6 +185,29 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
             ContinueAfter(player, error, () => OpenObjectMenu(player, mapObject), () => OpenDescriptionInput(player, mapObject));
         }
 
+        private void OpenStreamDistanceInput(Player player, MapObject mapObject)
+        {
+            if (!EnsureObjectExists(player, mapObject))
+            {
+                return;
+            }
+
+            OpenTextInput(player, "Stream distance", StreamDistancePrompt,
+                text => SetStreamDistanceFromInput(player, mapObject, text), () => OpenObjectMenu(player, mapObject));
+        }
+
+        private void SetStreamDistanceFromInput(Player player, MapObject mapObject, string text)
+        {
+            if (!MapDialogInput.TryParseStreamDistance(text, out float? streamDistance))
+            {
+                ShowMessage(player, "Stream distance", StreamDistanceNotNumberMessage, () => OpenStreamDistanceInput(player, mapObject));
+                return;
+            }
+
+            string? error = _mapEditorService.SetObjectStreamDistance(mapObject, streamDistance);
+            ContinueAfter(player, error, () => OpenObjectMenu(player, mapObject), () => OpenStreamDistanceInput(player, mapObject));
+        }
+
         private void OpenWorldChoices(Player player, MapObject mapObject)
         {
             if (!EnsureObjectExists(player, mapObject))
@@ -264,6 +296,7 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
                 $"Rotation: {MapDialogText.FormatPosition(mapObject.GetRotation())}",
                 $"World: {mapObject.GetVirtualWorld()}  Interior: {mapObject.GetInterior()}",
                 $"Description: {MapDialogText.GetDescriptionOrDash(mapObject)}",
+                $"Stream distance: {MapDialogText.GetStreamDistanceText(mapObject)}",
             };
             lines.AddRange(GetMaterialInfoLines(mapObject));
             return string.Join("\n", lines);

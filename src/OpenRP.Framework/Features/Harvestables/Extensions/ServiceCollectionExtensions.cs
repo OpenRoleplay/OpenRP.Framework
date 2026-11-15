@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Harvestables.Entities;
 using OpenRP.Framework.Features.Harvestables.Services;
+using OpenRP.Framework.Features.Maps.Extensions;
 
 namespace OpenRP.Framework.Features.Harvestables.Extensions
 {
@@ -10,7 +11,8 @@ namespace OpenRP.Framework.Features.Harvestables.Extensions
         {
             return self
                 .AddSingleton<IHarvestableService, HarvestableService>()
-                .AddHarvestableModel<IndianHempHarvestableModel>();
+                .AddHarvestableModel<IndianHempHarvestableModel>()
+                .AddMapObjectSpawnHandler<HarvestableMapObjectSpawnHandler>();
         }
 
         /// <summary>

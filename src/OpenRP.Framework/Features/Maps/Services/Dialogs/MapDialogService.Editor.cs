@@ -27,7 +27,7 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
             BetterListDialog editorDialog = new BetterListDialog("Choose", "Close");
             editorDialog.SetTitle(TitleType.Children, MapsTitle, $"Editing: {map.GetName()}");
             Dictionary<int, Action> actions = new Dictionary<int, Action>();
-            actions[editorDialog.AddRow("Select object (click)")] = () => BeginSelecting(player);
+            actions[editorDialog.AddRow("Select object (click)")] = () => BeginSelecting(player, map);
             actions[editorDialog.AddRow("Nearest object")] = () => SelectNearestObject(player, map, reopenEditor);
             actions[editorDialog.AddRow("Object list")] = () => OpenObjectList(player, map);
             actions[editorDialog.AddRow("Search by model")] = () => OpenModelSearch(player, map);
@@ -42,21 +42,26 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
         /// <summary>
         /// The admin clicks an object; the click handler takes it from there.
         /// </summary>
-        private static void BeginSelecting(Player player)
+        private void BeginSelecting(Player player, Map map)
         {
+            if (!EnsureMapNotBusy(player, map))
+            {
+                return;
+            }
+
             player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "Click an object of this map. Press Escape to stop.");
             player.Select();
         }
 
         private void SelectNearestObject(Player player, Map map, Action onBack)
         {
-            if (!EnsureMapExists(player, map))
+            if (!EnsureMapExists(player, map) || !EnsureMapNotBusy(player, map))
             {
                 return;
             }
 
             Vector3 origin = _mapEditingService.GetEditorOrigin(player);
-            MapObject? nearestObject = MapObjectListing.FindNearest(map.GetObjects(), origin, NearestObjectDistance);
+            MapObject? nearestObject = MapObjectListing.FindNearest(_mapStore.GetObjects(map), origin, NearestObjectDistance);
             if (nearestObject == null)
             {
                 ShowMessage(player, "Nearest object", $"No object of {map.GetName()} is within {NearestObjectDistance} m of you.", onBack);
@@ -67,7 +72,7 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
 
         private void OpenObjectList(Player player, Map map)
         {
-            if (!EnsureMapExists(player, map))
+            if (!EnsureMapExists(player, map) || !EnsureMapNotBusy(player, map))
             {
                 return;
             }
@@ -99,22 +104,22 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
         /// </summary>
         private void OpenFilteredObjectList(Player player, Map map, string title, Func<MapObject, bool> matches)
         {
-            if (!EnsureMapExists(player, map))
+            if (!EnsureMapExists(player, map) || !EnsureMapNotBusy(player, map))
             {
                 return;
             }
 
             Action reopenEditor = () => OpenEditorMenu(player, map);
-            List<MapObject> matchingObjects = map.GetObjects().Where(matches).ToList();
-            if (matchingObjects.Count == 0)
+            (List<MapObject> listedObjects, int matchingCount) = MapObjectListing.GetListedObjects(
+                _mapStore.GetObjects(map).Where(matches), _mapEditingService.GetEditorOrigin(player));
+            if (matchingCount == 0)
             {
                 ShowMessage(player, title, $"No objects of {map.GetName()} match.", reopenEditor);
                 return;
             }
 
-            List<MapObject> listedObjects = MapObjectListing.GetListedObjects(matchingObjects, _mapEditingService.GetEditorOrigin(player));
             BetterListDialog listDialog = new BetterListDialog("Choose", "Back");
-            listDialog.SetTitle(TitleType.Children, MapsTitle, map.GetName(), MapObjectListing.GetListTitle(title, matchingObjects.Count));
+            listDialog.SetTitle(TitleType.Children, MapsTitle, map.GetName(), MapObjectListing.GetListTitle(title, matchingCount));
             Dictionary<int, Action> actions = new Dictionary<int, Action>();
             foreach (MapObject mapObject in listedObjects)
             {

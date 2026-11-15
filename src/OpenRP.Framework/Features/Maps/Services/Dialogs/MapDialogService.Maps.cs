@@ -38,9 +38,9 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
             mapsDialog.AddHeaders("Map", "Objects", "State");
             int createRow = mapsDialog.AddRow(CreateMapLabel, string.Empty, string.Empty);
             Dictionary<int, Map> mapsByRow = new Dictionary<int, Map>();
-            foreach (Map map in _mapService.GetMaps())
+            foreach (Map map in _mapStore.GetMaps())
             {
-                mapsByRow[mapsDialog.AddRow(map.GetName(), map.GetObjects().Count.ToString(), GetStateLabel(map))] = map;
+                mapsByRow[mapsDialog.AddRow(map.GetName(), _mapStore.GetObjectCount(map).ToString(), GetStateLabel(map))] = map;
             }
 
             void OnMapChosen(TablistDialogResponse response)
@@ -90,7 +90,7 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
 
         private void OpenEditObjects(Player player, Map map, Action onBack)
         {
-            if (!EnsureMapExists(player, map))
+            if (!EnsureMapExists(player, map) || !EnsureMapNotBusy(player, map))
             {
                 return;
             }
@@ -108,12 +108,17 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
 
         private void LoadThenBeginEditing(Player player, Map map, Action onBack)
         {
-            string? error = _mapEditorService.LoadMap(map);
-            ContinueAfter(player, error, () => BeginEditing(player, map), onBack);
+            ContinueAfterAsync(player, () => _mapEditorService.LoadMap(map), () => BeginEditing(player, map), onBack);
         }
 
         private void BeginEditing(Player player, Map map)
         {
+            // The map may have started being replaced while it was loading.
+            if (!EnsureMapNotBusy(player, map))
+            {
+                return;
+            }
+
             _mapEditingService.StartEditing(player, map);
             player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, $"You're editing {map.GetName()}. Use /editmaps to open the editor.");
             OpenEditorMenu(player, map);
@@ -126,18 +131,17 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
                 return;
             }
 
-            string? error = map.IsLoaded() ? _mapEditorService.UnloadMap(map) : _mapEditorService.LoadMap(map);
-            ContinueAfter(player, error, reopenMenu, reopenMenu);
+            ContinueAfterAsync(player, () => map.IsLoaded() ? _mapEditorService.UnloadMap(map) : _mapEditorService.LoadMap(map), reopenMenu, reopenMenu);
         }
 
         private void TeleportToMap(Player player, Map map, Action onBack)
         {
-            if (!EnsureMapExists(player, map))
+            if (!EnsureMapExists(player, map) || !EnsureMapNotBusy(player, map))
             {
                 return;
             }
 
-            MapObject? firstObject = map.GetObjects().OrderBy(mapObject => mapObject.GetId()).FirstOrDefault();
+            MapObject? firstObject = _mapStore.GetObjects(map).MinBy(mapObject => mapObject.GetId());
             if (firstObject == null)
             {
                 ShowMessage(player, "Teleport", $"{map.GetName()} has no objects to teleport to.", onBack);
@@ -213,15 +217,14 @@ namespace OpenRP.Framework.Features.Maps.Services.Dialogs
                 return;
             }
 
-            string objects = MapDialogText.GetObjectCountText(map.GetObjects().Count);
+            string objects = MapDialogText.GetObjectCountText(_mapStore.GetObjectCount(map));
             ShowConfirmation(player, "Delete map", $"Delete {map.GetName()} and its {objects}? This can't be undone.",
                 () => DeleteMap(player, map), reopenMenu);
         }
 
         private void DeleteMap(Player player, Map map)
         {
-            string? error = _mapEditorService.DeleteMap(map);
-            ContinueAfter(player, error, () => OpenMapList(player), () => OpenMapList(player));
+            ContinueAfterAsync(player, () => _mapEditorService.DeleteMapAsync(map), () => OpenMapList(player), () => OpenMapList(player));
         }
 
         private static string GetStateLabel(Map map)
