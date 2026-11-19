@@ -1,4 +1,5 @@
 using OpenRP.Framework.Features.Inventories.Components;
+using OpenRP.Framework.Features.Items.Components;
 using SampSharp.Entities.SAMP;
 using System.Threading.Tasks;
 
@@ -15,6 +16,11 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
         /// Drops this amount of the inventory item on the ground below the player. False when it can't be dropped.
         /// </summary>
         Task<bool> DropItem(Player player, InventoryItem inventoryItem, uint amount);
+
+        /// <summary>
+        /// Puts one new item on the ground below the player, with its own weight when it has one. False when that fails.
+        /// </summary>
+        bool DropNewItem(Player player, Item item, uint? weightPerItemInGrams);
 
         /// <summary>
         /// Picks up the dropped item the player is standing next to, if it fits in their inventory.

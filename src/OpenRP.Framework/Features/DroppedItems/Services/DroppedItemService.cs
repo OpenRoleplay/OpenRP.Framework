@@ -94,6 +94,34 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
             }
         }
 
+        public bool DropNewItem(Player player, Item item, uint? weightPerItemInGrams)
+        {
+            try
+            {
+                (Vector3 position, Vector3 rotation) = GetDropPosition(player);
+                ItemModel itemModel = item.GetRawItemModel();
+                DroppedInventoryItemModel droppedItemModel = SaveWorldItem(new InventoryItemModel
+                {
+                    ItemId = item.GetId(),
+                    Amount = 1,
+                    UsesRemaining = itemModel.MaxUses,
+                    KeepOnDeath = itemModel.KeepOnDeath,
+                    CanDrop = itemModel.CanDrop,
+                    CanDestroy = itemModel.CanDestroy,
+                    Weight = weightPerItemInGrams,
+                    InventoryId = WorldInventoryId,
+                }, position, rotation);
+                AddWorldItemComponent(droppedItemModel.InventoryItem);
+                CreateDroppedItemEntity(droppedItemModel, itemModel);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to drop a new {ItemName}.", item.GetName());
+                return false;
+            }
+        }
+
         public async Task PickupNearbyItem(Player player)
         {
             try
@@ -108,7 +136,7 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
                 Item? item = GetItem(droppedItem);
                 Inventory? inventory = player.GetPlayerCurrentlyPlayingAsCharacter().GetInventory();
                 uint amount = droppedItem.GetAmount();
-                if (item == null || inventory == null || !inventory.DoesItemFit(item, amount))
+                if (item == null || inventory == null || !DoesDroppedItemFit(droppedItem, item, inventory))
                 {
                     player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You don't have enough space in your inventory to pick this up!");
                     return;
@@ -117,6 +145,8 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
                 // Claim the item before giving it: only one server can delete the row, so it can't be picked up twice.
                 bool claimed = DeleteWorldItem(droppedItem.GetInventoryItemId());
                 ItemAdditionalData? additionalData = droppedItem.GetAdditionalData();
+                uint? weightPerItem = droppedItem.GetWeightPerItem();
+                uint? usesRemaining = droppedItem.GetUsesRemaining();
                 droppedItem.DestroyEntity();
                 if (!claimed)
                 {
@@ -124,7 +154,7 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
                     return;
                 }
 
-                if (!inventory.AddItem(item, amount, additionalData))
+                if (!inventory.AddExistingItem(item, amount, usesRemaining, weightPerItem, additionalData))
                 {
                     _logger.LogError("Picked up {Amount}x {ItemName}, but it didn't fit in the inventory, so it was lost.", amount, item.GetName());
                     player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "You don't have enough space in your inventory to pick this up!");
@@ -138,6 +168,17 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
             {
                 _logger.LogError(ex, "Failed to pick up an item.");
             }
+        }
+
+        /// <summary>
+        /// An item with its own weight, such as a fish, is checked by that weight instead of what the item normally weighs.
+        /// </summary>
+        private static bool DoesDroppedItemFit(DroppedItem droppedItem, Item item, Inventory inventory)
+        {
+            uint? weightPerItem = droppedItem.GetWeightPerItem();
+            return weightPerItem.HasValue
+                ? inventory.DoesWeightFit(weightPerItem.Value * droppedItem.GetAmount())
+                : inventory.DoesItemFit(item, droppedItem.GetAmount());
         }
 
         private DroppedItem? GetNearbyDroppedItem(Player player)
@@ -171,6 +212,25 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
         private DroppedInventoryItemModel CreateWorldItem(InventoryItem inventoryItem, uint amount, Vector3 position, Vector3 rotation)
         {
             InventoryItemModel source = inventoryItem.GetRawInventoryItemModel();
+            return SaveWorldItem(new InventoryItemModel
+            {
+                ItemId = source.ItemId,
+                Amount = amount,
+                UsesRemaining = source.UsesRemaining,
+                KeepOnDeath = source.KeepOnDeath,
+                CanDrop = source.CanDrop,
+                CanDestroy = source.CanDestroy,
+                Weight = source.Weight,
+                InventoryId = WorldInventoryId,
+                AdditionalData = GetAdditionalDataWithoutPersonalData(source.AdditionalData),
+            }, position, rotation);
+        }
+
+        /// <summary>
+        /// Saves the world item together with where it lies.
+        /// </summary>
+        private DroppedInventoryItemModel SaveWorldItem(InventoryItemModel worldItemModel, Vector3 position, Vector3 rotation)
+        {
             DroppedInventoryItemModel droppedItemModel = new DroppedInventoryItemModel
             {
                 PosX = position.X,
@@ -179,18 +239,7 @@ namespace OpenRP.Framework.Features.DroppedItems.Services
                 RotX = rotation.X,
                 RotY = rotation.Y,
                 RotZ = rotation.Z,
-                InventoryItem = new InventoryItemModel
-                {
-                    ItemId = source.ItemId,
-                    Amount = amount,
-                    UsesRemaining = source.UsesRemaining,
-                    KeepOnDeath = source.KeepOnDeath,
-                    CanDrop = source.CanDrop,
-                    CanDestroy = source.CanDestroy,
-                    Weight = source.Weight,
-                    InventoryId = WorldInventoryId,
-                    AdditionalData = GetAdditionalDataWithoutPersonalData(source.AdditionalData),
-                },
+                InventoryItem = worldItemModel,
             };
 
             _dataContext.DroppedInventoryItems.Add(droppedItemModel);

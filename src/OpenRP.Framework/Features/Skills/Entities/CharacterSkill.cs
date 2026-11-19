@@ -13,6 +13,11 @@ namespace OpenRP.Framework.Features.Skills.Entities
             return SkillExperience.GetExperienceForNextLevel(Level);
         }
 
+        public bool IsMaxLevel()
+        {
+            return SkillExperience.IsMaxLevel(Level);
+        }
+
         public bool HasDescription()
         {
             return !string.IsNullOrEmpty(Description);

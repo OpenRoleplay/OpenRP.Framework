@@ -42,6 +42,19 @@ namespace OpenRP.Framework.Features.DroppedItems.Components
             return _droppedItemModel.InventoryItem.Amount;
         }
 
+        /// <summary>
+        /// The item's own weight per piece, such as a fish, or null when it weighs what the item normally weighs.
+        /// </summary>
+        public uint? GetWeightPerItem()
+        {
+            return _droppedItemModel.InventoryItem.Weight;
+        }
+
+        public uint? GetUsesRemaining()
+        {
+            return _droppedItemModel.InventoryItem.UsesRemaining;
+        }
+
         public ItemAdditionalData GetAdditionalData()
         {
             return ItemAdditionalData.Parse(_droppedItemModel.InventoryItem.AdditionalData);

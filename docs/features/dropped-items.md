@@ -13,7 +13,7 @@ Items are dropped from the [inventory](inventories.md) dialog.
 ## How it works
 
 1. **Dropping** moves the items into the **world inventory** (inventory 1), and stores the spot on the ground below you. ColAndreas finds the ground.
-2. **On the ground,** the item shows as an object (the item's drop model, or model 1575) with a small label.
+2. **On the ground,** the item shows as an object (the item's drop model, or model 1575) with a small label. An item keeps its remaining uses and its own weight, such as a worn rod or a fish. A [fishing](fishing.md) catch that doesn't fit in your inventory lands here too.
 3. **Picking up** first deletes the item's row, and only then puts the item in your inventory. If the row is already gone, someone on another server took it.
 4. **At startup,** every dropped item is put back on the ground.
 

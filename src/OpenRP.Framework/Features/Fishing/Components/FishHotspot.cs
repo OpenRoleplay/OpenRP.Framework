@@ -1,22 +1,31 @@
 using SampSharp.Entities;
-using OpenRP.OpenMp.Streamer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 
 namespace OpenRP.Framework.Features.Fishing.Components
 {
+    /// <summary>
+    /// A spot on the water where fish gather. Its splash is a child object, so it goes away with the hotspot.
+    /// </summary>
     public class FishHotspot : Component
     {
-        public FishHotspot()
+        private readonly Vector3 _position;
+
+        public FishHotspot(Vector3 position)
         {
+            _position = position;
         }
 
-        public DynamicObject GetDynamicObject()
+        public Vector3 GetPosition()
         {
-            return this.GetComponentInChildren<DynamicObject>();
+            return _position;
+        }
+
+        /// <summary>
+        /// True when the position is within range, measured flat: a pier high above the hotspot still counts as close.
+        /// </summary>
+        public bool IsPositionInRange(Vector3 position, float range)
+        {
+            return Vector2.Distance(new Vector2(_position.X, _position.Y), new Vector2(position.X, position.Y)) <= range;
         }
     }
 }

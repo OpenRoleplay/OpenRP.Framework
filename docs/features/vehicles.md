@@ -94,6 +94,7 @@ Temporary `/sv` vehicles can't be parked.
 
 - deletes the vehicle's row;
 - removes its radio, and the vehicle keys that are loaded in the game;
+- removes its [fishing net](fishing.md#reefer-net), with the net's storage and the fish in it;
 - ejects the people inside, and destroys the vehicle in the world.
 
 Keys in the inventories of offline characters aren't removed (see the known limitations). A temporary `/spawnveh` vehicle has no row, so the command refuses it.

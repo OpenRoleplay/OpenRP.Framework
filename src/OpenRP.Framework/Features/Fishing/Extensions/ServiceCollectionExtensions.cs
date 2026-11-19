@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OpenRP.Framework.Features.Fishing.Services;
-using OpenRP.Framework.Features.Inventories.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenRP.Framework.Features.Fishing.Services.Dialogs;
 
 namespace OpenRP.Framework.Features.Fishing.Extensions
 {
@@ -15,7 +10,12 @@ namespace OpenRP.Framework.Features.Fishing.Extensions
         {
             return self
                 .AddSingleton<IFishService, FishService>()
-                .AddSingleton<IFishHotspotService, FishHotspotService>();
+                .AddSingleton<IFishHotspotService, FishHotspotService>()
+                .AddSingleton<IFishingService, FishingService>()
+                .AddSingleton<IFishingNetManager, FishingNetManager>()
+                .AddSingleton<IFishingNetService, FishingNetService>()
+                .AddSingleton<ITrawlService, TrawlService>()
+                .AddSingleton<IFishingNetDialogService, FishingNetDialogService>();
         }
     }
 }

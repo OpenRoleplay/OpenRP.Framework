@@ -64,7 +64,7 @@ One row per account, → `Accounts` (cascade).
 | `DefaultCurrencyId` | ulong | The currency shown as GTA money |
 
 ### `Skills` (`SkillModel`) and `CharacterSkills` (`CharacterSkillModel`)
-- **`Skills`** has `Name` and `Description`. The skills themselves are seeded by the host.
+- **`Skills`** has `Name` and `Description`. The skills themselves are seeded by the host. [Fishing](features/fishing.md) looks for a skill named `Fishing`.
 - **`CharacterSkills`** has `CharacterId` and `SkillId`, plus `Level`, `Experience` and `LastUsedDate`.
 
 ## Permissions
@@ -150,7 +150,7 @@ The item types (definitions), not the items players own.
 | `KeepOnDeath`, `CanDrop`, `CanDestroy`, `Stackable` | bool | |
 | `DropModelId` | int? | Object model shown when dropped |
 
-The Framework seeds 51 items:
+The Framework seeds 67 items:
 - a uniform (skin);
 - a wallet;
 - the bills and coins of the San Andreas Dollar and the Caeroyna Ruble;
@@ -159,7 +159,8 @@ The Framework seeds 51 items:
 - a chicken egg;
 - twelve fish species;
 - a mobile phone (item 49, `UseType` Phone). Each phone item points to its row in `Phones` with `[PHONE_ID=x]`;
-- a handheld radio (item 50, `UseType` Radio), pointing to its row in `Radios` with `[RADIO_ID=x]`, and a radio earpiece (item 51).
+- a handheld radio (item 50, `UseType` Radio), pointing to its row in `Radios` with `[RADIO_ID=x]`, and a radio earpiece (item 51);
+- fishing gear (rod 52, bait 53, net 54), junk (55 to 57), treasures (58 to 61), four net-only fish (62 to 65) and two small saltwater fish (66 and 67).
 
 ### `Inventories` (`InventoryModel`)
 `Name`, `MaxWeight` (grams, null = unlimited). Seeded: "World Inventory", which holds items lying on the ground.
@@ -241,9 +242,19 @@ Persistent vehicles.
 Table `FishLoot`, with the `DbSet` named `FishSpecies` (`FishLootModel`). Columns:
 - `Name` (255);
 - `FishLootType`: Saltwater, Freshwater, Murkywater or Misc;
+- `LootKind`: Fish, Junk or Treasure;
+- `SizeClass`: None, Small, Medium, Large or Huge;
+- `RequiredFishingLevel`: the fishing level needed to catch it;
+- `IsNetOnly`: true for fish only a trawl net brings up;
 - `MinWeightInGrams` and `MaxWeightInGrams`;
-- `OddsToCatch`: 1 in N;
+- `CatchWeight`: how likely it is, relative to the other possible catches;
 - `ItemId` → `Items`.
+
+The Framework seeds 26 rows. Hosts can add their own.
+
+Table `VehicleFishingNets` (`VehicleFishingNetModel`) holds the nets fitted to Reefers:
+- `VehicleId` → `Vehicles` (cascade, unique);
+- `StorageInventoryId` → `Inventories` (cascade): the inventory holding the catch.
 
 ## Maps
 

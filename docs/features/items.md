@@ -21,7 +21,7 @@ The item types that everything in an [inventory](inventories.md) is made of, suc
 | `Radio` | A [handheld radio](radios.md) |
 | `RadioEarpiece` | Lets a radio's carrier listen without the people around them hearing it |
 
-**Seeded items (51):**
+**Seeded items (67):**
 - a uniform;
 - a wallet;
 - the SAD and CRU bills and coins;
@@ -30,7 +30,11 @@ The item types that everything in an [inventory](inventories.md) is made of, suc
 - a chicken egg (36);
 - 12 fish;
 - a mobile phone (49);
-- a handheld radio (50) and a radio earpiece (51).
+- a handheld radio (50) and a radio earpiece (51);
+- [fishing](fishing.md) gear: a rod (52), bait (53) and a net (54);
+- fishing junk (55 to 57) and treasures (58 to 61);
+- four net-only fish (62 to 65);
+- two small saltwater fish: a sardine (66) and a mackerel (67).
 
 Some code uses these ids, so don't renumber them.
 
@@ -42,7 +46,7 @@ Some code uses these ids, so don't renumber them.
 
 - **Code:** `Features/Items/`.
 - **Component:** `Item`: name, weight, flags, and `IsItemWallet()`, `IsItemCurrency()`, `IsItemRadio()`, `GetCurrencyUnitId()`, ….
-- **Service:** `IItemManager`: `LoadItems` and `ProcessChanges`.
+- **Services:** `IItemManager`: `LoadItems` and `ProcessChanges`. `IItemGiveService`: the [`/giveitem`](admins.md) command.
 - **Logs:** written to `Logs/ItemManager/`.
 - **Table:** [`Items`](../database.md#items-itemmodel).
 

@@ -140,6 +140,11 @@ namespace OpenRP.Framework.Features.Items.Components
             return _itemModel.UseType == ItemType.RadioEarpiece;
         }
 
+        public bool IsItemFish()
+        {
+            return _itemModel.UseType == ItemType.Fish;
+        }
+
         public bool IsItemInventory()
         {
             return IsItemWallet();

@@ -8,6 +8,7 @@ using OpenRP.Framework.Features.Currencies.Models.DefaultData;
 using OpenRP.Framework.Features.DroppedItems.Models.Configurations;
 using OpenRP.Framework.Features.Factions.Models.Configurations;
 using OpenRP.Framework.Features.Fishing.Models;
+using OpenRP.Framework.Features.Fishing.Models.DefaultData;
 using OpenRP.Framework.Features.Inventories.Models.Configurations;
 using OpenRP.Framework.Features.Inventories.Models.DefaultData;
 using OpenRP.Framework.Features.Items.Models.Configurations;
@@ -53,6 +54,8 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new ActorPermissionModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new FishLootModelConfiguration());
+            modelBuilder.ApplyConfiguration(new FishLootModelDefaultData());
+            modelBuilder.ApplyConfiguration(new VehicleFishingNetModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new InventoryItemModelConfiguration());
 

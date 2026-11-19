@@ -39,7 +39,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [DroppedItems](features/dropped-items.md): items on the ground
 - [EmergencyCalls](features/emergency-calls.md): 911 with an AI dispatcher that relays calls on the radio
 - [Factions](features/factions.md): organisations with ranks and permissions
-- [Fishing](features/fishing.md): early fishing
+- [Fishing](features/fishing.md): rod fishing, hotspots and trawling with a Reefer net
 - [FlyMode](features/fly-mode.md): `/fly`, a free-flying camera for admins
 - [Harvestables](features/harvestables.md): harvestable plants
 - [Hotwire](features/hotwire.md): start a vehicle without a key

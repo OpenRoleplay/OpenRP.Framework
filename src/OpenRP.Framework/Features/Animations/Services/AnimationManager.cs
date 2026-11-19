@@ -31,7 +31,7 @@ namespace OpenRP.Framework.Features.Animations.Services
             "PARK", "PAULNMAC", "PED", "PLAYER_DVBYS", "PLAYIDLES",
             "POLICE", "POOL", "POOR", "PYTHON", "QUAD",
             "QUAD_DBZ", "RAPPING", "RIFLE", "RIOT", "ROB_BANK",
-            "ROCKET", "RUNNINGMAN", "RUSTLER", "RYDER", "SCRATCHING",
+            "ROCKET", "RUNNINGMAN", "RUSTLER", "RYDER", "SAMP", "SCRATCHING",
             "SEX", "SHAMAL", "SHOP", "SHOTGUN", "SILENCED",
             "SKATE", "SMOKING", "SNIPER", "SNM", "SPRAYCAN",
             "STRIP", "SUNBATHE", "SWAT", "SWEET", "SWIM",

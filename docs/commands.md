@@ -17,6 +17,7 @@ All player commands of the Framework, grouped as in `/help`. `[argument]` is req
 | Command | Groups | Description | Feature |
 |---|---|---|---|
 | `/givemoney [receiver] [currency code] [amount]` | Admin | Give money of a currency to a player. Use a negative amount to take money. | [Admins](features/admins.md) |
+| `/giveitem [player] [item id] <amount>` | Admin | Give a player an amount of an item, by its item id. | [Admins](features/admins.md) |
 | `/gotopos [x] [y] [z] <interior> <virtual world>` | Admin | Teleport to a position, for example into a GTA interior. | [Admins](features/admins.md) |
 | `/tprel [player] [distance] [direction]` | Admin | Move a player a distance forward, back, left, right, up or down, keeping their interior and virtual world. | [Admins](features/admins.md) |
 | `/fly` | Admin | Fly around freely as an invisible camera. Use it again to land where you started, with your health, armour, skin and weapons. | [FlyMode](features/fly-mode.md) |
@@ -167,7 +168,11 @@ All player commands of the Framework, grouped as in `/help`. `[argument]` is req
 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
-| `/fish` | Default | Command to start fishing. | [Fishing](features/fishing.md) |
+| `/fish` | Default | Cast your line. Needs a Fishing Rod and Fishing Bait, while facing water or on a boat. | [Fishing](features/fishing.md) |
+| `/fitnet` | Default | Fit your Fishing Net to the saved Reefer you are on or next to. | [Fishing](features/fishing.md) |
+| `/netstorage` | Default | Open the net storage of the Reefer you are on or next to. | [Fishing](features/fishing.md) |
+| `/removenet` | Default | Take the net off the Reefer you are on or next to, once its storage is empty. | [Fishing](features/fishing.md) |
+| `/trawl` | Default | Lower the net of the Reefer you are driving, or raise it early. | [Fishing](features/fishing.md) |
 
 ## Jurisdictions
 

@@ -15,7 +15,8 @@ namespace OpenRP.Framework.Features.Items.Extensions
         public static IServiceCollection AddItems(this IServiceCollection self)
         {
             return self
-                .AddSingleton<IItemManager, ItemManager>();
+                .AddSingleton<IItemManager, ItemManager>()
+                .AddSingleton<IItemGiveService, ItemGiveService>();
         }
     }
 }

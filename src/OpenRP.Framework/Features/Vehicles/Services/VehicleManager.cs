@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Database.Services;
+using OpenRP.Framework.Features.Fishing.Services;
 using OpenRP.Framework.Features.Radios.Services;
 using OpenRP.Framework.Features.Vehicles.Components;
 using OpenRP.Framework.Features.Vehicles.Helpers;
@@ -39,14 +40,16 @@ namespace OpenRP.Framework.Features.Vehicles.Services
         private readonly IJurisdictionService _jurisdictionService;
         private readonly IVehicleKeyService _vehicleKeyService;
         private readonly IRadioEditorService _radioEditorService;
+        private readonly IFishingNetService _fishingNetService;
         private readonly ILogger<VehicleManager> _logger;
         // The saved vehicles whose lock is being saved right now, so a second lock or unlock waits for the first.
         private readonly HashSet<EntityId> _vehiclesWithLockChange = new HashSet<EntityId>();
 
         public VehicleManager(IWorldService worldService, IEntityManager entityManager, BaseDataContext dataContext, IServiceScopeFactory scopeFactory,
             IDataMemoryService dataMemoryService, IJurisdictionService jurisdictionService, IVehicleKeyService vehicleKeyService,
-            IRadioEditorService radioEditorService, ILogger<VehicleManager> logger)
+            IRadioEditorService radioEditorService, IFishingNetService fishingNetService, ILogger<VehicleManager> logger)
         {
+            _fishingNetService = fishingNetService;
             _jurisdictionService = jurisdictionService;
             _vehicleKeyService = vehicleKeyService;
             _radioEditorService = radioEditorService;
@@ -424,7 +427,23 @@ namespace OpenRP.Framework.Features.Vehicles.Services
             {
                 _logger.LogError(ex, "Removing the keys and radio of deleted vehicle {VehicleId} failed.", vehicleId);
             }
+            RemoveVehicleFishingNet(vehicleId);
             DestroyLoadedVehicle(vehicleId);
+        }
+
+        /// <summary>
+        /// The net's row went with the vehicle (cascade), but its storage and the fish in it did not.
+        /// </summary>
+        private void RemoveVehicleFishingNet(ulong vehicleId)
+        {
+            try
+            {
+                _fishingNetService.RemoveNetOfDeletedVehicle(vehicleId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Removing the fishing net of deleted vehicle {VehicleId} failed.", vehicleId);
+            }
         }
 
         private bool TryRemoveVehicleRow(VehicleModel vehicle)

@@ -47,6 +47,7 @@ namespace OpenRP.Framework.Database
         public DbSet<VehicleModelSpawnTypeModel> VehicleModelSpawnTypes { get; set; }
         public DbSet<VehicleModelSpawnTypeModelModel> VehicleModelSpawnTypeModels { get; set; }
         public DbSet<FishLootModel> FishSpecies { get; set; }
+        public DbSet<VehicleFishingNetModel> VehicleFishingNets { get; set; }
         public DbSet<AccountSettingsModel> AccountSettings { get; set; }
         public DbSet<JurisdictionModel> Jurisdictions { get; set; }
         public DbSet<FactionTaxRegistrationModel> FactionTaxRegistrations { get; set; }
