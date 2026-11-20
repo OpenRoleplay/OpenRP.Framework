@@ -40,8 +40,14 @@ namespace OpenRP.Framework.Features.MainMenu.Systems
             Class playerClass,
             IMainMenuDialogService mainMenuService,
             IEnumerable<IMainMenuScene> mainMenuScenes
-        ) 
+        )
         {
+            // open.mp NPCs connect as players; the main menu would put them into spectate mode in a scene world.
+            if (player.IsNpc)
+            {
+                return;
+            }
+
             try
             {
                 // Toggle player state

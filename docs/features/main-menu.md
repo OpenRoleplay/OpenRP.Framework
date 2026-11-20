@@ -6,7 +6,9 @@ What a player sees between connecting and playing: a living scene in the backgro
 
 ## How it works
 
-1. **Connecting.** A connecting player is put in a scene, and gets the main menu.
+1. **Connecting.** A connecting player is put in a scene, and gets the main menu. open.mp NPCs are skipped.
+
+   **Why:** NPCs connect as players too. The scene would put them into spectate mode in the scene's world, so nobody could see them.
 2. **Login or register,** handled by [Accounts](accounts.md).
 3. **After login,** the [character selection](characters.md) opens. Going back returns to step 2.
 4. **When a character is picked,** the player leaves the scene: music and conversations stop.

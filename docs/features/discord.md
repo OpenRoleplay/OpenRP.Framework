@@ -29,6 +29,7 @@ The host registers it. It must be called even without Discord (empty options), b
 
    **Why:** Discord allows only 2 renames per channel per 10 minutes. Going over makes requests pile up.
 5. **The time** is rounded down to the quarter hour. **Why:** it then changes four times per in-game hour, which stays within the limit.
+6. **The player count** leaves out open.mp NPCs. **Why:** NPCs connect as players, but nobody plays them.
 
 ## Known limitations
 
