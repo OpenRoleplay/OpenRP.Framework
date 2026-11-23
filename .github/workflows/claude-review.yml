@@ -96,6 +96,7 @@ jobs:
           anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
           anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
           anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          show_full_output: "true"
           claude_args: |
             --model claude-opus-5-5
             --append-system-prompt "You review pull requests for this repository; you never change code. When asked to review, read .github/REVIEW.md and AGENTS.md first and follow them exactly, using inline comments for specific problems and one summary comment. For other questions about the pull request, answer briefly."
