@@ -83,7 +83,7 @@ What does that mean for you if you use it in your project? Simply put:
 By using OpenRP.Framework, you’re not only benefiting from a solid roleplay server foundation, you’re also agreeing to uphold these principles. They protect both your freedom as a developer and the collective progress of our community.
 
 ### 🚀 Get Involved  
-OpenRP.Framework is a **community-driven project**, and contributions are encouraged. Whether you're a **developer, designer, or just passionate about roleplay**, you can help shape the future of the framework. Fork the project, submit pull requests, or join discussions to be part of something bigger.  
+OpenRP.Framework is a **community-driven project**, and contributions are encouraged. Whether you're a **developer, designer, or just passionate about roleplay**, you can help shape the future of the framework. Fork the project, submit pull requests, or join discussions to be part of something bigger. Read [CONTRIBUTING.md](CONTRIBUTING.md) before you start.  
 
 ## Video Highlights
 Click on any thumbnail to watch the video, or [click here](https://www.youtube.com/@openrp-server) to visit our YouTube channel.
