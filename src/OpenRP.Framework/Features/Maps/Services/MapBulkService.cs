@@ -122,16 +122,39 @@ namespace OpenRP.Framework.Features.Maps.Services
         {
             try
             {
+                bool wasLoaded = map.IsLoaded();
                 await RemoveOldObjectsAsync(map, progress);
                 await AddNewObjectsAsync(map, objects, rowIds, progress);
                 _mapStore.MarkMapLoadedInMemory(map);
                 await _mapService.SpawnMapAsync(map, ToSliceProgress(MapBulkProgress.SpawningObjects, objects.Count, progress));
+                if (!wasLoaded)
+                {
+                    ApplyRemovedBuildings(map);
+                }
                 return null;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "The objects of map {MapId} were saved, but the game couldn't be updated.", map.GetId());
                 return InGameFailedMessage;
+            }
+        }
+
+        /// <summary>
+        /// A replace loads a map that wasn't in the game, so its removed buildings go too, as when the map is loaded.
+        /// A map that was already in the game has them applied; applying them twice would count twice against the
+        /// player's limit.
+        /// </summary>
+        private void ApplyRemovedBuildings(Map map)
+        {
+            if (!map.IsComponentAlive)
+            {
+                return;
+            }
+
+            foreach (MapRemovedBuilding removal in map.GetRemovedBuildings())
+            {
+                _mapService.ApplyRemovedBuilding(removal);
             }
         }
 

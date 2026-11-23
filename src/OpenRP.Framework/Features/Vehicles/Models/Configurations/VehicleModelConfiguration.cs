@@ -87,15 +87,19 @@ namespace OpenRP.Framework.Features.Vehicles.Models.Configurations
             builder.Property(v => v.MaxHealth)
                    .IsRequired();
 
-            // Server Vehicle (the model's default, false, is the only default)
+            // Database defaults, so servers on an older Framework sharing the database can still insert rows. The
+            // ServerVehicle default must be false: an older Framework leaves the column out when it's false.
             builder.Property(v => v.ServerVehicle)
-                   .IsRequired();
+                   .IsRequired()
+                   .HasDefaultValue(false);
 
-            // Where the vehicle is (required)
+            // Where the vehicle is
             builder.Property(v => v.VirtualWorld)
-                   .IsRequired();
+                   .IsRequired()
+                   .HasDefaultValue(0);
             builder.Property(v => v.Interior)
-                   .IsRequired();
+                   .IsRequired()
+                   .HasDefaultValue(0);
 
             // Configure the optional relationship to OwnerCharacter
             builder.HasOne(v => v.OwnerCharacter)

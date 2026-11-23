@@ -216,7 +216,7 @@ Persistent vehicles.
 | `IsEngineOn`, `AreLightsOn`, `IsAlarmOn`, `AreDoorsLocked`, `IsBonnetOpen`, `IsBootOpen` | bool | State |
 | `Is…DoorOpen`, `Is…WindowClosed` | bool | Per door and window |
 | `CurrentHealth`, `MaxHealth` | float | |
-| `ServerVehicle` | bool | Belongs to the server, not a player. No database default |
+| `ServerVehicle` | bool | Belongs to the server, not a player. Database default false: an older Framework leaves the column out of an insert when it's false. Before, the default was true, so vehicles saved then may be marked as server vehicles by mistake |
 | `OwnerCharacterId` | ulong? | → `Characters` |
 | `VirtualWorld`, `Interior` | int | The virtual world and the GTA interior the vehicle is in. Default 0 |
 | `JurisdictionId` | ulong? | → `Jurisdictions` (set null). Where it's registered; its plate starts with that country's tag. Null = none, an `SA` plate |
@@ -250,7 +250,14 @@ Table `FishLoot`, with the `DbSet` named `FishSpecies` (`FishLootModel`). Column
 - `CatchWeight`: how likely it is, relative to the other possible catches;
 - `ItemId` → `Items`.
 
-The Framework seeds 26 rows. Hosts can add their own.
+`LootKind`, `SizeClass`, `RequiredFishingLevel` and `IsNetOnly` have database defaults (Fish, None, 0, false), so servers on an older Framework sharing the database can still insert rows.
+
+The Framework seeds ids 1 to 26. Hosts can add their own:
+- **Ids from 1000 up.** The Framework may seed more of the low ids later.
+- **Remove your own seeds of ids 1 to 26.** Hosts used to seed the fish themselves, and EF refuses two seeds with the same id.
+- **Set `SizeClass` on your fish.** A trawl net only brings up Small, Medium and Large fish, so a row left at None is never caught by a net.
+
+**`CatchWeight` used to be `OddsToCatch`**, with the opposite meaning: "1 in N", so a higher number was rarer. Now a higher number is more common. A migration that only renames the column turns rare fish into common ones. Convert your own rows, for example with `UPDATE FishLoot SET CatchWeight = GREATEST(1, ROUND(100 / CatchWeight))`, or set new weights.
 
 Table `VehicleFishingNets` (`VehicleFishingNetModel`) holds the nets fitted to Reefers:
 - `VehicleId` → `Vehicles` (cascade, unique);

@@ -176,7 +176,8 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                 else if (response.ItemIndex == clearRow)
                     ClearOwnValue(player, jurisdiction, setting, reopenSettings, canEdit);
                 else if (response.ItemIndex == bindRow)
-                    ToggleBinding(player, jurisdiction, setting, state.BindsSubJurisdictions, reopenActions, reopenSettings, canEdit);
+                    // The row showed the binding as it was when the menu opened; the player chose its opposite.
+                    SetBinding(player, jurisdiction, setting, !state.BindsSubJurisdictions, reopenActions, reopenSettings, canEdit);
                 else
                     reopenSettings();
             });
@@ -201,10 +202,10 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
                 ContinueAfter(player, _jurisdictionSettingService.ClearValue(jurisdiction, setting), reopenSettings, reopenSettings));
         }
 
-        private void ToggleBinding(Player player, Jurisdiction country, IJurisdictionSetting setting, bool currentlyBinds, Action reopenActions, Action reopenSettings, Func<bool> canEdit)
+        private void SetBinding(Player player, Jurisdiction country, IJurisdictionSetting setting, bool binds, Action reopenActions, Action reopenSettings, Func<bool> canEdit)
         {
             WithEditPermission(player, canEdit, reopenSettings, () =>
-                ContinueAfter(player, _jurisdictionSettingService.SetBindsSubJurisdictions(country, setting, !currentlyBinds), reopenActions, reopenActions));
+                ContinueAfter(player, _jurisdictionSettingService.SetBindsSubJurisdictions(country, setting, binds), reopenActions, reopenActions));
         }
 
         /// <summary>

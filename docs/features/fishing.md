@@ -82,6 +82,7 @@ The driver's fishing level decides the result, and the driver gets the experienc
 - **"Use" wears out a rod.** Choosing Use on a rod in the inventory costs one use, like any item with a use limit.
 - **Fish lost at sea.** A catch that doesn't fit lands below you, which from a boat is the sea floor.
 - **Long catches.** `/netstorage` lists the first 50 fish, because a dialog holds a limited amount of text.
+- **Net-only fish are stuck in the net.** They weigh 25 kg or more, and a character carries 10 kg, so they can't be taken out. A net with fish in it can't be removed with `/removenet`, so such a net stays on the Reefer until the vehicle is deleted.
 
 ## Deep dive
 
@@ -94,7 +95,8 @@ The driver's fishing level decides the result, and the driver gets the experienc
   - `IFishHotspotService`: places and moves hotspots;
   - `IFishingNetService` and `IFishingNetManager`: fitted nets and their storage;
   - `ITrawlService`: the trawl;
-  - `IFishingNetDialogService`: the storage dialog.
+  - `IFishingNetDialogService`: the storage dialog. Each answer checks again that the player is still at the Reefer, still playing their character and still allowed to use the net.
+- **Systems:** `FishingNetServerSystem` deletes the net of a deleted vehicle on [`OnVehicleDeleted`](../server-events.md#onvehicledeleted).
 - **Water zones:** `Helpers/WaterTypeHelper`.
 - **Skill:** the host seeds a skill named `Fishing`. Without it, players stay at level 0.
 - **Tables:** [`FishLoot` and `VehicleFishingNets`](../database.md#fishing). The Framework seeds the catch table and its items.

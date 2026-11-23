@@ -235,7 +235,7 @@ All player commands of the Framework, grouped as in `/help`. `[argument]` is req
 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
-| `/park` | Default | Make your vehicle spawn here from now on; only the owner or a key holder can. | [Vehicles](features/vehicles.md) |
+| `/park` | Default | Make your vehicle spawn here, in this virtual world and interior, from now on; only the owner or a key holder can. | [Vehicles](features/vehicles.md) |
 | `/savecar` | Default | Park your currently owned vehicle. Use /savecar to save your vehicle in a new parking spot. | [Vehicles](features/vehicles.md) |
 
 ## Ungrouped
@@ -243,7 +243,7 @@ All player commands of the Framework, grouped as in `/help`. `[argument]` is req
 | Command | Groups | Description | Feature |
 |---|---|---|---|
 | `/createvehicle` | Admin | Create a persistent vehicle that can be owned. | [Vehicles](features/vehicles.md) |
-| `/deletevehicle [vehicle id]` | Admin | Delete a persistent vehicle for good. Without an id, it deletes the vehicle you sit in, else the nearest saved one within 5 m in your virtual world and interior. | [Vehicles](features/vehicles.md) |
+| `/deletevehicle <vehicle id>` | Admin | Delete a persistent vehicle for good. Without an id, it deletes the vehicle you sit in, else the nearest saved one within 5 m in your virtual world and interior. | [Vehicles](features/vehicles.md) |
 | `/editvehicle` | Admin | Edit a persistent vehicle that can be owned. | [Vehicles](features/vehicles.md) |
 | `/inv` | Default | Open your character's inventory. Use this command to view, manage, and interact with the items you possess. | [Inventories](features/inventories.md) |
 | `/inventory` | Default | Open your character's inventory. Use this command to view, manage, and interact with the items you possess. | [Inventories](features/inventories.md) |

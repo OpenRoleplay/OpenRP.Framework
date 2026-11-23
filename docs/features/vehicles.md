@@ -13,7 +13,7 @@ Persistent vehicles: saved in the database, spawned at startup, started with a k
 | `/repairvehicle`, `/fixveh` | Admin | Repairs the vehicle to full health. See [Repairing](#repairing) |
 | `/createvehicle` | Admin | Creates a vehicle in front of you, in the [vehicle editor](vehicles/editor.md) |
 | `/editvehicle` | Admin | Edits the vehicle you're in, in the [vehicle editor](vehicles/editor.md) |
-| `/deletevehicle [vehicle id]` | Admin | Deletes a saved vehicle for good, after you confirm. Without an id, see [Deleting a vehicle](#deleting-a-vehicle) |
+| `/deletevehicle <vehicle id>` | Admin | Deletes a saved vehicle for good, after you confirm. Without an id, see [Deleting a vehicle](#deleting-a-vehicle) |
 
 Without a key: [Hotwire](hotwire.md). Turn signals: [Turn signals](vehicles/indicators.md). Temporary vehicles: `/sv` ([Admins](admins.md)).
 
@@ -51,7 +51,7 @@ Locking a locked vehicle says "The doors are already locked."
 
 ## Parking
 
-`/park` and `/savecar` set the spot where the vehicle spawns from now on. Only the owner or a key holder can do it, and admins too. You must be in the driver's seat.
+`/park` and `/savecar` set the spot where the vehicle spawns from now on, including your virtual world and interior, so a car parked inside a building stays there. Only the owner or a key holder can do it, and admins too. You must be in the driver's seat.
 
 | Who | Saved vehicle | Server vehicle |
 |---|---|---|
@@ -93,9 +93,11 @@ Temporary `/sv` vehicles can't be parked.
 `/deletevehicle` (Admin) deletes a saved vehicle for good. With an id, it deletes that vehicle. Without one, it deletes the vehicle you sit in, else the nearest saved vehicle within 5 m of its body, in your virtual world and interior. If there's none, it says so. It then asks you to confirm. On Delete it:
 
 - deletes the vehicle's row;
-- removes its radio, and the vehicle keys that are loaded in the game;
-- removes its [fishing net](fishing.md#reefer-net), with the net's storage and the fish in it;
+- removes the vehicle keys that are loaded in the game;
+- publishes [`OnVehicleDeleted`](../server-events.md#onvehicledeleted): its radio is removed, and its [fishing net](fishing.md#reefer-net) with the net's storage and the fish in it;
 - ejects the people inside, and destroys the vehicle in the world.
+
+**Why an event:** the radio and the net belong to other features, which clean up after themselves instead of Vehicles reaching into them.
 
 Keys in the inventories of offline characters aren't removed (see the known limitations). A temporary `/spawnveh` vehicle has no row, so the command refuses it.
 

@@ -209,7 +209,7 @@ namespace OpenRP.Framework.Features.Fishing.Services
 
                 storedFish++;
                 experience += _fishService.GetExperienceForCatch(loot);
-                _fishService.PublishFishCaught(player, loot, weightInGrams, FishCatchMethod.Net);
+                _ = _fishService.PublishFishCaught(player, loot, weightInGrams, FishCatchMethod.Net);
             }
 
             if (experience > 0)

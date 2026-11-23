@@ -111,6 +111,12 @@ namespace OpenRP.Framework.Features.Maps.Services
 
         public void DespawnObject(MapObject mapObject)
         {
+            // Despawning a big map awaits between slices, and an object deleted meanwhile took its children with it.
+            if (!mapObject.IsComponentAlive)
+            {
+                return;
+            }
+
             DestroyDynamicObjects(mapObject);
         }
 

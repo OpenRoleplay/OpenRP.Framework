@@ -18,6 +18,7 @@ namespace OpenRP.Framework.Features.Fishing.Services.Dialogs
     {
         private const string DialogTitle = "Net Storage";
         private const string LeftTheBoatError = "You moved too far away from the Reefer.";
+        private const string NoLongerAllowedError = "You can no longer use the net of this Reefer.";
 
         private readonly IDialogService _dialogService;
         private readonly IFishingNetService _fishingNetService;
@@ -163,17 +164,24 @@ namespace OpenRP.Framework.Features.Fishing.Services.Dialogs
         }
 
         /// <summary>
-        /// The player can walk off, or the net can be removed, while a dialog is open.
+        /// While a dialog is open the player can walk off, stop playing their character or lose their key, and the
+        /// net can be removed.
         /// </summary>
         private bool CanStillUseNet(Player player, Vehicle reefer, VehicleFishingNet net)
         {
-            if (net.IsComponentAlive && !net.IsDeleted() && _fishingNetService.IsPlayerAtVehicle(player, reefer))
+            if (!net.IsComponentAlive || net.IsDeleted() || !_fishingNetService.IsPlayerAtVehicle(player, reefer))
             {
-                return true;
+                player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, LeftTheBoatError);
+                return false;
             }
 
-            player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, LeftTheBoatError);
-            return false;
+            if (!_fishingNetService.CanUseNetOf(player, reefer))
+            {
+                player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, NoLongerAllowedError);
+                return false;
+            }
+
+            return true;
         }
 
         private static void SendMoveResult(Player player, string? error, string successMessage)
