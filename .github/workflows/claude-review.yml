@@ -8,10 +8,9 @@ name: Claude review
 # - on-request: runs when someone with write access writes "@claude" in a pull request comment, for example
 #               "@claude review" on a pull request from a fork, or "@claude review again" after new commits.
 #
-# Logs in to the Claude API with workload identity federation: each run swaps GitHub's OIDC token for a short-lived
-# Anthropic token, so there is no API key secret. The IDs come from repository variables (not secrets):
-# ANTHROPIC_FEDERATION_RULE_ID, ANTHROPIC_ORGANIZATION_ID, ANTHROPIC_SERVICE_ACCOUNT_ID, ANTHROPIC_WORKSPACE_ID.
-# Also needs the Claude GitHub app. Don't add an ANTHROPIC_API_KEY input: the action would use it instead.
+# Logs in to the Claude API with the ANTHROPIC_API_KEY secret (an organisation secret). An API key, not workload
+# identity federation: Anthropic's monthly API credits for subscribers only cover the Agent SDK and `claude -p` when
+# they run with an API key from the linked Console organisation. Also needs the Claude GitHub app.
 
 on:
   pull_request:
@@ -49,10 +48,7 @@ jobs:
       - name: Review the pull request
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
-          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
-          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
-          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
@@ -92,10 +88,7 @@ jobs:
       - name: Answer the comment
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
-          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
-          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
-          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
             --model claude-opus-5-5
             --append-system-prompt "You review pull requests for this repository; you never change code. When asked to review, read .github/REVIEW.md and AGENTS.md first and follow them exactly, using inline comments for specific problems and one summary comment. For other questions about the pull request, answer briefly."
