@@ -22,10 +22,6 @@ on:
   pull_request_review_comment:
     types: [created]
 
-concurrency:
-  group: claude-review-${{ github.event.pull_request.number || github.event.issue.number }}
-  cancel-in-progress: true
-
 jobs:
   review:
     # Pull requests from forks get no secrets, and their authors can't trigger the action anyway: use "@claude review".
@@ -33,6 +29,11 @@ jobs:
       github.event_name == 'pull_request' &&
       github.event.pull_request.draft == false &&
       github.event.pull_request.head.repo.full_name == github.repository
+    # A newer push replaces a review that's still running. Only on this job: every comment on a pull request starts
+    # the workflow (Claude's own progress comment too), and those runs must not cancel a review.
+    concurrency:
+      group: claude-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
