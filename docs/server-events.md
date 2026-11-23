@@ -24,6 +24,7 @@ public void OnCharacterSelected(OnCharacterSelectedEventArgs args, ISkillService
 | `OnPlayerCashUpdate` | a player's money changed | [Currencies](features/currencies.md), [DroppedItems](features/dropped-items.md) | Currencies (GTA money, if default currency) |
 | <a id="onfactionpermissionschanged"></a>`OnFactionPermissionsChanged` | faction permissions may have changed | [Factions](features/factions.md) | [Permissions](permissions.md) (reload those online) |
 | <a id="onresourceharvested"></a>`OnResourceHarvested` | a player harvested a resource | [Harvestables](features/harvestables.md) | nothing yet: for gamemodes to give rewards |
+| <a id="onfishcaught"></a>`OnFishCaught` | a player brought up a fish, junk or a treasure, with a rod or a net (`Loot`, `WeightInGrams`, `Method`) | [Fishing](features/fishing.md) | nothing yet: for gamemodes to give rewards |
 | <a id="onpropertydeleted"></a>`OnPropertyDeleted` | an admin deleted a property | [Properties](features/properties.md) | [Actors](features/actors.md) (actors inside it move outside) |
 | <a id="onjurisdictionsloaded"></a>`OnJurisdictionsLoaded` | the jurisdictions were loaded at startup | [Jurisdictions](features/jurisdictions.md) | [Vehicles](features/vehicles.md) (set plates again) |
 | <a id="onjurisdictionplatetagchanged"></a>`OnJurisdictionPlateTagChanged` | a jurisdiction's tags changed, or it moved to another country | [Jurisdictions](features/jurisdictions.md) | [Vehicles](features/vehicles.md) (set plates again) |

@@ -19,7 +19,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
     {
         private const string InventoryKey = "INVENTORY";
         private const string SkinKey = "SKIN";
-        private const string VehicleIdKey = "VEHICLE_ID";
+        public const string VehicleIdKey = "VEHICLE_ID";
         private const string PhoneIdKey = "PHONE_ID";
         private const string RadioIdKey = "RADIO_ID";
 
@@ -279,40 +279,37 @@ namespace OpenRP.Framework.Features.Inventories.Components
             // Determine how many units to transfer (0 means full stack).
             uint transferAmount = (amount == 0) ? this.GetAmount() : amount;
 
-            // Check if the target inventory has enough available weight to accept the item.
-            // Here we use the item's own weight check.
-            if (!targetInventory.DoesInventoryItemFit(this, transferAmount))
+            if (!HasAmount(transferAmount) || !targetInventory.DoesInventoryItemFit(this, transferAmount))
             {
                 return false;
             }
 
-            // Attempt to subtract the transfer amount from the source InventoryItem.
-            if (!this.Subtract(transferAmount))
+            // The copy is added first: removing the last of an unsaved item destroys this component.
+            if (!AddCopyTo(targetInventory, transferAmount))
             {
                 return false;
             }
 
-            // If subtracting reduced the item count to 0, schedule its deletion.
-            if (this.GetAmount() == 0)
-            {
-                this.ProcessDeletion();
-            }
-
-            // Add the item to the target inventory.
-            // Pass along the additional data so that any extra properties are preserved.
-            bool added = targetInventory.AddItem(this.GetItem(), transferAmount, this.GetAdditionalData());
-            if (!added)
-            {
-                // Roll back the subtraction in case adding to the target inventory fails.
-                this.Add(transferAmount);
-                return false;
-            }
-
-            // Mark that both inventories have changed.
-            this.ProcessChanges();
             targetInventory.ProcessChanges();
-
+            RemoveTransferredAmount(transferAmount);
             return true;
+        }
+
+        /// <summary>
+        /// Adds this item to the inventory with its additional data, its remaining uses and its own weight.
+        /// </summary>
+        private bool AddCopyTo(Inventory targetInventory, uint amount)
+        {
+            return targetInventory.AddExistingItem(GetItem(), amount, _inventoryItemModel.UsesRemaining, _inventoryItemModel.Weight, GetAdditionalData());
+        }
+
+        private void RemoveTransferredAmount(uint amount)
+        {
+            Subtract(amount);
+            if (GetAmount() == 0)
+            {
+                ProcessDeletion();
+            }
         }
     }
 }

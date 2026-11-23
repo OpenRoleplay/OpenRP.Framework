@@ -64,7 +64,7 @@ One row per account, → `Accounts` (cascade).
 | `DefaultCurrencyId` | ulong | The currency shown as GTA money |
 
 ### `Skills` (`SkillModel`) and `CharacterSkills` (`CharacterSkillModel`)
-- **`Skills`** has `Name` and `Description`. The skills themselves are seeded by the host.
+- **`Skills`** has `Name` and `Description`. The skills themselves are seeded by the host. [Fishing](features/fishing.md) looks for a skill named `Fishing`.
 - **`CharacterSkills`** has `CharacterId` and `SkillId`, plus `Level`, `Experience` and `LastUsedDate`.
 
 ## Permissions
@@ -130,8 +130,9 @@ See [Banking](features/banking.md).
 |---|---|---|
 | `Jurisdictions` (`JurisdictionModel`) | `Name` (64), `TwoLetterTag` (2), `ThreeLetterTag` (3), `FourLetterTag` (4), `ParentJurisdictionId` → `Jurisdictions` (restrict), `CurrencyId` → `Currencies` (set null), `GovernmentFactionId` → `Factions` (set null) | A tree; no parent = a country. Each tag is required and unique. Null currency or government = the parent's |
 | `FactionTaxRegistrations` (`FactionTaxRegistrationModel`) | `FactionId` → factions (cascade), `JurisdictionId` → jurisdictions (cascade) | Where a faction pays taxes. Unique per faction + jurisdiction |
+| `JurisdictionSettings` (`JurisdictionSettingModel`) | `JurisdictionId` → jurisdictions (cascade), `Key` (64), `Value` (64, null = inherits), `BindsSubJurisdictions` | One row per jurisdiction and setting key. A row with neither a value nor a binding is removed. Unique per jurisdiction + key |
 
-See [Jurisdictions](features/jurisdictions.md).
+See [Jurisdictions](features/jurisdictions.md) and [Jurisdiction settings](features/jurisdictions/settings.md).
 
 ## Items, inventories and money
 
@@ -149,7 +150,7 @@ The item types (definitions), not the items players own.
 | `KeepOnDeath`, `CanDrop`, `CanDestroy`, `Stackable` | bool | |
 | `DropModelId` | int? | Object model shown when dropped |
 
-The Framework seeds 51 items:
+The Framework seeds 67 items:
 - a uniform (skin);
 - a wallet;
 - the bills and coins of the San Andreas Dollar and the Caeroyna Ruble;
@@ -158,7 +159,8 @@ The Framework seeds 51 items:
 - a chicken egg;
 - twelve fish species;
 - a mobile phone (item 49, `UseType` Phone). Each phone item points to its row in `Phones` with `[PHONE_ID=x]`;
-- a handheld radio (item 50, `UseType` Radio), pointing to its row in `Radios` with `[RADIO_ID=x]`, and a radio earpiece (item 51).
+- a handheld radio (item 50, `UseType` Radio), pointing to its row in `Radios` with `[RADIO_ID=x]`, and a radio earpiece (item 51);
+- fishing gear (rod 52, bait 53, net 54), junk (55 to 57), treasures (58 to 61), four net-only fish (62 to 65) and two small saltwater fish (66 and 67).
 
 ### `Inventories` (`InventoryModel`)
 `Name`, `MaxWeight` (grams, null = unlimited). Seeded: "World Inventory", which holds items lying on the ground.
@@ -207,15 +209,16 @@ Persistent vehicles.
 
 | Column | Type | Meaning |
 |---|---|---|
-| `ModelId` | ulong? | → `VehicleModels` (set null) |
+| `ModelId` | ulong? | → `VehicleModels` (set null). The `Id` of the model row, not the GTA model id (that is `VehicleModels.ModelId`) |
 | `ModelSpawnTypeId` | ulong? | → `VehicleModelSpawnTypes` (set null). Spawn with a random model of this type |
 | `X`, `Y`, `Z`, `Rotation` | float | Parking spot |
 | `Color1`, `Color2` | int | |
 | `IsEngineOn`, `AreLightsOn`, `IsAlarmOn`, `AreDoorsLocked`, `IsBonnetOpen`, `IsBootOpen` | bool | State |
 | `Is…DoorOpen`, `Is…WindowClosed` | bool | Per door and window |
 | `CurrentHealth`, `MaxHealth` | float | |
-| `ServerVehicle` | bool | Belongs to the server, not a player |
+| `ServerVehicle` | bool | Belongs to the server, not a player. No database default |
 | `OwnerCharacterId` | ulong? | → `Characters` |
+| `VirtualWorld`, `Interior` | int | The virtual world and the GTA interior the vehicle is in. Default 0 |
 | `JurisdictionId` | ulong? | → `Jurisdictions` (set null). Where it's registered; its plate starts with that country's tag. Null = none, an `SA` plate |
 | `LoadedAs` | int? | |
 
@@ -239,12 +242,29 @@ Persistent vehicles.
 Table `FishLoot`, with the `DbSet` named `FishSpecies` (`FishLootModel`). Columns:
 - `Name` (255);
 - `FishLootType`: Saltwater, Freshwater, Murkywater or Misc;
+- `LootKind`: Fish, Junk or Treasure;
+- `SizeClass`: None, Small, Medium, Large or Huge;
+- `RequiredFishingLevel`: the fishing level needed to catch it;
+- `IsNetOnly`: true for fish only a trawl net brings up;
 - `MinWeightInGrams` and `MaxWeightInGrams`;
-- `OddsToCatch`: 1 in N;
+- `CatchWeight`: how likely it is, relative to the other possible catches;
 - `ItemId` → `Items`.
 
-## Models without a table
+The Framework seeds 26 rows. Hosts can add their own.
 
-`MapModel` (`Name`) exists, but has no `DbSet`, so it isn't part of the database. See [Maps](features/maps.md).
+Table `VehicleFishingNets` (`VehicleFishingNetModel`) holds the nets fitted to Reefers:
+- `VehicleId` → `Vehicles` (cascade, unique);
+- `StorageInventoryId` → `Inventories` (cascade): the inventory holding the catch.
+
+## Maps
+
+| Table | Columns | Notes |
+|---|---|---|
+| `Maps` (`MapModel`) | `Name` (64, unique), `IsLoaded` | Loaded maps come back after a restart. Only a loaded map's objects are in the game |
+| `MapObjects` (`MapObjectModel`) | `MapId` → `Maps` (cascade), `ModelId` (negative = custom model), `X/Y/Z`, `RotX/RotY/RotZ`, `VirtualWorld`, `Interior` (-1 = everywhere), `Description` (64), `StreamDistance` (float, nullable: null = the default 300 m) | Each object has its own world and interior. The columns have no database default: new objects get -1 from the model. A null stream distance means the default |
+| `MapObjectMaterials` (`MapObjectMaterialModel`) | `MapObjectId` → `MapObjects` (cascade), `MaterialIndex` (0 to 15), `Type` (Texture or Text), `ModelId`, `TxdName` (64), `TextureName` (64), `Color` (ARGB, 0 = original colour), `Text` (256), `MaterialSize`, `FontFace` (64), `FontSize`, `Bold`, `FontColor`, `BackColor`, `Alignment` (0 left, 1 centre, 2 right) | Unique per object + material index. Texture columns are used for textures, text columns for text |
+| `MapRemovedBuildings` (`MapRemovedBuildingModel`) | `MapId` → `Maps` (cascade), `ModelId`, `X/Y/Z`, `Radius` | A GTA building removed for the players of a map |
+
+See [Maps](features/maps.md).
 
 Want more? → [Persistence](persistence.md) · [Glossary](glossary.md)

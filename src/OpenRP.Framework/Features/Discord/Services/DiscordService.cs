@@ -262,7 +262,7 @@ namespace OpenRP.Framework.Features.Discord.Services
                 return;
             }
 
-            int playerCount = _entityManager.GetComponents<Player>().Count();
+            int playerCount = _entityManager.GetComponents<Player>().Count(player => !player.IsNpc);
             if (decrease)
             {
                 playerCount--;

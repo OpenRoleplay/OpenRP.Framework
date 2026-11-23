@@ -12,7 +12,7 @@ You need a **Rusty Paperclip** and a **Worn-Out Screwdriver**. **Electrical Tape
 
 ## How it works
 
-1. **Checks.** You must be the driver, with the engine off.
+1. **Checks.** You must be the driver, with the engine off. Locked doors stop anyone getting in, so a locked car can't be hotwired from outside it. See [Locking](vehicles.md#locking).
 2. **The job.** It plays out in steps every 2.5 seconds, as `/me` and `/do` messages, and the engine starts.
 3. **Without tape,** while the engine runs, every 2.5 seconds there's a 1 in 20 chance the wires short. The engine dies and the vehicle's health drops to 250–390.
 

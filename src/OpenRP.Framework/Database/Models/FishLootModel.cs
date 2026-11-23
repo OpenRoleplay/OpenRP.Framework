@@ -12,9 +12,14 @@ namespace OpenRP.Framework.Database.Models
     {
         public string Name { get; set; }
         public FishLootType FishLootType { get; set; }
+        public FishLootKind LootKind { get; set; }
+        public FishSizeClass SizeClass { get; set; }
+        public uint RequiredFishingLevel { get; set; }
+        public bool IsNetOnly { get; set; }
         public int MinWeightInGrams { get; set; }
         public int MaxWeightInGrams { get; set; }
-        public int OddsToCatch { get; set; }
+        // How likely this catch is compared to the other catches that are possible on the same bite.
+        public int CatchWeight { get; set; }
         public ulong ItemId { get; set; }
 
         // Navigational Properties

@@ -690,6 +690,222 @@ namespace OpenRP.Framework.Features.Items.Models.DefaultData
                     KeepOnDeath = true,
                     Stackable = false,
                     DropModelId = 19421
+                },
+                new ItemModel
+                {
+                    Id = 52,
+                    Name = "Fishing Rod",
+                    Description = "A trusty rod with a squeaky reel. Every cast wears it down a little, so look after it.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 900,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    MaxUses = 50,
+                    Stackable = false,
+                    DropModelId = 18632
+                },
+                new ItemModel
+                {
+                    Id = 53,
+                    Name = "Fishing Bait",
+                    Description = "A tub of wriggling worms. The fish love them. Nobody else does.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 10,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = true
+                },
+                new ItemModel
+                {
+                    Id = 54,
+                    Name = "Fishing Net",
+                    Description = "A heavy trawl net with floats and weights. Fit it to a Reefer with /fitnet and let the sea do the work.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 8000,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false
+                },
+                new ItemModel
+                {
+                    Id = 55,
+                    Name = "Old Boot",
+                    Description = "Somebody out there is walking around with one very wet sock.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 800,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = true
+                },
+                new ItemModel
+                {
+                    Id = 56,
+                    Name = "Tin Can",
+                    Description = "Rusty, dented and empty. Even the fish didn't want it.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 100,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = true
+                },
+                new ItemModel
+                {
+                    Id = 57,
+                    Name = "Seaweed",
+                    Description = "A slimy green clump. Some call it trash, others call it a five-star salad.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 300,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = true
+                },
+                new ItemModel
+                {
+                    Id = 58,
+                    Name = "Old Lockbox",
+                    Description = "Heavy, rusted shut and rattling. Whatever is inside has been waiting a long time for someone to care.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 1500,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false
+                },
+                new ItemModel
+                {
+                    Id = 59,
+                    Name = "Silver Ring",
+                    Description = "A tarnished ring with a worn inscription. Somebody's proposal went very badly.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 10,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false
+                },
+                new ItemModel
+                {
+                    Id = 60,
+                    Name = "Gold Pocket Watch",
+                    Description = "It stopped ticking decades ago, but gold never goes out of style.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 120,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false
+                },
+                new ItemModel
+                {
+                    Id = 61,
+                    Name = "Pirate Doubloon",
+                    Description = "A heavy gold coin from a ship nobody remembers. Collectors would kill for it. Hopefully not literally.",
+                    UseType = ItemType.Misc,
+                    UseValue = String.Empty,
+                    Weight = 25,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false
+                },
+                new ItemModel
+                {
+                    Id = 62,
+                    Name = "Blue Marlin",
+                    Description = "The bruiser of the open ocean: long, fast and far too heavy to carry. Only a trawl net brings one up.",
+                    UseType = ItemType.Fish,
+                    UseValue = "[FISH_SPECIES=21]",
+                    Weight = 150000,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 19630
+                },
+                new ItemModel
+                {
+                    Id = 63,
+                    Name = "Swordfish",
+                    Description = "A living rapier that fences with anything it meets. Only a trawl net brings one up.",
+                    UseType = ItemType.Fish,
+                    UseValue = "[FISH_SPECIES=22]",
+                    Weight = 100000,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 19630
+                },
+                new ItemModel
+                {
+                    Id = 64,
+                    Name = "Giant Sturgeon",
+                    Description = "An ancient armoured giant from the deep rivers. Only a trawl net brings one up.",
+                    UseType = ItemType.Fish,
+                    UseValue = "[FISH_SPECIES=23]",
+                    Weight = 120000,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 19630
+                },
+                new ItemModel
+                {
+                    Id = 65,
+                    Name = "Alligator Gar",
+                    Description = "Half fish, half nightmare, all teeth. The swamp keeps it, unless a trawl net says otherwise.",
+                    UseType = ItemType.Fish,
+                    UseValue = "[FISH_SPECIES=24]",
+                    Weight = 90000,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 19630
+                },
+                new ItemModel
+                {
+                    Id = 66,
+                    Name = "Sardine",
+                    Description = "Small, silver and used to tight spaces. It has spent its whole life packed in with the crowd, so your pocket feels roomy.",
+                    UseType = ItemType.Fish,
+                    UseValue = "[FISH_SPECIES=25]",
+                    Weight = 150,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 19630
+                },
+                new ItemModel
+                {
+                    Id = 67,
+                    Name = "Mackerel",
+                    Description = "Striped, restless and always in a hurry, like a courier who is late for a very shady delivery.",
+                    UseType = ItemType.Fish,
+                    UseValue = "[FISH_SPECIES=26]",
+                    Weight = 600,
+                    CanDrop = true,
+                    CanDestroy = true,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 19630
                 }
             );
         }

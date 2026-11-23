@@ -26,6 +26,7 @@ namespace OpenRP.Framework.Features.Banking.Extensions
                 .AddSingleton<IBankEditorService, BankEditorService>()
                 .AddSingleton<IBankDialogService, BankDialogService>()
                 .AddJurisdictionDeletionGuard<BankJurisdictionGuard>()
+                .AddJurisdictionSetting<MaxMonthlyFeeSetting>()
                 .AddTellerPermissions()
                 .AddTellerActions();
         }

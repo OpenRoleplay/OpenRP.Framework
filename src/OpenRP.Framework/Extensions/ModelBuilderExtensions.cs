@@ -8,11 +8,13 @@ using OpenRP.Framework.Features.Currencies.Models.DefaultData;
 using OpenRP.Framework.Features.DroppedItems.Models.Configurations;
 using OpenRP.Framework.Features.Factions.Models.Configurations;
 using OpenRP.Framework.Features.Fishing.Models;
+using OpenRP.Framework.Features.Fishing.Models.DefaultData;
 using OpenRP.Framework.Features.Inventories.Models.Configurations;
 using OpenRP.Framework.Features.Inventories.Models.DefaultData;
 using OpenRP.Framework.Features.Items.Models.Configurations;
 using OpenRP.Framework.Features.Items.Models.DefaultData;
 using OpenRP.Framework.Features.Jurisdictions.Models.Configurations;
+using OpenRP.Framework.Features.Maps.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.Configurations;
 using OpenRP.Framework.Features.Permissions.Models.DefaultData;
 using OpenRP.Framework.Features.Phones.Models.Configurations;
@@ -52,6 +54,8 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new ActorPermissionModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new FishLootModelConfiguration());
+            modelBuilder.ApplyConfiguration(new FishLootModelDefaultData());
+            modelBuilder.ApplyConfiguration(new VehicleFishingNetModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new InventoryItemModelConfiguration());
 
@@ -69,6 +73,7 @@ namespace OpenRP.Framework.Extensions
 
             modelBuilder.ApplyConfiguration(new JurisdictionModelConfiguration());
             modelBuilder.ApplyConfiguration(new FactionTaxRegistrationModelConfiguration());
+            modelBuilder.ApplyConfiguration(new JurisdictionSettingModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new PhoneModelConfiguration());
             modelBuilder.ApplyConfiguration(new PhoneContactModelConfiguration());
@@ -88,6 +93,11 @@ namespace OpenRP.Framework.Extensions
 
             modelBuilder.ApplyConfiguration(new PropertyModelConfiguration());
             modelBuilder.ApplyConfiguration(new PropertyDoorModelConfiguration());
+
+            modelBuilder.ApplyConfiguration(new MapModelConfiguration());
+            modelBuilder.ApplyConfiguration(new MapObjectModelConfiguration());
+            modelBuilder.ApplyConfiguration(new MapObjectMaterialModelConfiguration());
+            modelBuilder.ApplyConfiguration(new MapRemovedBuildingModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new VehicleModelConfiguration());
             modelBuilder.ApplyConfiguration(new VehicleModelDefaultColorConfiguration());

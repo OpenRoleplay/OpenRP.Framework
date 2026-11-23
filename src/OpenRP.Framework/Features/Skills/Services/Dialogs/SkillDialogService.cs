@@ -16,6 +16,7 @@ namespace OpenRP.Framework.Features.Skills.Services.Dialogs
     public class SkillDialogService : ISkillDialogService
     {
         private const string NotUsedYet = "N/A";
+        private const string MaxLevelText = "Max";
         private const string LastUsedFormat = "yyyy-MM-dd HH:mm:ss";
 
         private readonly IDialogService _dialogService;
@@ -92,7 +93,8 @@ namespace OpenRP.Framework.Features.Skills.Services.Dialogs
 
         private static string GetExperienceText(CharacterSkill skill)
         {
-            return $"{skill.Experience}{ChatColor.CornflowerBlue}/{ChatColor.White}{skill.GetExperienceForNextLevel()}";
+            string target = skill.IsMaxLevel() ? MaxLevelText : skill.GetExperienceForNextLevel().ToString();
+            return $"{skill.Experience}{ChatColor.CornflowerBlue}/{ChatColor.White}{target}";
         }
 
         private static string GetLastUsedText(CharacterSkill skill)

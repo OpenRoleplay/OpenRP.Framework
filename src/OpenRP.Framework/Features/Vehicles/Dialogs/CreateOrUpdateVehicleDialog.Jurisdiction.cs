@@ -1,12 +1,4 @@
-using OpenRP.Framework.Database;
 using OpenRP.Framework.Features.Jurisdictions.Components;
-using OpenRP.Framework.Features.Jurisdictions.Services;
-using OpenRP.Framework.Features.Jurisdictions.Services.Dialogs;
-using OpenRP.Framework.Features.Radios.Services;
-using OpenRP.Framework.Features.Vehicles.Components;
-using OpenRP.Framework.Features.Vehicles.Services;
-using SampSharp.Entities;
-using SampSharp.Entities.SAMP;
 
 namespace OpenRP.Framework.Features.Vehicles.Dialogs
 {
@@ -15,32 +7,25 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
     /// </summary>
     public partial class CreateOrUpdateVehicleDialog
     {
-        private static void OpenRegisteredIn(Player player, IDialogService dialogService, IEntityManager entityManager, IVehicleManager vehicleManager,
-            IJurisdictionService jurisdictionService, IJurisdictionDialogService jurisdictionDialogService, IRadioService radioService, IRadioEditorService radioEditorService, BaseDataContext context, CreateOrUpdateVehicleDataComponent component)
+        private void OpenRegisteredIn()
         {
-            void ReopenEditor()
-            {
-                Open(player, dialogService, entityManager, vehicleManager, jurisdictionService, jurisdictionDialogService, radioService, radioEditorService, context, component);
-            }
-
-            void SetRegisteredIn(Jurisdiction? jurisdiction)
-            {
-                component.CreateOrUpdateVehicleData.JurisdictionId = jurisdiction?.GetId();
-                if (component.EditedVehicle != null)
-                {
-                    vehicleManager.UpdateVehicle(component.EditedVehicle, component.CreateOrUpdateVehicleData);
-                }
-                ReopenEditor();
-            }
-
-            jurisdictionDialogService.OpenJurisdictionPicker(player, "Registered in", "Nowhere (SA plate)", SetRegisteredIn, ReopenEditor);
+            _jurisdictionDialogService.OpenJurisdictionPicker(_player, "Registered in", "Nowhere (SA plate)", SetRegisteredIn, ShowEditor);
         }
 
-        private static string GetRegisteredInLabel(IJurisdictionService jurisdictionService, CreateOrUpdateVehicleDataComponent component)
+        /// <summary>
+        /// Only the copy changes. The plate follows when the editor is saved.
+        /// </summary>
+        private void SetRegisteredIn(Jurisdiction? jurisdiction)
         {
-            ulong? jurisdictionId = component.CreateOrUpdateVehicleData.JurisdictionId;
-            Jurisdiction? jurisdiction = jurisdictionId.HasValue ? jurisdictionService.GetJurisdiction(jurisdictionId.Value) : null;
-            string plateTag = jurisdictionService.GetPlateTag(jurisdictionId);
+            Data.JurisdictionId = jurisdiction?.GetId();
+            ShowEditor();
+        }
+
+        private string GetRegisteredInLabel()
+        {
+            ulong? jurisdictionId = Data.JurisdictionId;
+            Jurisdiction? jurisdiction = jurisdictionId.HasValue ? _jurisdictionService.GetJurisdiction(jurisdictionId.Value) : null;
+            string plateTag = _jurisdictionService.GetPlateTag(jurisdictionId);
             return jurisdiction == null ? $"Nowhere ({plateTag} plate)" : $"{jurisdiction.GetName()} ({plateTag} plate)";
         }
     }

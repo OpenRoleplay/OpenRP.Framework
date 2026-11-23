@@ -1,6 +1,6 @@
 # Commands
 
-All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is required, `<argument>` optional.
+All player commands of the Framework, grouped as in `/help`. `[argument]` is required, `<argument>` optional.
 
 - **Groups** are the [permission groups](permissions.md) that may use the command.
 - Every command needs a selected character.
@@ -17,8 +17,14 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
 | `/givemoney [receiver] [currency code] [amount]` | Admin | Give money of a currency to a player. Use a negative amount to take money. | [Admins](features/admins.md) |
+| `/giveitem [player] [item id] <amount>` | Admin | Give a player an amount of an item, by its item id. | [Admins](features/admins.md) |
 | `/gotopos [x] [y] [z] <interior> <virtual world>` | Admin | Teleport to a position, for example into a GTA interior. | [Admins](features/admins.md) |
 | `/tprel [player] [distance] [direction]` | Admin | Move a player a distance forward, back, left, right, up or down, keeping their interior and virtual world. | [Admins](features/admins.md) |
+| `/fly` | Admin | Fly around freely as an invisible camera. Use it again to land where you started, with your health, armour, skin and weapons. | [FlyMode](features/fly-mode.md) |
+| `/repairvehicle` | Admin | Repair the vehicle you sit in, or the nearest one, to full health. | [Vehicles](features/vehicles.md) |
+| `/repairvehicle <vehicle id>` | Admin | Repair a saved vehicle to full health, by its id. | [Vehicles](features/vehicles.md) |
+| `/fixveh` | Admin | Repair the vehicle you sit in, or the nearest one, to full health. Same as /repairvehicle. | [Vehicles](features/vehicles.md) |
+| `/fixveh <vehicle id>` | Admin | Repair a saved vehicle to full health, by its id. Same as /repairvehicle [vehicle id]. | [Vehicles](features/vehicles.md) |
 
 ## Admin > Bank
 
@@ -39,6 +45,12 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
 | `/editjurisdictions` | Admin | Create countries and the places in them, and set their tags, currency, government and tax registrations. | [Jurisdictions](features/jurisdictions.md) |
+
+## Admin > Maps
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/editmaps` | Admin | Create maps of objects, load and unload them, and edit their objects, textures, text and removed buildings. | [Maps](features/maps.md) |
 
 ## Admin > Permissions
 
@@ -156,7 +168,17 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
-| `/fish` | Default | Command to start fishing. | [Fishing](features/fishing.md) |
+| `/fish` | Default | Cast your line. Needs a Fishing Rod and Fishing Bait, while facing water or on a boat. | [Fishing](features/fishing.md) |
+| `/fitnet` | Default | Fit your Fishing Net to the saved Reefer you are on or next to. | [Fishing](features/fishing.md) |
+| `/netstorage` | Default | Open the net storage of the Reefer you are on or next to. | [Fishing](features/fishing.md) |
+| `/removenet` | Default | Take the net off the Reefer you are on or next to, once its storage is empty. | [Fishing](features/fishing.md) |
+| `/trawl` | Default | Lower the net of the Reefer you are driving, or raise it early. | [Fishing](features/fishing.md) |
+
+## Jurisdictions
+
+| Command | Groups | Description | Feature |
+|---|---|---|---|
+| `/government` | Default | Change the settings of the jurisdictions your faction governs. | [Jurisdiction settings](features/jurisdictions/settings.md) |
 
 ## Phone
 
@@ -195,20 +217,25 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
+| `/blinker [side]` | Default | Switch your vehicle's turn signals. Use /blinker left, right, hazards or off. | [Turn signals](features/vehicles/indicators.md) |
 | `/e` | Default | Toggle your vehicle's engine status. Use /e to toggle the engine on or off. | [Vehicles](features/vehicles.md) |
 | `/engine` | Default | Toggle your vehicle's engine status. Use /engine to toggle the engine on or off. | [Vehicles](features/vehicles.md) |
 | `/eoff` | Default | Toggle your vehicle's engine status. Use /eoff to turn the engine off. | [Vehicles](features/vehicles.md) |
 | `/eon` | Default | Toggle your vehicle's engine status. Use /eon to turn the engine on. | [Vehicles](features/vehicles.md) |
 | `/hotwire` | Default | Attempt to hotwire a vehicle. This allows you to start a car without a key, provided you have the necessary tools. | [HotwireFeature](features/hotwire.md) |
+| `/indicator [side]` | Default | Switch your vehicle's turn signals. Use /indicator left, right, hazards or off. | [Turn signals](features/vehicles/indicators.md) |
 | `/lights` | Default | Control your vehicle's lights. Use /lights to toggle the headlights. | [Vehicles](features/vehicles.md) |
+| `/lock` | Default | Lock the doors of the vehicle you sit in, or the nearest one. Use /lock to lock them. | [Vehicles](features/vehicles.md) |
+| `/locks` | Default | Lock the doors of the vehicle, or unlock them when they're locked. Use /locks to toggle the doors. | [Vehicles](features/vehicles.md) |
 | `/loff` | Default | Control your vehicle's lights. Use /loff to turn them off. | [Vehicles](features/vehicles.md) |
 | `/lon` | Default | Control your vehicle's lights. Use /lon to turn them on. | [Vehicles](features/vehicles.md) |
+| `/unlock` | Default | Unlock the doors of the vehicle you sit in, or the nearest one. Use /unlock to unlock them. | [Vehicles](features/vehicles.md) |
 
 ## Vehicles > Ownership
 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
-| `/park` | Default | Park your currently owned vehicle. Use /park to save your vehicle in a new parking spot. | [Vehicles](features/vehicles.md) |
+| `/park` | Default | Make your vehicle spawn here from now on; only the owner or a key holder can. | [Vehicles](features/vehicles.md) |
 | `/savecar` | Default | Park your currently owned vehicle. Use /savecar to save your vehicle in a new parking spot. | [Vehicles](features/vehicles.md) |
 
 ## Ungrouped
@@ -216,6 +243,7 @@ All 61 player commands of the Framework, grouped as in `/help`. `[argument]` is 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
 | `/createvehicle` | Admin | Create a persistent vehicle that can be owned. | [Vehicles](features/vehicles.md) |
+| `/deletevehicle [vehicle id]` | Admin | Delete a persistent vehicle for good. Without an id, it deletes the vehicle you sit in, else the nearest saved one within 5 m in your virtual world and interior. | [Vehicles](features/vehicles.md) |
 | `/editvehicle` | Admin | Edit a persistent vehicle that can be owned. | [Vehicles](features/vehicles.md) |
 | `/inv` | Default | Open your character's inventory. Use this command to view, manage, and interact with the items you possess. | [Inventories](features/inventories.md) |
 | `/inventory` | Default | Open your character's inventory. Use this command to view, manage, and interact with the items you possess. | [Inventories](features/inventories.md) |

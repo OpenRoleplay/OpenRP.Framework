@@ -221,6 +221,7 @@ namespace OpenRP.Framework.Features.Banking.Services
             BankModel? bank = _bankService.GetBank(account.BankId);
             // Fees go to the house account of the account's own currency, so currencies are never mixed.
             BankAccountModel? houseAccount = bank == null ? null : _bankAccountService.GetOrOpenHouseAccount(bank, account.CurrencyId);
+            decimal fee = GetFeeToCharge(bank);
             _database.UseInTransaction(db =>
             {
                 if (!ClaimFee(db, account))
@@ -228,7 +229,6 @@ namespace OpenRP.Framework.Features.Banking.Services
                     return false;
                 }
 
-                decimal fee = Math.Min(bank?.MonthlyFee ?? 0, BankingRules.MaxMonthlyFee);
                 decimal balance = db.BankAccounts.Where(row => row.Id == account.Id).Select(row => row.Balance).First();
                 decimal charge = Math.Min(fee, balance - BankingRules.LowestBalance);
                 if (charge > 0 && houseAccount != null
@@ -238,6 +238,14 @@ namespace OpenRP.Framework.Features.Banking.Services
                 }
                 return true;
             });
+        }
+
+        /// <summary>
+        /// The bank's fee, held to the cap its jurisdiction has now. The cap may have been lowered since the bank set its fee.
+        /// </summary>
+        private decimal GetFeeToCharge(BankModel? bank)
+        {
+            return bank == null ? 0 : Math.Min(bank.MonthlyFee, _bankService.GetMaxMonthlyFee(bank));
         }
 
         private static bool ClaimFee(BaseDataContext db, BankAccountModel account)

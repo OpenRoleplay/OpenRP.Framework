@@ -1,8 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Actors.Components;
+using OpenRP.Framework.Features.Banking.Entities;
 using OpenRP.Framework.Features.Banking.Enums;
+using OpenRP.Framework.Features.Jurisdictions.Components;
+using OpenRP.Framework.Features.Jurisdictions.Services;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace OpenRP.Framework.Features.Banking.Services
@@ -10,10 +14,17 @@ namespace OpenRP.Framework.Features.Banking.Services
     public class BankService : IBankService
     {
         private readonly IBankingDatabase _database;
+        private readonly IJurisdictionService _jurisdictionService;
+        private readonly IJurisdictionSettingService _jurisdictionSettingService;
+        private readonly MaxMonthlyFeeSetting _maxMonthlyFeeSetting;
 
-        public BankService(IBankingDatabase database)
+        public BankService(IBankingDatabase database, IJurisdictionService jurisdictionService, IJurisdictionSettingService jurisdictionSettingService,
+            MaxMonthlyFeeSetting maxMonthlyFeeSetting)
         {
             _database = database;
+            _jurisdictionService = jurisdictionService;
+            _jurisdictionSettingService = jurisdictionSettingService;
+            _maxMonthlyFeeSetting = maxMonthlyFeeSetting;
         }
 
         public List<BankModel> GetBanks()
@@ -24,6 +35,22 @@ namespace OpenRP.Framework.Features.Banking.Services
         public BankModel? GetBank(ulong bankId)
         {
             return _database.Use(db => db.Banks.AsNoTracking().FirstOrDefault(bank => bank.Id == bankId));
+        }
+
+        public decimal GetMaxMonthlyFee(BankModel bank)
+        {
+            Jurisdiction? jurisdiction = _jurisdictionService.GetJurisdiction(bank.JurisdictionId);
+            return jurisdiction == null
+                ? BankingRules.DefaultMaxMonthlyFee
+                : _jurisdictionSettingService.GetValue(jurisdiction, _maxMonthlyFeeSetting);
+        }
+
+        public string FormatFee(BankModel bank, decimal amount)
+        {
+            Jurisdiction? jurisdiction = _jurisdictionService.GetJurisdiction(bank.JurisdictionId);
+            return jurisdiction == null
+                ? amount.ToString("0.00", CultureInfo.InvariantCulture)
+                : _maxMonthlyFeeSetting.Format(amount, jurisdiction);
         }
 
         public BankModel? GetTellerBank(ServerActor actor)

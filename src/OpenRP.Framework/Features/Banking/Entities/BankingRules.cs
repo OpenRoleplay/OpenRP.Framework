@@ -10,9 +10,14 @@ namespace OpenRP.Framework.Features.Banking.Entities
     public static class BankingRules
     {
         /// <summary>
-        /// The highest fee a bank may charge per account per 30 days. Later, governments may set their own.
+        /// The fee cap when no government has set one.
         /// </summary>
-        public const decimal MaxMonthlyFee = 100m;
+        public const decimal DefaultMaxMonthlyFee = 100m;
+
+        /// <summary>
+        /// The highest fee cap a government may set.
+        /// </summary>
+        public const decimal HighestMaxMonthlyFee = 10000m;
 
         /// <summary>
         /// Only the fee can make an account negative, and never below this.

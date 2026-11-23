@@ -15,8 +15,9 @@
 - **Lies in:** move it into another jurisdiction, or make it a country. Moving it into itself or a place inside it is refused.
 - **Governed by:** pick a faction, or none to use the parent's government. Shows "(from ...)" when inherited.
 - **Tax registrations:** the factions registered here. "Register a faction" adds one (refused when it's registered already); picking a faction asks to remove it.
+- **[Settings](settings.md):** each setting's value for this jurisdiction, such as the bank fee cap. Change a value, or remove it so the place inherits again.
 - **Create a sub-jurisdiction:** asks for the name, then the tags.
-- **Delete:** asks first. Refused while other jurisdictions lie in it. Its properties and vehicles have no jurisdiction afterwards.
+- **Delete:** asks first. Refused while other jurisdictions lie in it. Its properties and vehicles have no jurisdiction afterwards, and its settings are removed.
 
 Names are 1 to 64 characters.
 

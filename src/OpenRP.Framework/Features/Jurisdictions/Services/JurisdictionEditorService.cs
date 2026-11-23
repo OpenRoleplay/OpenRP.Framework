@@ -5,6 +5,7 @@ using OpenRP.Framework.Features.Jurisdictions.Components;
 using OpenRP.Framework.Features.Jurisdictions.Entities;
 using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
 using OpenRP.Framework.Shared.ServerEvents.Services;
+using SampSharp.Entities;
 using System;
 using System.Linq;
 
@@ -21,12 +22,14 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services
         private readonly IServerEventAggregator _serverEventAggregator;
         private readonly ILogger<JurisdictionEditorService> _logger;
         private readonly List<IJurisdictionDeletionGuard> _deletionGuards;
+        private readonly IEntityManager _entityManager;
 
         public JurisdictionEditorService(IJurisdictionService jurisdictionService, IJurisdictionManager jurisdictionManager,
             IFactionTaxRegistrationManager factionTaxRegistrationManager, IServerEventAggregator serverEventAggregator, ILogger<JurisdictionEditorService> logger,
-            IEnumerable<IJurisdictionDeletionGuard> deletionGuards)
+            IEnumerable<IJurisdictionDeletionGuard> deletionGuards, IEntityManager entityManager)
         {
             _deletionGuards = deletionGuards.ToList();
+            _entityManager = entityManager;
             _jurisdictionService = jurisdictionService;
             _jurisdictionManager = jurisdictionManager;
             _factionTaxRegistrationManager = factionTaxRegistrationManager;
@@ -154,10 +157,14 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services
                 return guardError;
             }
 
-            // The database removes these too, but loaded registrations would stay in memory until the next sync.
+            // The database removes these too, but loaded registrations and settings would stay in memory until the next sync.
             foreach (FactionTaxRegistration registration in _jurisdictionService.GetTaxRegistrations(jurisdiction))
             {
                 registration.ProcessDeletion();
+            }
+            foreach (JurisdictionSetting setting in GetSettingRows(jurisdiction))
+            {
+                setting.ProcessDeletion();
             }
             jurisdiction.ProcessDeletion();
 
@@ -190,6 +197,16 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services
         {
             return candidate.GetId() == jurisdiction.GetId()
                 || _jurisdictionService.GetAncestors(candidate).Any(ancestor => ancestor.GetId() == jurisdiction.GetId());
+        }
+
+        /// <summary>
+        /// The loaded setting rows of the jurisdiction.
+        /// </summary>
+        private List<JurisdictionSetting> GetSettingRows(Jurisdiction jurisdiction)
+        {
+            return _entityManager.GetComponents<JurisdictionSetting>()
+                .Where(setting => setting.GetJurisdictionId() == jurisdiction.GetId())
+                .ToList();
         }
 
         private void PublishPlateTagChanged(Jurisdiction jurisdiction)

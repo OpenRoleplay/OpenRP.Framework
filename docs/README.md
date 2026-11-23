@@ -39,14 +39,15 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [DroppedItems](features/dropped-items.md): items on the ground
 - [EmergencyCalls](features/emergency-calls.md): 911 with an AI dispatcher that relays calls on the radio
 - [Factions](features/factions.md): organisations with ranks and permissions
-- [Fishing](features/fishing.md): early fishing
+- [Fishing](features/fishing.md): rod fishing, hotspots and trawling with a Reefer net
+- [FlyMode](features/fly-mode.md): `/fly`, a free-flying camera for admins
 - [Harvestables](features/harvestables.md): harvestable plants
 - [Hotwire](features/hotwire.md): start a vehicle without a key
 - [Inventories](features/inventories.md): weight-based inventories
 - [Items](features/items.md): item types
-- [Jurisdictions](features/jurisdictions.md): countries and cities with tags, currency, government and tax registrations; `/editjurisdictions`
+- [Jurisdictions](features/jurisdictions.md): countries and cities with tags, currency, government, tax registrations and settings; `/editjurisdictions` and `/government`
 - [MainMenu](features/main-menu.md): what you see after connecting
-- [Maps](features/maps.md): placeholder, not working yet
+- [Maps](features/maps.md): saved maps of objects, built in-game with `/editmaps` and loaded at startup
 - [Permissions](features/permissions.md): see the Permissions guide
 - [Phones](features/phones.md): 1992-style mobile phones: calls, texts, phone book, call log
 - [Players](features/players.md): find a player's account and character

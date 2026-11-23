@@ -1,4 +1,5 @@
-﻿using OpenRP.Framework.Database.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Commands.Attributes;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Services;
@@ -98,13 +99,14 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
             VehicleDataComponent vehicleDataComponent = vehicle.GetComponent<VehicleDataComponent>();
             if (vehicleDataComponent != null && !vehicleDataComponent.VehicleData.ServerVehicle)
             {
+                // The live data is the one source of truth; only the lights column is written.
+                vehicleDataComponent.VehicleData.AreLightsOn = lightsOn;
                 ulong id = vehicleDataComponent.VehicleData.Id;
-
-                VehicleModel vehicleData = dataContext.Vehicles.Find(id);
-
-                vehicleData.AreLightsOn = lightsOn;
-                vehicleDataComponent.VehicleData = vehicleData;
-                dataContext.SaveChanges();
+                dataContext.Vehicles
+                    .Where(row => row.Id == id)
+                    .ExecuteUpdate(setters => setters
+                        .SetProperty(row => row.AreLightsOn, lightsOn)
+                        .SetProperty(row => row.UpdatedOn, DateTime.UtcNow));
             }
         }
     }

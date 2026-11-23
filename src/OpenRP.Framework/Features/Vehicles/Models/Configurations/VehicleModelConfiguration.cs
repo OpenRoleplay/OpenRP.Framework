@@ -87,10 +87,15 @@ namespace OpenRP.Framework.Features.Vehicles.Models.Configurations
             builder.Property(v => v.MaxHealth)
                    .IsRequired();
 
-            // Server Vehicle
+            // Server Vehicle (the model's default, false, is the only default)
             builder.Property(v => v.ServerVehicle)
-                   .IsRequired()
-                   .HasDefaultValue(true);
+                   .IsRequired();
+
+            // Where the vehicle is (required)
+            builder.Property(v => v.VirtualWorld)
+                   .IsRequired();
+            builder.Property(v => v.Interior)
+                   .IsRequired();
 
             // Configure the optional relationship to OwnerCharacter
             builder.HasOne(v => v.OwnerCharacter)

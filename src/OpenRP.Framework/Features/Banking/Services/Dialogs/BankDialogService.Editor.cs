@@ -1,6 +1,5 @@
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Actors.Components;
-using OpenRP.Framework.Features.Banking.Entities;
 using OpenRP.Framework.Features.Banking.Helpers;
 using OpenRP.Framework.Features.Factions.Components;
 using OpenRP.Framework.Features.Jurisdictions.Components;
@@ -58,7 +57,9 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
             int renameRow = actionsDialog.AddRow("Rename");
             actionsDialog.AddRow($"Code: {Highlight(bank.Code)} {ChatColor.LightGray}(part of every OBAN, can't change)");
             actionsDialog.AddRow($"Jurisdiction: {Highlight(_jurisdictionService.GetJurisdiction(bank.JurisdictionId)?.GetName() ?? "none")}");
-            int feeRow = actionsDialog.AddRow($"Monthly fee: {Highlight(bank.MonthlyFee.ToString("0.00"))} {ChatColor.LightGray}(at most {BankingRules.MaxMonthlyFee:0})");
+            decimal maxMonthlyFee = _bankService.GetMaxMonthlyFee(bank);
+            string maxMonthlyFeeText = _bankService.FormatFee(bank, maxMonthlyFee);
+            int feeRow = actionsDialog.AddRow($"Monthly fee: {GetMonthlyFeeText(bank, maxMonthlyFee, maxMonthlyFeeText)}");
             int factionRow = actionsDialog.AddRow($"Run by: {Highlight(GetFactionName(bank.RunByFactionId))}");
             int branchesRow = actionsDialog.AddRow($"Branches ({_bankService.GetBranches(bank.Id).Count})");
             int tellersRow = actionsDialog.AddRow($"Tellers ({_bankService.GetTellers(bank.Id).Count})");
@@ -73,7 +74,7 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
                     OpenTextInput(player, EditorTitle, "Rename", $"Enter the new name for {Highlight(bank.Name)}:",
                         name => ContinueAfter(player, EditorTitle, _bankEditorService.RenameBank(bank, name), reopenActions, reopenActions), reopenActions);
                 else if (response.ItemIndex == feeRow)
-                    OpenTextInput(player, EditorTitle, "Monthly fee", $"Enter the fee per account per 30 days, from 0 to {BankingRules.MaxMonthlyFee:0}:",
+                    OpenTextInput(player, EditorTitle, "Monthly fee", $"Enter the fee per account per 30 days, from 0 to {maxMonthlyFeeText}:",
                         fee => ContinueAfter(player, EditorTitle, _bankEditorService.SetMonthlyFee(bank, fee), reopenActions, reopenActions), reopenActions);
                 else if (response.ItemIndex == factionRow)
                     _factionDialogService.OpenFactionPicker(player, "Run by", "Nobody", faction => { _bankEditorService.SetRunByFaction(bank, faction); reopenActions(); }, reopenActions);
@@ -86,6 +87,17 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
                 else
                     reopenActions();
             });
+        }
+
+        /// <summary>
+        /// The stored fee. When it's above the cap, also what the bank charges, which is the cap.
+        /// </summary>
+        private string GetMonthlyFeeText(BankModel bank, decimal maxMonthlyFee, string maxMonthlyFeeText)
+        {
+            string storedFee = Highlight(_bankService.FormatFee(bank, bank.MonthlyFee));
+            if (bank.MonthlyFee <= maxMonthlyFee)
+                return $"{storedFee} {ChatColor.LightGray}(at most {maxMonthlyFeeText})";
+            return $"{storedFee} {ChatColor.LightGray}(charged {maxMonthlyFeeText})";
         }
 
         /// <summary>

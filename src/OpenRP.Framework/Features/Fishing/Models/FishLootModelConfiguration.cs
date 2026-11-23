@@ -36,7 +36,19 @@ namespace OpenRP.Framework.Features.Fishing.Models
             builder.Property(f => f.MaxWeightInGrams)
                    .IsRequired();
 
-            builder.Property(f => f.OddsToCatch)
+            builder.Property(f => f.CatchWeight)
+                   .IsRequired();
+
+            builder.Property(f => f.LootKind)
+                   .IsRequired();
+
+            builder.Property(f => f.SizeClass)
+                   .IsRequired();
+
+            builder.Property(f => f.RequiredFishingLevel)
+                   .IsRequired();
+
+            builder.Property(f => f.IsNetOnly)
                    .IsRequired();
 
             // Configure the relationship with ItemModel.

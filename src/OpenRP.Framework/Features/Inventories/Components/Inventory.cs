@@ -291,11 +291,52 @@ namespace OpenRP.Framework.Features.Inventories.Components
         public bool DoesItemFit(Item itemToCheck, uint amountToCheck)
         {
             // Check if amount of inventoryitem fits in the inventory 
-            if ((itemToCheck.GetWeight() * amountToCheck) < GetAvailableWeight())
+            if (((ulong)itemToCheck.GetWeight() * amountToCheck) < GetAvailableWeight())
             {
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// True when this much extra weight still fits in the inventory.
+        /// </summary>
+        public bool DoesWeightFit(uint weightInGrams)
+        {
+            return weightInGrams <= GetAvailableWeight();
+        }
+
+        /// <summary>
+        /// Adds the item as its own stack with its own weight per item, such as a fish. False when it doesn't fit.
+        /// </summary>
+        public bool AddItem(Item item, uint amount, uint weightPerItemInGrams, ItemAdditionalData? customAdditionalData = null)
+        {
+            if (!DoesWeightFit(weightPerItemInGrams * amount))
+            {
+                return false;
+            }
+
+            CreateInventoryItem(item, amount, GetAdditionalDataForNewItem(item, customAdditionalData), weightPerItemInGrams, item.GetMaxUses());
+            return true;
+        }
+
+        /// <summary>
+        /// Adds an item that comes from somewhere else, keeping its remaining uses and its own weight. False when it doesn't fit.
+        /// </summary>
+        public bool AddExistingItem(Item item, uint amount, uint? usesRemaining, uint? weightPerItemInGrams, ItemAdditionalData? customAdditionalData = null)
+        {
+            if (usesRemaining == item.GetMaxUses() && weightPerItemInGrams == null)
+            {
+                return AddItem(item, amount, customAdditionalData);
+            }
+
+            if (!DoesWeightFit((weightPerItemInGrams ?? item.GetWeight()) * amount))
+            {
+                return false;
+            }
+
+            CreateInventoryItem(item, amount, GetAdditionalDataForNewItem(item, customAdditionalData), weightPerItemInGrams, usesRemaining);
+            return true;
         }
 
         /// <summary>
@@ -316,7 +357,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
                 return true;
             }
 
-            CreateInventoryItem(item, amount, additionalData);
+            CreateInventoryItem(item, amount, additionalData, null, item.GetMaxUses());
             return true;
         }
 
@@ -336,10 +377,11 @@ namespace OpenRP.Framework.Features.Inventories.Components
         {
             return GetInventoryItems().FirstOrDefault(inventoryItem =>
                 IsUnchangedCopyOf(inventoryItem, item)
+                && inventoryItem.GetRemainingUses() == item.GetMaxUses()
                 && ItemAdditionalData.Equals(inventoryItem.GetRawInventoryItemModel().AdditionalData, additionalData));
         }
 
-        private void CreateInventoryItem(Item item, uint amount, string? additionalData)
+        private void CreateInventoryItem(Item item, uint amount, string? additionalData, uint? weightPerItemInGrams, uint? usesRemaining)
         {
             ItemModel itemModel = item.GetRawItemModel();
             InventoryItemModel inventoryItemModel = new InventoryItemModel()
@@ -350,8 +392,9 @@ namespace OpenRP.Framework.Features.Inventories.Components
                 CanDrop = itemModel.CanDrop,
                 KeepOnDeath = itemModel.KeepOnDeath,
                 InventoryId = GetId(),
-                UsesRemaining = itemModel.MaxUses,
+                UsesRemaining = usesRemaining,
                 AdditionalData = additionalData,
+                Weight = weightPerItemInGrams,
             };
 
             // Unsaved until the next sync; the inventory item manager then makes this entity the new row's entity.

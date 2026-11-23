@@ -17,10 +17,16 @@ namespace OpenRP.Framework.Features.Harvestables.Services
         IEnumerable<string> GetResourceNames();
 
         /// <summary>
-        /// Turns an entity whose object the caller already created (for example the biome generator) into a
+        /// Turns an entity whose object the caller already created (for example a map spawn handler) into a
         /// harvestable plant, with its text label. False when the model isn't harvestable.
         /// </summary>
         bool AddHarvestable(EntityId entityId, int modelId, Vector3 position);
+
+        /// <summary>
+        /// Removes the plant and its text label from the entity, so AddHarvestable can put them back elsewhere, for example
+        /// after an editor move. The entity and its object stay.
+        /// </summary>
+        void RemoveHarvestable(EntityId entityId);
 
         /// <summary>
         /// Places a new harvestable plant: its entity, object and text label. False when the model isn't harvestable.

@@ -1,78 +1,92 @@
-using OpenRP.Framework.Database.Models;
+using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Features.Fishing.Components;
 using OpenRP.Framework.Features.Fishing.Entities;
+using OpenRP.OpenMp.Streamer;
 using SampSharp.ColAndreas.Entities;
 using SampSharp.ColAndreas.Entities.Services;
 using SampSharp.Entities;
-using SampSharp.Entities.SAMP;
-using OpenRP.OpenMp.Streamer;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 
 namespace OpenRP.Framework.Features.Fishing.Services
 {
     public class FishHotspotService : IFishHotspotService
     {
-        private IColAndreasService _colAndreasService;
-        private IStreamerService _streamerService;
-        private IWorldService _worldService;
-        private IEntityManager _entityManager;
-        public FishHotspotService(IColAndreasService colAndreasService, IStreamerService streamerService, IWorldService worldService, IEntityManager entityManager)
+        private readonly IColAndreasService _colAndreasService;
+        private readonly IStreamerService _streamerService;
+        private readonly IEntityManager _entityManager;
+        private readonly ILogger<FishHotspotService> _logger;
+
+        public FishHotspotService(IColAndreasService colAndreasService, IStreamerService streamerService, IEntityManager entityManager, ILogger<FishHotspotService> logger)
         {
             _colAndreasService = colAndreasService;
             _streamerService = streamerService;
-            _worldService = worldService;
             _entityManager = entityManager;
+            _logger = logger;
         }
 
-        public async Task<Vector3> GetRandomHotspotPosition()
+        public void CreateHotspots()
         {
-            var random = new Random();
-
-            while (true)
+            for (int i = 0; i < FishingSettings.HotspotCount; i++)
             {
-                // Generate random coordinates between -3100 and 3100
-                float x = (float)(random.NextDouble() * 6200 - 3100);
-                float y = (float)(random.NextDouble() * 6200 - 3100);
-
-                // Check if coordinates are outside detailed map area
-                if (x < -3000 || x > 3000 || y < -3000 || y > 3000)
-                {
-                    // Return ocean/sea position with fixed water level
-                    return new Vector3(x, y, -1.5f);
-                }
-
-                // For coordinates within detailed area, check actual water collision
-                var startPos = new Vector3(x, y, 1000);  // Start above terrain
-                var endPos = new Vector3(x, y, -10);     // Extend below water level
-
-                // Cast vertical ray to find water surface
-                if (_colAndreasService.RayCastLineModel(startPos, endPos, out Vector3 waterSurface) == ColAndreasConstants.WaterObject)
-                {
-                    // Return position at known water height
-                    return new Vector3(x, y, -1.5f);
-                }
-
-                // Prevent tight loop starvation
-                await Task.Delay(100);
+                CreateRandomHotspot();
             }
         }
 
-        public async Task<DynamicObject> CreateRandomHotspot()
+        public void MoveHotspots()
         {
-            Vector3 hotspotPosition = await GetRandomHotspotPosition();
+            foreach (FishHotspot hotspot in _entityManager.GetComponents<FishHotspot>().ToList())
+            {
+                hotspot.DestroyEntity();
+            }
+            CreateHotspots();
+        }
 
-            EntityId fishHotspotEntityId = FishHotspotEntities.GenerateFishHotspotId();
-            _entityManager.AddComponent<FishHotspot>(fishHotspotEntityId);
+        public bool IsNearHotspot(Vector3 position)
+        {
+            return _entityManager.GetComponents<FishHotspot>().Any(hotspot => hotspot.IsPositionInRange(position, FishingSettings.HotspotRange));
+        }
 
-            DynamicObject hotspotObject = _streamerService.CreateDynamicObject(18741, hotspotPosition, Vector3.Zero, parent: fishHotspotEntityId);
+        private void CreateRandomHotspot()
+        {
+            Vector3? position = FindRandomWaterPosition();
+            if (position == null)
+            {
+                _logger.LogWarning("No water found for a fish hotspot after {Attempts} attempts.", FishingSettings.HotspotMaxPlacementAttempts);
+                return;
+            }
 
-            Console.WriteLine($"Fish Hotspot created at {hotspotPosition.X}, {hotspotPosition.Y}, {hotspotPosition.Z}.");
+            EntityId hotspotEntityId = FishHotspotEntities.GenerateFishHotspotId();
+            _entityManager.AddComponent<FishHotspot>(hotspotEntityId, new object[] { position.Value });
+            _streamerService.CreateDynamicObject(FishingSettings.HotspotObjectModelId, position.Value, Vector3.Zero, parent: hotspotEntityId);
+        }
 
-            return hotspotObject;
+        private Vector3? FindRandomWaterPosition()
+        {
+            for (int attempt = 0; attempt < FishingSettings.HotspotMaxPlacementAttempts; attempt++)
+            {
+                if (TryGetWaterSurface(GetRandomMapCoordinate(), GetRandomMapCoordinate(), out Vector3 waterSurface))
+                {
+                    return waterSurface;
+                }
+            }
+            return null;
+        }
+
+        private static float GetRandomMapCoordinate()
+        {
+            return (Random.Shared.NextSingle() * 2f - 1f) * FishingSettings.HotspotMapEdge;
+        }
+
+        /// <summary>
+        /// Water counts only when a ray from high above hits it first, so spots under bridges and roofs are skipped.
+        /// </summary>
+        private bool TryGetWaterSurface(float x, float y, out Vector3 waterSurface)
+        {
+            Vector3 start = new Vector3(x, y, FishingSettings.HotspotRayStartHeight);
+            Vector3 end = new Vector3(x, y, FishingSettings.HotspotRayEndHeight);
+            return _colAndreasService.RayCastLineModel(start, end, out waterSurface) == ColAndreasConstants.WaterObject;
         }
     }
 }

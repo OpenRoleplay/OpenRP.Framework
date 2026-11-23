@@ -1,12 +1,13 @@
 # Admins
 
-Admin and tester commands that don't belong to another feature. Other admin tools live with their feature: `/createfaction` in [Factions](factions.md), `/editproperties` in [Properties](properties.md), `/createvehicle` in [Vehicles](vehicles.md).
+Admin and tester commands that don't belong to another feature. Other admin tools live with their feature: `/createfaction` in [Factions](factions.md), `/editproperties` in [Properties](properties.md), `/createvehicle`, `/deletevehicle` and `/repairvehicle` in [Vehicles](vehicles.md).
 
 ## How to use it
 
 | Command | Groups | Does |
 |---|---|---|
 | `/givemoney [receiver] [currency code] [amount]` | Admin | Gives money; a negative amount takes it |
+| `/giveitem [player] [item id] <amount>` | Admin | Gives a player new items with their normal defaults. The amount is 1 when left out. See the [item ids](items.md) |
 | `/givepermissiongroup [player] [group]` | Admin | Gives a [permission group](../permissions.md), effective at once |
 | `/gotopos [x] [y] [z] <interior> <virtual world>` | Admin | Teleports, for example into a GTA interior. Accepts `.` or `,` as the decimal separator |
 | `/tprel [player] [distance] [direction]` | Admin | Moves a player a distance `forward`, `back`, `left`, `right`, `up` or `down` (or `f`, `b`, `l`, `r`, `u`, `d`), relative to where they face. In a vehicle, the vehicle moves with everyone in it |
@@ -19,7 +20,8 @@ Admin and tester commands that don't belong to another feature. Other admin tool
 ## Known limitations
 
 - **No moderation tools yet:** no kick, ban, mute, spectate, reports or admin chat.
-- **Temporary vehicles.** `/sv` vehicles aren't saved and have no key.
+- **`/giveitem` gives plain items.** A wallet, vehicle key, phone or radio given this way isn't linked to anything, so it doesn't work like a real one.
+- **Temporary vehicles.** `/sv` vehicles aren't saved and have no key, and `/deletevehicle` refuses them.
 - **No `/help` group.** `/setweathertime` and `/testerkit` appear ungrouped in `/help`.
 
 ## Deep dive

@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 using OpenRP.Framework.Database;
-using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Vehicles.Components;
 using OpenRP.Framework.Shared.Chat.Enums;
 using OpenRP.Framework.Shared.Chat.Services;
@@ -83,15 +83,13 @@ namespace OpenRP.Framework.Features.Vehicles.Services
                 return;
             }
 
-            VehicleModel? vehicleData = _dataContext.Vehicles.Find(vehicleDataComponent.VehicleData.Id);
-            if (vehicleData == null)
-            {
-                return;
-            }
-
-            vehicleData.IsEngineOn = isEngineOn;
-            vehicleDataComponent.VehicleData = vehicleData;
-            _dataContext.SaveChanges();
+            // The live data is the one source of truth; only the engine column is written, so the rest of the row stays as it is.
+            vehicleDataComponent.VehicleData.IsEngineOn = isEngineOn;
+            _dataContext.Vehicles
+                .Where(row => row.Id == vehicleDataComponent.VehicleData.Id)
+                .ExecuteUpdate(setters => setters
+                    .SetProperty(row => row.IsEngineOn, isEngineOn)
+                    .SetProperty(row => row.UpdatedOn, DateTime.UtcNow));
         }
     }
 }

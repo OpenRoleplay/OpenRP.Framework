@@ -16,5 +16,16 @@ namespace OpenRP.Framework.Features.Jurisdictions.Services.Dialogs
         /// noneLabel. Other features' editors use it, for example for a property's jurisdiction.
         /// </summary>
         void OpenJurisdictionPicker(Player player, string title, string noneLabel, Action<Jurisdiction?> onPicked, Action onBack);
+
+        /// <summary>
+        /// Opens the government menu of the player's faction: the settings of the jurisdictions it governs, or a picker when
+        /// there are several. Only the leaders of the governing faction get this far.
+        /// </summary>
+        void OpenGovernment(Player player);
+
+        /// <summary>
+        /// Opens the settings of a jurisdiction for an admin, who may change any of them. onBack returns to the caller.
+        /// </summary>
+        void OpenJurisdictionSettings(Player player, Jurisdiction jurisdiction, Action onBack);
     }
 }

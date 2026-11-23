@@ -21,6 +21,11 @@ namespace OpenRP.Framework.Features.Discord.Systems
         [Event]
         public void OnPlayerConnect(Player player, IDiscordService discordService)
         {
+            // open.mp NPCs connect as players, but they aren't players for the count.
+            if (player.IsNpc)
+            {
+                return;
+            }
             try
             {
                 discordService.UpdatePlayerCount();
@@ -34,6 +39,10 @@ namespace OpenRP.Framework.Features.Discord.Systems
         [Event]
         public void OnPlayerDisconnect(Player player, DisconnectReason disconnectReason, IDiscordService discordService)
         {
+            if (player.IsNpc)
+            {
+                return;
+            }
             try
             {
                 /*#if (!DEBUG)

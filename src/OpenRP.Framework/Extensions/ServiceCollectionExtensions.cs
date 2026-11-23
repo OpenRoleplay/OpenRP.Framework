@@ -15,9 +15,11 @@ using OpenRP.Framework.Features.Skills.Extensions;
 using OpenRP.Framework.Features.Harvestables.Extensions;
 using OpenRP.Framework.Features.DebugSettingsFeature.Extensions;
 using OpenRP.Framework.Features.Fishing.Extensions;
+using OpenRP.Framework.Features.FlyMode.Extensions;
 using OpenRP.Framework.Features.Inventories.Extensions;
 using OpenRP.Framework.Features.Items.Extensions;
 using OpenRP.Framework.Features.Jurisdictions.Extensions;
+using OpenRP.Framework.Features.Maps.Extensions;
 using OpenRP.Framework.Features.MainMenu.Extensions;
 using OpenRP.Framework.Features.Permissions.Extensions;
 using OpenRP.Framework.Features.Phones.Extensions;
@@ -66,6 +68,7 @@ namespace OpenRP.Framework.Extensions
                 .AddSkills()
                 .AddHarvestables()
                 .AddProperties()
+                .AddMaps()
                 .AddChickenCoops()
                 .AddFactions()
                 .AddJurisdictions()
@@ -74,6 +77,7 @@ namespace OpenRP.Framework.Extensions
                 .AddRadios()
                 .AddBanking()
                 .AddDebugSettings()
+                .AddFlyMode()
                 .AddBiomeGenerator()
                 .AddCommands()
                 .AddServerSystemEvents()

@@ -1,4 +1,5 @@
-﻿using OpenRP.Framework.Features.Vehicles.Services;
+﻿using OpenRP.Framework.Features.Permissions.Services;
+using OpenRP.Framework.Features.Vehicles.Services;
 using SampSharp.Entities;
 using SampSharp.Entities.SAMP;
 using System;
@@ -13,9 +14,10 @@ namespace OpenRP.Framework.Features.Vehicles.Systems
     public class VehicleSystem : ISystem
     {
         [Event]
-        public void OnGameModeInit(IServerService serverService, IVehicleManager vehicleManager)
+        public void OnGameModeInit(IServerService serverService, IVehicleManager vehicleManager, IVehicleAccessService vehicleAccessService, IPermissionService permissionService)
         {
-            // VehicleManager
+            // The admin permission is made before the vehicles spawn; no character is selected yet, so no one needs a reload.
+            vehicleAccessService.CreatePermissions(permissionService);
             vehicleManager.LoadAndUnloadVehicles();
         }
     }

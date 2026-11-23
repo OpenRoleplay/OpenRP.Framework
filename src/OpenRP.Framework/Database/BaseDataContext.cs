@@ -32,6 +32,10 @@ namespace OpenRP.Framework.Database
         public DbSet<CharacterPreferencesModel> CharacterPreferences { get; set; }
         public DbSet<PropertyModel> Properties { get; set; }
         public DbSet<PropertyDoorModel> PropertyDoors { get; set; }
+        public DbSet<MapModel> Maps { get; set; }
+        public DbSet<MapObjectModel> MapObjects { get; set; }
+        public DbSet<MapObjectMaterialModel> MapObjectMaterials { get; set; }
+        public DbSet<MapRemovedBuildingModel> MapRemovedBuildings { get; set; }
         public DbSet<MainMenuSceneModel> MainMenuScenes { get; set; }
         public DbSet<FactionModel> Factions { get; set; }
         public DbSet<FactionRankModel> FactionRanks { get; set; }
@@ -43,9 +47,11 @@ namespace OpenRP.Framework.Database
         public DbSet<VehicleModelSpawnTypeModel> VehicleModelSpawnTypes { get; set; }
         public DbSet<VehicleModelSpawnTypeModelModel> VehicleModelSpawnTypeModels { get; set; }
         public DbSet<FishLootModel> FishSpecies { get; set; }
+        public DbSet<VehicleFishingNetModel> VehicleFishingNets { get; set; }
         public DbSet<AccountSettingsModel> AccountSettings { get; set; }
         public DbSet<JurisdictionModel> Jurisdictions { get; set; }
         public DbSet<FactionTaxRegistrationModel> FactionTaxRegistrations { get; set; }
+        public DbSet<JurisdictionSettingModel> JurisdictionSettings { get; set; }
         public DbSet<PhoneModel> Phones { get; set; }
         public DbSet<PhoneContactModel> PhoneContacts { get; set; }
         public DbSet<PhoneMessageModel> PhoneMessages { get; set; }

@@ -6,7 +6,7 @@ A teller is an AI actor that works for a bank, stands inside one of its branches
 
 1. **Create the bank:** `/editbanks`, then **Create a bank**: the name, the 4-letter code (it can't change later, because it's part of every OBAN), and the jurisdiction. The jurisdiction must have a currency. The bank's own house account is created with it.
 2. **Set it up** in the bank's menu:
-   - **Monthly fee:** 0 to 100 per account per 30 days.
+   - **Monthly fee:** 0 up to the bank's fee cap per account per 30 days. The cap comes from the bank's jurisdiction and is 100 unless a government has set another (see [Jurisdiction settings](../jurisdictions/settings.md)).
    - **Run by:** the faction running the bank. Its leader and members with `faction.bank` use the house account, where the fees land.
    - **Branches:** add the bank's properties. The editor warns when a branch lies outside the bank's jurisdiction.
 3. **Make the actor:** `/editactors`. Give it an AI prompt (a bank teller) and put it **inside** a branch property (Virtual world, Inside).

@@ -29,6 +29,19 @@ namespace OpenRP.Framework.Features.Banking.Helpers
             return IsValid(amount) ? amount : null;
         }
 
+        /// <summary>
+        /// A monthly fee from 0 up to the maximum, with at most 2 decimals, such as "5", "$12.50" or "0.5". Null when it
+        /// isn't one. Unlike Parse, it doesn't take thousands separators.
+        /// </summary>
+        public static decimal? ParseFee(string text, decimal maximum)
+        {
+            if (!decimal.TryParse(text.Trim().TrimStart('$'), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal fee))
+            {
+                return null;
+            }
+            return fee >= 0 && fee <= maximum && decimal.Round(fee, 2) == fee ? (decimal?)fee : null;
+        }
+
         public static bool IsValid(decimal amount)
         {
             return amount > 0 && amount <= Maximum && decimal.Round(amount, 2) == amount;

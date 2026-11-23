@@ -14,7 +14,7 @@ namespace OpenRP.Framework.Database.Models
         public ulong JurisdictionId { get; set; }
         // The faction running the bank; its members with faction.bank use the house account.
         public ulong? RunByFactionId { get; set; }
-        // Per 30 days, at most BankingLimits.MaxMonthlyFee.
+        // Per 30 days, at most the fee cap of its jurisdiction (the banking.maxMonthlyFee setting).
         public decimal MonthlyFee { get; set; }
 
         // Navigational Properties

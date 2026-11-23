@@ -14,6 +14,18 @@ namespace OpenRP.Framework.Features.Banking.Services
         BankModel? GetBank(ulong bankId);
 
         /// <summary>
+        /// The highest monthly fee the bank may charge per account: the cap its jurisdiction has set, or the default
+        /// when the jurisdiction can't be found.
+        /// </summary>
+        decimal GetMaxMonthlyFee(BankModel bank);
+
+        /// <summary>
+        /// An amount of money (a fee, or the cap) as menu text, in the currency of the bank's jurisdiction. Falls back
+        /// to the plain amount when the jurisdiction can't be found.
+        /// </summary>
+        string FormatFee(BankModel bank, decimal amount);
+
+        /// <summary>
         /// The bank the actor works for as a teller, or null.
         /// </summary>
         BankModel? GetTellerBank(ServerActor actor);

@@ -27,6 +27,24 @@ namespace OpenRP.Framework.Features.Skills.Components
             return _skills.FirstOrDefault(skill => skill.SkillId == skillId);
         }
 
+        /// <summary>
+        /// The character's level in the skill with this name, or 0 when they haven't learned it yet.
+        /// </summary>
+        public uint GetSkillLevel(string skillName)
+        {
+            return _skills.FirstOrDefault(skill => skill.Name == skillName)?.Level ?? 0;
+        }
+
+        /// <summary>
+        /// Puts the new progress of a skill in place of the old one, or adds the skill when it's new.
+        /// </summary>
+        public void SetSkill(CharacterSkill skill)
+        {
+            _skills.RemoveAll(existingSkill => existingSkill.SkillId == skill.SkillId);
+            _skills.Add(skill);
+            _skills.Sort((first, second) => string.Compare(first.Name, second.Name, System.StringComparison.Ordinal));
+        }
+
         public bool HasSkills()
         {
             return _skills.Count > 0;

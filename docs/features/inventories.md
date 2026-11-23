@@ -22,7 +22,7 @@ Picking an item offers, depending on the item:
 
 ## How it works
 
-1. **Weight.** An item's weight is its weight × amount, plus the contents if it holds an inventory. New characters get 10 kg.
+1. **Weight.** An item's weight is its weight × amount, plus the contents if it holds an inventory. New characters get 10 kg. A stack can have its own weight, such as a caught fish. It keeps that weight and its remaining uses when it's moved or dropped.
 2. **Stacking.** Stackable items join a matching stack when their extra data matches.
 3. **Flags.** Each stack has extra data, such as `DEFAULT_WALLET` (where money goes), `WEARING` (the worn outfit) or the vehicle id of a key.
 
@@ -34,7 +34,7 @@ Picking an item offers, depending on the item:
 
 - **Code:** `Features/Inventories/`.
 - **Components:**
-  - `Inventory`: `AddItem`, `TakeItem`, `UseItem`, `DoesItemFit`, `GetDefaultWallet`, …;
+  - `Inventory`: `AddItem` (also with a weight of its own), `TakeItem`, `UseItem`, `DoesItemFit`, `DoesWeightFit`, `GetDefaultWallet`, …;
   - `InventoryItem`: `Transfer`, `GetItemInventory`, `GetVehicleId`, `GetSkinModelId`, …;
   - `InventoryOpened`, while the dialog is open.
 - **Extra data:** `Helpers/ItemAdditionalData` parses and compares the key/value text. "Personalised" keys don't stop stacking.
