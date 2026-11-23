@@ -39,7 +39,7 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
             Vehicle? vehicle = player.InAnyVehicle ? player.Vehicle : NearbyVehicleFinder.FindNearestSavedVehicle(_entityManager, _vehicleInfoService, player);
             if (vehicle == null)
             {
-                player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "Sit in the vehicle, or stand within 5 metres of it, or use /deletevehicle [vehicle id].");
+                player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "Sit in the vehicle, or stand within 5 metres of it, or use /deletevehicle <vehicle id>.");
                 return;
             }
 

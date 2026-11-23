@@ -51,6 +51,6 @@ namespace OpenRP.Framework.Features.Fishing.Services
         /// <summary>
         /// Tells other features that the player brought something up.
         /// </summary>
-        void PublishFishCaught(Player player, FishLootModel loot, uint weightInGrams, FishCatchMethod method);
+        Task PublishFishCaught(Player player, FishLootModel loot, uint weightInGrams, FishCatchMethod method);
     }
 }

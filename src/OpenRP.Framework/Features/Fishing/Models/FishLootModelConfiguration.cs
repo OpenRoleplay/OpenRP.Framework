@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Features.Fishing.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,17 +40,22 @@ namespace OpenRP.Framework.Features.Fishing.Models
             builder.Property(f => f.CatchWeight)
                    .IsRequired();
 
+            // Database defaults, so servers on an older Framework sharing the database can still insert rows.
             builder.Property(f => f.LootKind)
-                   .IsRequired();
+                   .IsRequired()
+                   .HasDefaultValue(FishLootKind.Fish);
 
             builder.Property(f => f.SizeClass)
-                   .IsRequired();
+                   .IsRequired()
+                   .HasDefaultValue(FishSizeClass.None);
 
             builder.Property(f => f.RequiredFishingLevel)
-                   .IsRequired();
+                   .IsRequired()
+                   .HasDefaultValue(0u);
 
             builder.Property(f => f.IsNetOnly)
-                   .IsRequired();
+                   .IsRequired()
+                   .HasDefaultValue(false);
 
             // Configure the relationship with ItemModel.
             builder.HasOne(f => f.Item)

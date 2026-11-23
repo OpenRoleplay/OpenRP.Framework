@@ -53,9 +53,10 @@ namespace OpenRP.Framework.Features.Fishing.Services
             }
 
             ulong vehicleId = reefer!.GetComponent<VehicleDataComponent>()!.VehicleData.Id;
-            player.GetPlayerCurrentlyPlayingAsCharacter().GetInventory()!.TakeItem(GetNetItem()!, 1);
             Inventory storage = _inventoryManager.CreateInventory($"Fishing Net of Vehicle {vehicleId}", FishingSettings.NetStorageMaxWeightInGrams);
             _fishingNetManager.CreateNet(vehicleId, storage.GetId());
+            // Taken only once the net exists: creating it saves to the database and can fail.
+            player.GetPlayerCurrentlyPlayingAsCharacter().GetInventory()!.TakeItem(GetNetItem()!, 1);
             // Saved now, like the net itself: a crash must not leave the player with both the item and a fitted net.
             _inventoryItemManager.SaveNow();
             player.SendPlayerInfoMessage(PlayerInfoMessageType.INFO, "The net is fitted. Use /trawl while driving to lower it, and /netstorage to see the catch.");

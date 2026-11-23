@@ -111,6 +111,12 @@ namespace OpenRP.Framework.Features.Maps.Services
 
         public void DespawnObject(MapObject mapObject)
         {
+            // Despawning a big map awaits between slices, and an object deleted meanwhile took its children with it.
+            if (!mapObject.IsComponentAlive)
+            {
+                return;
+            }
+
             DestroyDynamicObjects(mapObject);
         }
 
@@ -149,6 +155,14 @@ namespace OpenRP.Framework.Features.Maps.Services
             foreach (Player player in _entityManager.GetComponents<Player>().ToList())
             {
                 ApplyRemovedBuildingTo(player, removal);
+            }
+        }
+
+        public void ApplyRemovedBuildings(Map map)
+        {
+            foreach (MapRemovedBuilding removal in map.GetRemovedBuildings())
+            {
+                ApplyRemovedBuilding(removal);
             }
         }
 

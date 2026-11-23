@@ -263,7 +263,7 @@ namespace OpenRP.Framework.Features.Fishing.Services
             _chatService.SendPlayerChatMessage(player, PlayerChatMessageType.ME, $"reels in the line and pulls up: {loot.Name}.");
             SendCatchMessage(player, loot, weightInGrams, isInInventory);
             _fishService.AddFishingExperience(player, _fishService.GetExperienceForCatch(loot));
-            _fishService.PublishFishCaught(player, loot, weightInGrams, FishCatchMethod.Rod);
+            _ = _fishService.PublishFishCaught(player, loot, weightInGrams, FishCatchMethod.Rod);
         }
 
         /// <summary>

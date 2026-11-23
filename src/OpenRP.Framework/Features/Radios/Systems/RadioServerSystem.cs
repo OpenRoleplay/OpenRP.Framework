@@ -22,5 +22,15 @@ namespace OpenRP.Framework.Features.Radios.Systems
                 radioDialogService.OpenRadio(args.Player, radio);
             }
         }
+
+        /// <summary>
+        /// The radio's row went with the vehicle (cascade). Marking its component deleted keeps the next save from
+        /// writing to that row.
+        /// </summary>
+        [ServerEvent]
+        public void OnVehicleDeleted(OnVehicleDeletedEventArgs args, IRadioEditorService radioEditorService)
+        {
+            radioEditorService.RemoveVehicleRadio(args.VehicleId);
+        }
     }
 }

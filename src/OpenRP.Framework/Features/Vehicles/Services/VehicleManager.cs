@@ -5,8 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Database.Services;
-using OpenRP.Framework.Features.Fishing.Services;
-using OpenRP.Framework.Features.Radios.Services;
 using OpenRP.Framework.Features.Vehicles.Components;
 using OpenRP.Framework.Features.Vehicles.Helpers;
 using SampSharp.Entities.SAMP;
@@ -19,6 +17,8 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenRP.Framework.Database;
 using OpenRP.Framework.Features.Jurisdictions.Services;
+using OpenRP.Framework.Shared.ServerEvents.Entities.EventArgs;
+using OpenRP.Framework.Shared.ServerEvents.Services;
 
 namespace OpenRP.Framework.Features.Vehicles.Services
 {
@@ -32,27 +32,25 @@ namespace OpenRP.Framework.Features.Vehicles.Services
         private readonly IWorldService _worldService;
         private readonly IEntityManager _entityManager;
         private readonly VehicleHelper _vehicleHelper;
-        // Shared for the whole server run, so it's only used to delete rows and to forget stale copies. Everything
-        // else goes through a short-lived context from _scopeFactory.
+        // Shared for the whole server run, so it's only used to load vehicles at startup and to forget stale copies.
+        // Everything else goes through a short-lived context from _scopeFactory.
         private readonly BaseDataContext _DataContext;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IDataMemoryService _dataMemoryService;
         private readonly IJurisdictionService _jurisdictionService;
         private readonly IVehicleKeyService _vehicleKeyService;
-        private readonly IRadioEditorService _radioEditorService;
-        private readonly IFishingNetService _fishingNetService;
+        private readonly IServerEventAggregator _serverEventAggregator;
         private readonly ILogger<VehicleManager> _logger;
         // The saved vehicles whose lock is being saved right now, so a second lock or unlock waits for the first.
         private readonly HashSet<EntityId> _vehiclesWithLockChange = new HashSet<EntityId>();
 
         public VehicleManager(IWorldService worldService, IEntityManager entityManager, BaseDataContext dataContext, IServiceScopeFactory scopeFactory,
             IDataMemoryService dataMemoryService, IJurisdictionService jurisdictionService, IVehicleKeyService vehicleKeyService,
-            IRadioEditorService radioEditorService, IFishingNetService fishingNetService, ILogger<VehicleManager> logger)
+            IServerEventAggregator serverEventAggregator, ILogger<VehicleManager> logger)
         {
-            _fishingNetService = fishingNetService;
             _jurisdictionService = jurisdictionService;
             _vehicleKeyService = vehicleKeyService;
-            _radioEditorService = radioEditorService;
+            _serverEventAggregator = serverEventAggregator;
             _worldService = worldService;
             _entityManager = entityManager;
             _vehicleHelper = new VehicleHelper();
@@ -396,16 +394,16 @@ namespace OpenRP.Framework.Features.Vehicles.Services
 
         public string? DeleteVehicle(ulong id)
         {
-            VehicleModel? vehicle = _DataContext.Vehicles.Find(id);
-            if (vehicle == null)
-            {
-                return $"There's no vehicle #{id}.";
-            }
-
             // The row goes first: if that fails, nothing in game or in the inventories has been touched yet.
-            if (!TryRemoveVehicleRow(vehicle))
+            int? deletedRows = TryDeleteVehicleRow(id);
+            if (deletedRows == null)
             {
                 return "The vehicle couldn't be deleted.";
+            }
+
+            if (deletedRows == 0)
+            {
+                return $"There's no vehicle #{id}.";
             }
 
             RemoveVehicleLeftovers(id);
@@ -413,53 +411,39 @@ namespace OpenRP.Framework.Features.Vehicles.Services
         }
 
         /// <summary>
-        /// Runs once the row is gone. A failure in the keys or the radio is logged, and the loaded vehicle is still destroyed.
+        /// Runs once the row is gone. A failure in the keys is logged, and the loaded vehicle is still destroyed.
+        /// Other features clean up what they fitted to the vehicle through OnVehicleDeleted; its handlers don't await,
+        /// so they run before the loaded vehicle is destroyed.
         /// </summary>
         private void RemoveVehicleLeftovers(ulong vehicleId)
         {
             try
             {
                 _vehicleKeyService.RemoveVehicleKeys(vehicleId);
-                // The radio's row went with the vehicle (cascade). Marking its component deleted keeps the next save from writing to that row.
-                _radioEditorService.RemoveVehicleRadio(vehicleId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Removing the keys and radio of deleted vehicle {VehicleId} failed.", vehicleId);
+                _logger.LogError(ex, "Removing the keys of deleted vehicle {VehicleId} failed.", vehicleId);
             }
-            RemoveVehicleFishingNet(vehicleId);
+            _ = _serverEventAggregator.PublishAsync(new OnVehicleDeletedEventArgs { VehicleId = vehicleId });
             DestroyLoadedVehicle(vehicleId);
         }
 
         /// <summary>
-        /// The net's row went with the vehicle (cascade), but its storage and the fish in it did not.
+        /// The number of rows deleted (0 when there was no such vehicle), or null when the delete failed.
         /// </summary>
-        private void RemoveVehicleFishingNet(ulong vehicleId)
+        private int? TryDeleteVehicleRow(ulong vehicleId)
         {
             try
             {
-                _fishingNetService.RemoveNetOfDeletedVehicle(vehicleId);
+                using IServiceScope scope = _scopeFactory.CreateScope();
+                BaseDataContext dataContext = scope.ServiceProvider.GetRequiredService<BaseDataContext>();
+                return dataContext.Vehicles.Where(row => row.Id == vehicleId).ExecuteDelete();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Removing the fishing net of deleted vehicle {VehicleId} failed.", vehicleId);
-            }
-        }
-
-        private bool TryRemoveVehicleRow(VehicleModel vehicle)
-        {
-            try
-            {
-                _DataContext.Vehicles.Remove(vehicle);
-                _DataContext.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Deleting vehicle {VehicleId} failed.", vehicle.Id);
-                // Forget the failed delete, so later saves on this context don't repeat it.
-                _DataContext.ChangeTracker.Clear();
-                return false;
+                _logger.LogError(ex, "Deleting vehicle {VehicleId} failed.", vehicleId);
+                return null;
             }
         }
 

@@ -110,7 +110,7 @@ namespace OpenRP.Framework.Features.Fishing.Services
             return _entityManager.GetComponent<Item>(ItemEntities.GetItemId((int)loot.ItemId));
         }
 
-        public async void PublishFishCaught(Player player, FishLootModel loot, uint weightInGrams, FishCatchMethod method)
+        public async Task PublishFishCaught(Player player, FishLootModel loot, uint weightInGrams, FishCatchMethod method)
         {
             try
             {

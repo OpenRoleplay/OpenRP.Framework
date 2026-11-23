@@ -28,7 +28,7 @@ namespace OpenRP.Framework.Features.Banking.Entities
 
         public override string Name => "Bank account fee cap";
 
-        public override string Prompt => "Enter the highest monthly fee a bank in this jurisdiction may charge per account, from 0 to 10,000:";
+        public override string Prompt => "Enter the highest monthly fee a bank in this jurisdiction may charge per account, from 0 to 10000:";
 
         public override decimal Default => BankingRules.DefaultMaxMonthlyFee;
 
@@ -36,7 +36,7 @@ namespace OpenRP.Framework.Features.Banking.Entities
         {
             decimal? fee = BankAmounts.ParseFee(input, BankingRules.HighestMaxMonthlyFee);
             value = fee ?? 0;
-            return fee.HasValue ? null : "The fee is an amount from 0 to 10,000, with at most 2 decimals.";
+            return fee.HasValue ? null : "The fee is an amount from 0 to 10000, with at most 2 decimals and no thousands separators.";
         }
 
         public override string Format(decimal value, Jurisdiction jurisdiction)

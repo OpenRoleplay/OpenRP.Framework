@@ -122,10 +122,18 @@ namespace OpenRP.Framework.Features.Maps.Services
         {
             try
             {
+                bool wasLoaded = map.IsLoaded();
                 await RemoveOldObjectsAsync(map, progress);
                 await AddNewObjectsAsync(map, objects, rowIds, progress);
                 _mapStore.MarkMapLoadedInMemory(map);
                 await _mapService.SpawnMapAsync(map, ToSliceProgress(MapBulkProgress.SpawningObjects, objects.Count, progress));
+                // A replace loads a map that wasn't in the game, so its removed buildings go too, as when the map is
+                // loaded. A map that was already in the game has them applied; applying them twice would count twice
+                // against the player's limit.
+                if (!wasLoaded && map.IsComponentAlive)
+                {
+                    _mapService.ApplyRemovedBuildings(map);
+                }
                 return null;
             }
             catch (Exception ex)
@@ -134,7 +142,6 @@ namespace OpenRP.Framework.Features.Maps.Services
                 return InGameFailedMessage;
             }
         }
-
         /// <summary>
         /// Despawns the old objects, then forgets them, a slice at a time. Forgetting destroys their entities, so they must be despawned first.
         /// </summary>

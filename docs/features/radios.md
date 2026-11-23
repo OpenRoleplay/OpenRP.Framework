@@ -13,7 +13,7 @@ Two-way radios on numbered frequencies: a handheld radio item, and a radio an ad
 | `/giveearpiece [player]` | Admin | Gives the player a radio earpiece |
 | `/editfrequencies` | Admin | Creates protected and encrypted frequencies and picks their factions. See [Frequencies](radios/frequencies.md) |
 
-**Vehicle radios:** an admin sets the **Radio** row in [`/createvehicle` or `/editvehicle`](vehicles.md). Everyone inside can then use `/radio`, `/freq` and `/r`.
+**Vehicle radios:** an admin sets the **Radio** row in [`/createvehicle` or `/editvehicle`](vehicles.md). Everyone inside can then use `/radio`, `/freq` and `/r`. Deleting the vehicle removes its radio too, on [`OnVehicleDeleted`](../server-events.md#onvehicledeleted).
 
 ## Who can use a frequency
 

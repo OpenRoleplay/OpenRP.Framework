@@ -54,6 +54,11 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
                         vehicleData.Y = vehiclePosition.Y;
                         vehicleData.Z = vehiclePosition.Z;
                         vehicleData.Rotation = vehicleAngle;
+                        // The vehicle spawns in these again, so a car parked inside an interior stays there.
+                        int virtualWorld = player.VirtualWorld;
+                        int interior = player.Interior;
+                        vehicleData.VirtualWorld = virtualWorld;
+                        vehicleData.Interior = interior;
 
                         ulong id = vehicleData.Id;
                         dataContext.Vehicles
@@ -63,6 +68,8 @@ namespace OpenRP.Framework.Features.Vehicles.Commands
                                 .SetProperty(row => row.Y, vehiclePosition.Y)
                                 .SetProperty(row => row.Z, vehiclePosition.Z)
                                 .SetProperty(row => row.Rotation, vehicleAngle)
+                                .SetProperty(row => row.VirtualWorld, virtualWorld)
+                                .SetProperty(row => row.Interior, interior)
                                 .SetProperty(row => row.UpdatedOn, DateTime.UtcNow));
 
                         // Notify the player that the vehicle has been parked and saved
