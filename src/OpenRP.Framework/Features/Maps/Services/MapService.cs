@@ -158,6 +158,14 @@ namespace OpenRP.Framework.Features.Maps.Services
             }
         }
 
+        public void ApplyRemovedBuildings(Map map)
+        {
+            foreach (MapRemovedBuilding removal in map.GetRemovedBuildings())
+            {
+                ApplyRemovedBuilding(removal);
+            }
+        }
+
         private IEnumerable<MapRemovedBuilding> GetLoadedRemovedBuildings()
         {
             return GetMaps().Where(map => map.IsLoaded()).SelectMany(map => map.GetRemovedBuildings());

@@ -90,5 +90,10 @@ namespace OpenRP.Framework.Features.Maps.Services
         /// Removes the building for every online player.
         /// </summary>
         void ApplyRemovedBuilding(MapRemovedBuilding removal);
+
+        /// <summary>
+        /// Removes all of this map's buildings for every online player, when the map comes into the game.
+        /// </summary>
+        void ApplyRemovedBuildings(Map map);
     }
 }

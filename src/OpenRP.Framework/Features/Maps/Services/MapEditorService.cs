@@ -120,10 +120,7 @@ namespace OpenRP.Framework.Features.Maps.Services
             {
                 return MapGoneMessage;
             }
-            foreach (MapRemovedBuilding removal in map.GetRemovedBuildings())
-            {
-                _mapService.ApplyRemovedBuilding(removal);
-            }
+            _mapService.ApplyRemovedBuildings(map);
             return null;
         }
 

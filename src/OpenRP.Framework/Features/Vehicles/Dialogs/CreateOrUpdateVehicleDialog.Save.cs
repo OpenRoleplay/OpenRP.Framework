@@ -16,7 +16,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
 
         private void SaveVehicleData()
         {
-            if (!RefreshEditedVehicle())
+            if (!LoadEditedVehicle())
             {
                 _player.SendPlayerInfoMessage(PlayerInfoMessageType.ERROR, "This vehicle was deleted or despawned while you edited it, so nothing was saved.");
                 return;
@@ -63,7 +63,7 @@ namespace OpenRP.Framework.Features.Vehicles.Dialogs
         /// Another admin can replace (a model change) or delete the vehicle while this editor is open, so the save looks
         /// the live vehicle up again. False when the editor had a live vehicle and it's gone.
         /// </summary>
-        private bool RefreshEditedVehicle()
+        private bool LoadEditedVehicle()
         {
             if (Data.Id == 0 || _component.EditedVehicle == null)
             {
