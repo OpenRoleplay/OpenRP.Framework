@@ -6,7 +6,9 @@ using OpenRP.Framework.Features.Banking.Entities;
 using OpenRP.Framework.Features.Banking.Enums;
 using OpenRP.Framework.Features.Banking.Services;
 using OpenRP.Framework.Features.Banking.Services.Dialogs;
+using OpenRP.Framework.Features.Inventories.Extensions;
 using OpenRP.Framework.Features.Jurisdictions.Extensions;
+using OpenRP.Framework.Features.Maps.Extensions;
 using System;
 
 namespace OpenRP.Framework.Features.Banking.Extensions
@@ -25,6 +27,10 @@ namespace OpenRP.Framework.Features.Banking.Extensions
                 .AddSingleton<ITellerService, TellerService>()
                 .AddSingleton<IBankEditorService, BankEditorService>()
                 .AddSingleton<IBankDialogService, BankDialogService>()
+                .AddSingleton<IBankCardService, BankCardService>()
+                .AddSingleton<IAtmService, AtmService>()
+                .AddMapObjectSpawnHandler<AtmMapObjectSpawnHandler>()
+                .AddInventoryItemNameProvider<BankCardNameProvider>()
                 .AddJurisdictionDeletionGuard<BankJurisdictionGuard>()
                 .AddJurisdictionSetting<MaxMonthlyFeeSetting>()
                 .AddTellerPermissions()
@@ -40,7 +46,8 @@ namespace OpenRP.Framework.Features.Banking.Extensions
                 .AddActorPermission(BankingRules.TellerPermissions[BankOperation.Deposit], "Take cash deposits")
                 .AddActorPermission(BankingRules.TellerPermissions[BankOperation.Withdraw], "Pay out cash withdrawals")
                 .AddActorPermission(BankingRules.TellerPermissions[BankOperation.Transfer], "Make transfers for customers")
-                .AddActorPermission(BankingRules.TellerPermissions[BankOperation.ManageAccess], "Change who has access to an account");
+                .AddActorPermission(BankingRules.TellerPermissions[BankOperation.ManageAccess], "Change who has access to an account")
+                .AddActorPermission(BankingRules.TellerPermissions[BankOperation.ManageCards], "Issue, block and unblock debit cards");
         }
 
         /// <summary>
@@ -56,7 +63,8 @@ namespace OpenRP.Framework.Features.Banking.Extensions
                 .AddTellerAction("bank_withdraw", "pay out cash, when they want to take money out", AmountDetail, BankOperation.Withdraw)
                 .AddTellerAction("bank_transfer", "make a transfer, when they want to send money to another account", AmountDetail, BankOperation.Transfer)
                 .AddTellerAction("bank_access", "change who has access to their account, when they want to add or remove someone", null, BankOperation.ManageAccess)
-                .AddTellerAction("bank_close_account", "close an account, when they want to close one", null, BankOperation.CloseAccount);
+                .AddTellerAction("bank_close_account", "close an account, when they want to close one", null, BankOperation.CloseAccount)
+                .AddTellerAction("bank_cards", "order, block, unblock or rename a debit card, or change its PIN, when they ask about their card", null, BankOperation.ManageCards);
         }
 
         private static IServiceCollection AddTellerAction(this IServiceCollection self, string name, string description, string? detailDescription, BankOperation operation, bool opensFullMenu = false)

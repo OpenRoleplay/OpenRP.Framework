@@ -144,6 +144,9 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
                 case BankOperation.ManageAccess:
                     OpenAccessList(player, teller, account.Id, onBack);
                     break;
+                case BankOperation.ManageCards:
+                    OpenCardMenu(player, teller, account.Id, onBack);
+                    break;
                 case BankOperation.CloseAccount:
                     OpenCloseAccount(player, teller, account.Id, onBack);
                     break;

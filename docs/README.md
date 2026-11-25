@@ -24,7 +24,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [Accounts](features/accounts.md): register, log in, one login per account
 - [AccountSettings](features/account-settings.md): chat toggles and `/settings`
 - [Actors](features/actors.md): non-player characters in the world, created and edited in-game with `/editactors`
-- [Banking](features/banking.md): banks, accounts with OBANs, AI bank tellers, `/bank` and `/editbanks`
+- [Banking](features/banking.md): banks, accounts with OBANs, AI bank tellers, debit cards and ATMs, `/bank`, `/atm` and `/editbanks`
 - [ActorConversations](features/actor-conversations.md): AI conversations between actors
 - [ActorRoleplay](features/actor-roleplay.md): AI actors that answer players' /me, /do and /say
 - [Admins](features/admins.md): admin and tester commands
@@ -48,6 +48,7 @@ OpenRP.Framework is the open-source (LGPL v3) gameplay library behind Open Rolep
 - [Jurisdictions](features/jurisdictions.md): countries and cities with tags, currency, government, tax registrations and settings; `/editjurisdictions` and `/government`
 - [MainMenu](features/main-menu.md): what you see after connecting
 - [Maps](features/maps.md): saved maps of objects, built in-game with `/editmaps` and loaded at startup
+- [Payments](features/payments.md): one way for features to take cash or card payments into a bank account
 - [Permissions](features/permissions.md): see the Permissions guide
 - [Phones](features/phones.md): 1992-style mobile phones: calls, texts, phone book, call log
 - [Players](features/players.md): find a player's account and character

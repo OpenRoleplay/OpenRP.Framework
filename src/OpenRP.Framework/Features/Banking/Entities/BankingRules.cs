@@ -29,6 +29,47 @@ namespace OpenRP.Framework.Features.Banking.Entities
         public const int HistoryLength = 20;
         public const int AccountNameMaxLength = 32;
         public const int BankNameMaxLength = 32;
+        public const int TransactionDescriptionMaxLength = 64;
+
+        /// <summary>
+        /// The seeded "Debit card" item.
+        /// </summary>
+        public const int BankCardItemId = 68;
+
+        public const int CardDigitsLength = 4;
+        public const int CardNameMaxLength = 32;
+        public const int PinLength = 4;
+
+        /// <summary>
+        /// The work factor of the PIN hash, the same as passwords.
+        /// </summary>
+        public const int PinHashWorkFactor = 11;
+
+        /// <summary>
+        /// Wrong PINs in a row that block a card until the bank unblocks it.
+        /// </summary>
+        public const int MaxWrongPinAttempts = 3;
+
+        /// <summary>
+        /// The model of the ATM object (kmb_atm1). Every placed map object of it is an ATM.
+        /// </summary>
+        public const int AtmModelId = 2942;
+
+        /// <summary>
+        /// How close a player must stand to an ATM to use it.
+        /// </summary>
+        public const float AtmRange = 2.0f;
+
+        /// <summary>
+        /// The most cash one card can take from ATMs in a period, in the account's currency.
+        /// </summary>
+        public const decimal AtmWithdrawalLimit = 1000m;
+        public static readonly TimeSpan AtmWithdrawalLimitPeriod = TimeSpan.FromHours(24);
+
+        /// <summary>
+        /// How long cash put into an ATM takes to reach the account.
+        /// </summary>
+        public static readonly TimeSpan AtmDepositDelay = TimeSpan.FromHours(2);
 
         /// <summary>
         /// The actor permission a teller needs for each operation.
@@ -41,7 +82,8 @@ namespace OpenRP.Framework.Features.Banking.Entities
             { BankOperation.Deposit, "bank.deposit" },
             { BankOperation.Withdraw, "bank.withdraw" },
             { BankOperation.Transfer, "bank.transfer" },
-            { BankOperation.ManageAccess, "bank.manage_access" }
+            { BankOperation.ManageAccess, "bank.manage_access" },
+            { BankOperation.ManageCards, "bank.cards" }
         };
 
         /// <summary>
@@ -52,7 +94,7 @@ namespace OpenRP.Framework.Features.Banking.Entities
             return operation switch
             {
                 BankOperation.View => BankAccessLevel.View,
-                BankOperation.Deposit or BankOperation.Withdraw or BankOperation.Transfer => BankAccessLevel.Full,
+                BankOperation.Deposit or BankOperation.Withdraw or BankOperation.Transfer or BankOperation.ManageCards => BankAccessLevel.Full,
                 _ => BankAccessLevel.Manage
             };
         }

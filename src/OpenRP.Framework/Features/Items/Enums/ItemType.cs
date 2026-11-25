@@ -18,5 +18,6 @@ namespace OpenRP.Framework.Features.Items.Enums
         Phone = 8,
         Radio = 9,
         RadioEarpiece = 10,
+        BankCard = 11,
     }
 }

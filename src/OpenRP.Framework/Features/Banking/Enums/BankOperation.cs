@@ -11,6 +11,7 @@ namespace OpenRP.Framework.Features.Banking.Enums
         Deposit = 4,
         Withdraw = 5,
         Transfer = 6,
-        ManageAccess = 7
+        ManageAccess = 7,
+        ManageCards = 8
     }
 }

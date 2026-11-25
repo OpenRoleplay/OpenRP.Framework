@@ -29,5 +29,17 @@ namespace OpenRP.Framework.Features.Banking.Services
         /// Charges the monthly fee of every account that's due, into its bank's own account.
         /// </summary>
         void ChargeDueFees();
+
+        /// <summary>
+        /// Pays from the card's account to the receiving account, in one database transaction. The PIN must have been
+        /// checked before. The description says what it was for, in both histories.
+        /// </summary>
+        string? PayWithCard(Player player, ulong cardId, ulong receiverAccountId, decimal amount, string description);
+
+        /// <summary>
+        /// Takes the cash from the player's wallet, with change, and pays it into the receiving account. Gives the cash
+        /// back when the account can't take it.
+        /// </summary>
+        Task<string?> PayInCashAsync(Player player, ulong receiverAccountId, ulong currencyId, decimal amount, string description);
     }
 }

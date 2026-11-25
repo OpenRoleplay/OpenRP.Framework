@@ -83,6 +83,7 @@ All player commands of the Framework, grouped as in `/help`. `[argument]` is req
 
 | Command | Groups | Description | Feature |
 |---|---|---|---|
+| `/atm` | Default | Use the ATM you're standing at, with a debit card. | [Banking](features/banking/cards-and-atms.md) |
 | `/bank` | Default | Open the bank menu at the teller you're standing at. | [Banking](features/banking.md) |
 
 ## Character
@@ -212,6 +213,7 @@ All player commands of the Framework, grouped as in `/help`. `[argument]` is req
 | `/spawnveh [model] <first color> <second color>` | Admin, Tester | Spawn a vehicle. Use /spawnveh followed by the vehicle name or ID to generate a new vehicle for your use. | [Admins](features/admins.md) |
 | `/spawnvehicle [model] <first color> <second color>` | Admin, Tester | Spawn a vehicle. Use /sv followed by the vehicle name or ID to generate a new vehicle for your use. | [Admins](features/admins.md) |
 | `/sv [model] <first color> <second color>` | Admin, Tester | Spawn a vehicle. Use /sv followed by the vehicle name or ID to generate a new vehicle for your use. | [Admins](features/admins.md) |
+| `/testpayment [amount] [OBAN]` | Admin, Tester | Ask yourself to pay an amount into a bank account, to test cash and card payments. | [Payments](features/payments.md) |
 
 ## Vehicles > General
 

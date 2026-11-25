@@ -17,9 +17,14 @@ namespace OpenRP.Framework.Database.Models
         public string? OtherOban { get; set; }
         // Who did it, when a character did.
         public ulong? CharacterId { get; set; }
+        // The card used, for ATM withdrawals and deposits and card payments.
+        public ulong? BankCardId { get; set; }
+        // What a payment was for, for example "Card payment: groceries".
+        public string? Description { get; set; }
 
         // Navigational Properties
         public BankAccountModel? BankAccount { get; set; }
         public CharacterModel? Character { get; set; }
+        public BankCardModel? BankCard { get; set; }
     }
 }

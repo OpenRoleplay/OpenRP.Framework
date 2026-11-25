@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OpenRP.Framework.Database.Models;
+using OpenRP.Framework.Features.Banking.Entities;
 
 namespace OpenRP.Framework.Features.Banking.Models.Configurations
 {
@@ -80,6 +81,10 @@ namespace OpenRP.Framework.Features.Banking.Models.Configurations
             builder.Property(transaction => transaction.Amount).HasColumnType("decimal(18,2)");
             builder.Property(transaction => transaction.BalanceAfter).HasColumnType("decimal(18,2)");
             builder.Property(transaction => transaction.OtherOban).HasMaxLength(18);
+            builder.Property(transaction => transaction.Description).HasMaxLength(BankingRules.TransactionDescriptionMaxLength);
+
+            // The ATM limit adds up a card's recent withdrawals.
+            builder.HasIndex(transaction => new { transaction.BankCardId, transaction.Type, transaction.CreatedOn });
 
             builder.HasOne(transaction => transaction.BankAccount)
                    .WithMany()
@@ -90,6 +95,61 @@ namespace OpenRP.Framework.Features.Banking.Models.Configurations
             builder.HasOne(transaction => transaction.Character)
                    .WithMany()
                    .HasForeignKey(transaction => transaction.CharacterId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(transaction => transaction.BankCard)
+                   .WithMany()
+                   .HasForeignKey(transaction => transaction.BankCardId)
+                   .OnDelete(DeleteBehavior.SetNull);
+        }
+    }
+
+    public class BankCardModelConfiguration : IEntityTypeConfiguration<BankCardModel>
+    {
+        public void Configure(EntityTypeBuilder<BankCardModel> builder)
+        {
+            builder.Property(card => card.Digits).HasMaxLength(BankingRules.CardDigitsLength).IsRequired();
+            builder.Property(card => card.Name).HasMaxLength(BankingRules.CardNameMaxLength);
+            builder.Property(card => card.PinHash).HasMaxLength(60).IsRequired();
+            builder.Property(card => card.WrongPinAttempts).HasDefaultValue(0);
+
+            builder.HasIndex(card => new { card.BankAccountId, card.CharacterId });
+
+            builder.HasOne(card => card.BankAccount)
+                   .WithMany()
+                   .HasForeignKey(card => card.BankAccountId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(card => card.Character)
+                   .WithMany()
+                   .HasForeignKey(card => card.CharacterId)
+                   .OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class BankPendingDepositModelConfiguration : IEntityTypeConfiguration<BankPendingDepositModel>
+    {
+        public void Configure(EntityTypeBuilder<BankPendingDepositModel> builder)
+        {
+            builder.Property(deposit => deposit.Amount).HasColumnType("decimal(18,2)");
+
+            // The crediting timer looks for deposits that are due.
+            builder.HasIndex(deposit => new { deposit.CreditedAt, deposit.CreditAt });
+
+            // Restrict, so an account with cash still on its way can't be deleted.
+            builder.HasOne(deposit => deposit.BankAccount)
+                   .WithMany()
+                   .HasForeignKey(deposit => deposit.BankAccountId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(deposit => deposit.BankCard)
+                   .WithMany()
+                   .HasForeignKey(deposit => deposit.BankCardId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(deposit => deposit.Character)
+                   .WithMany()
+                   .HasForeignKey(deposit => deposit.CharacterId)
                    .OnDelete(DeleteBehavior.SetNull);
         }
     }

@@ -18,7 +18,10 @@ using System.Threading.Tasks;
 
 namespace OpenRP.Framework.Features.Banking.Services
 {
-    public class BankTransactionService : IBankTransactionService
+    /// <summary>
+    /// Teller deposits, withdrawals, transfers and fees here; payments in BankTransactionService.Payments.cs.
+    /// </summary>
+    public partial class BankTransactionService : IBankTransactionService
     {
         private const int FeeBatchSize = 500;
 
@@ -26,15 +29,17 @@ namespace OpenRP.Framework.Features.Banking.Services
         private readonly IBankAccountService _bankAccountService;
         private readonly IBankService _bankService;
         private readonly ICurrencyService _currencyService;
+        private readonly IBankCardService _bankCardService;
         private readonly ILogger<BankTransactionService> _logger;
 
         public BankTransactionService(IBankingDatabase database, IBankAccountService bankAccountService, IBankService bankService, ICurrencyService currencyService,
-            ILogger<BankTransactionService> logger)
+            IBankCardService bankCardService, ILogger<BankTransactionService> logger)
         {
             _database = database;
             _bankAccountService = bankAccountService;
             _bankService = bankService;
             _currencyService = currencyService;
+            _bankCardService = bankCardService;
             _logger = logger;
         }
 
@@ -159,14 +164,7 @@ namespace OpenRP.Framework.Features.Banking.Services
         private string GetCashError(CurrencyChangeResult result, ulong currencyId, bool isTaking)
         {
             string currencyName = _currencyService.GetCurrencies().FirstOrDefault(currency => currency.Id == currencyId)?.Name ?? "this currency";
-            return result switch
-            {
-                CurrencyChangeResult.NoWallet => "You have no wallet to hold the cash.",
-                CurrencyChangeResult.NotEnoughFunds => $"You don't have that much cash in {currencyName}.",
-                CurrencyChangeResult.NotEnoughSpace => "The cash doesn't fit in your wallet.",
-                CurrencyChangeResult.AmountNotPayableInBills => $"That amount can't be paid in {currencyName} bills and coins.",
-                _ => isTaking ? "The cash couldn't be taken." : "The cash couldn't be handed over."
-            };
+            return BankCashErrors.Get(result, currencyName, isTaking);
         }
 
         /// <summary>
@@ -191,7 +189,7 @@ namespace OpenRP.Framework.Features.Banking.Services
         /// </summary>
         private bool TryCredit(ulong accountId, decimal amount, BankTransactionType type, ulong? characterId, string? otherOban)
         {
-            return _database.UseInTransaction(db => Credit(db, accountId, amount, type, characterId, otherOban));
+            return _database.UseInTransaction(db => BankLedger.Credit(db, accountId, amount, new BankLedgerEntry(type, characterId, otherOban)));
         }
 
         /// <summary>
@@ -199,7 +197,7 @@ namespace OpenRP.Framework.Features.Banking.Services
         /// </summary>
         private bool TryDebit(ulong accountId, decimal amount, BankTransactionType type, ulong? characterId, string? otherOban)
         {
-            return _database.UseInTransaction(db => Debit(db, accountId, amount, minimumBalanceAfter: 0, type, characterId, otherOban));
+            return _database.UseInTransaction(db => BankLedger.Debit(db, accountId, amount, minimumBalanceAfter: 0, new BankLedgerEntry(type, characterId, otherOban)));
         }
 
         /// <summary>
@@ -208,8 +206,8 @@ namespace OpenRP.Framework.Features.Banking.Services
         private bool TryMove(BankAccountModel fromAccount, BankAccountModel toAccount, decimal amount, ulong characterId)
         {
             return _database.UseInTransaction(db =>
-                Debit(db, fromAccount.Id, amount, minimumBalanceAfter: 0, BankTransactionType.TransferOut, characterId, toAccount.Oban)
-                && Credit(db, toAccount.Id, amount, BankTransactionType.TransferIn, characterId, fromAccount.Oban));
+                BankLedger.Debit(db, fromAccount.Id, amount, minimumBalanceAfter: 0, new BankLedgerEntry(BankTransactionType.TransferOut, characterId, toAccount.Oban))
+                && BankLedger.Credit(db, toAccount.Id, amount, new BankLedgerEntry(BankTransactionType.TransferIn, characterId, fromAccount.Oban)));
         }
 
         /// <summary>
@@ -232,9 +230,9 @@ namespace OpenRP.Framework.Features.Banking.Services
                 decimal balance = db.BankAccounts.Where(row => row.Id == account.Id).Select(row => row.Balance).First();
                 decimal charge = Math.Min(fee, balance - BankingRules.LowestBalance);
                 if (charge > 0 && houseAccount != null
-                    && Debit(db, account.Id, charge, BankingRules.LowestBalance, BankTransactionType.Fee, null, houseAccount.Oban))
+                    && BankLedger.Debit(db, account.Id, charge, BankingRules.LowestBalance, new BankLedgerEntry(BankTransactionType.Fee, null, houseAccount.Oban)))
                 {
-                    Credit(db, houseAccount.Id, charge, BankTransactionType.FeeIncome, null, account.Oban);
+                    BankLedger.Credit(db, houseAccount.Id, charge, new BankLedgerEntry(BankTransactionType.FeeIncome, null, account.Oban));
                 }
                 return true;
             });
@@ -254,47 +252,6 @@ namespace OpenRP.Framework.Features.Banking.Services
             return db.BankAccounts
                 .Where(row => row.Id == account.Id && row.NextFeeAt == dueAt)
                 .ExecuteUpdate(setters => setters.SetProperty(row => row.NextFeeAt, dueAt + BankingRules.FeeInterval)) == 1;
-        }
-
-        private static bool Credit(BaseDataContext db, ulong accountId, decimal amount, BankTransactionType type, ulong? characterId, string? otherOban)
-        {
-            int updated = db.BankAccounts
-                .Where(row => row.Id == accountId && row.ClosedAt == null)
-                .ExecuteUpdate(setters => setters.SetProperty(row => row.Balance, row => row.Balance + amount));
-            if (updated != 1)
-            {
-                return false;
-            }
-            AddTransaction(db, accountId, amount, type, characterId, otherOban);
-            return true;
-        }
-
-        private static bool Debit(BaseDataContext db, ulong accountId, decimal amount, decimal minimumBalanceAfter, BankTransactionType type, ulong? characterId, string? otherOban)
-        {
-            int updated = db.BankAccounts
-                .Where(row => row.Id == accountId && row.ClosedAt == null && row.Balance - amount >= minimumBalanceAfter)
-                .ExecuteUpdate(setters => setters.SetProperty(row => row.Balance, row => row.Balance - amount));
-            if (updated != 1)
-            {
-                return false;
-            }
-            AddTransaction(db, accountId, -amount, type, characterId, otherOban);
-            return true;
-        }
-
-        private static void AddTransaction(BaseDataContext db, ulong accountId, decimal amount, BankTransactionType type, ulong? characterId, string? otherOban)
-        {
-            decimal balanceAfter = db.BankAccounts.Where(row => row.Id == accountId).Select(row => row.Balance).First();
-            db.BankTransactions.Add(new BankTransactionModel
-            {
-                BankAccountId = accountId,
-                Amount = amount,
-                BalanceAfter = balanceAfter,
-                Type = type,
-                OtherOban = otherOban,
-                CharacterId = characterId
-            });
-            db.SaveChanges();
         }
     }
 }

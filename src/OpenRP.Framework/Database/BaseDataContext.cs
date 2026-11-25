@@ -65,6 +65,8 @@ namespace OpenRP.Framework.Database
         public DbSet<BankTransactionModel> BankTransactions { get; set; }
         public DbSet<BankBranchModel> BankBranches { get; set; }
         public DbSet<BankTellerModel> BankTellers { get; set; }
+        public DbSet<BankCardModel> BankCards { get; set; }
+        public DbSet<BankPendingDepositModel> BankPendingDeposits { get; set; }
 
         // Parameterless Constructor
         public BaseDataContext() : base() { }

@@ -20,8 +20,9 @@ The item types that everything in an [inventory](inventories.md) is made of, suc
 | `Phone` | A [mobile phone](phones.md) |
 | `Radio` | A [handheld radio](radios.md) |
 | `RadioEarpiece` | Lets a radio's carrier listen without the people around them hearing it |
+| `BankCard` | A [debit card](banking/cards-and-atms.md) for one bank account |
 
-**Seeded items (67):**
+**Seeded items (68):**
 - a uniform;
 - a wallet;
 - the SAD and CRU bills and coins;
@@ -34,7 +35,8 @@ The item types that everything in an [inventory](inventories.md) is made of, suc
 - [fishing](fishing.md) gear: a rod (52), bait (53) and a net (54);
 - fishing junk (55 to 57) and treasures (58 to 61);
 - four net-only fish (62 to 65);
-- two small saltwater fish: a sardine (66) and a mackerel (67).
+- two small saltwater fish: a sardine (66) and a mackerel (67);
+- a debit card (68).
 
 Some code uses these ids, so don't renumber them.
 
