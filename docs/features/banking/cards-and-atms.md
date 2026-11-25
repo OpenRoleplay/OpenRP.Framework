@@ -51,7 +51,7 @@ An ATM works in the object's interior and virtual world (or all of them, when th
   - `BankCardNameProvider`: the card's inventory name (an `IInventoryItemNameProvider`, see [Inventories](../inventories.md#deep-dive));
   - `AtmMapObjectSpawnHandler`: puts an `Atm` component on each spawned ATM object.
 - **PINs** are hashed with BCrypt, like passwords. Hashing and checking run on a worker thread, so the server doesn't wait.
-- **The limit** adds up the card's withdrawals of the last 24 hours (`BankTransactions.BankCardId`) in the same transaction as the debit.
+- **The limit** adds up the card's withdrawals of the last 24 hours (`BankTransactions.BankCardId`) in the same transaction as the debit. It locks the card row first, so two withdrawals with one card, even on two servers, can't both pass it.
 - **Pending deposits:** `BankingSystem` runs every minute. Each due deposit is claimed by setting `CreditedAt` in the same transaction as the credit, so two servers never credit it twice. The row keeps the ATM's position, interior and world.
 - **Tables:** [`BankCards`, `BankPendingDeposits`](../../database.md#banking).
 

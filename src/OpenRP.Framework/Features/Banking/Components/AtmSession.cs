@@ -16,6 +16,9 @@ namespace OpenRP.Framework.Features.Banking.Components
             _atmEntity = atmEntity;
         }
 
+        /// <summary>
+        /// The bank card whose PIN was typed for this session.
+        /// </summary>
         public ulong GetCardId()
         {
             return _cardId;

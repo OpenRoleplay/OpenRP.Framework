@@ -162,7 +162,8 @@ namespace OpenRP.Framework.Features.Banking.Services
         }
 
         /// <summary>
-        /// The limit check and the debit in one transaction, so two withdrawals at once can't both pass the limit.
+        /// The limit check and the debit in one transaction, after locking the card row, so two withdrawals at once
+        /// (even on two servers) can't both pass the limit.
         /// </summary>
         private string? TryDebitWithinLimit(BankCardDetails card, decimal amount, ulong characterId)
         {
@@ -170,6 +171,7 @@ namespace OpenRP.Framework.Features.Banking.Services
             _database.UseInTransaction(db =>
             {
                 error = null;
+                LockCard(db, card.Card.Id);
                 if (GetWithdrawnInPeriod(db, card.Card.Id) + amount > BankingRules.AtmWithdrawalLimit)
                 {
                     error = $"That's over this card's ATM limit of {FormatMoney(card.Account.CurrencyId, BankingRules.AtmWithdrawalLimit)} in {BankingRules.AtmWithdrawalLimitPeriod.TotalHours:0} hours.";
@@ -184,6 +186,16 @@ namespace OpenRP.Framework.Features.Banking.Services
                 return true;
             });
             return error;
+        }
+
+        /// <summary>
+        /// A no-op update still takes the row lock, so a second withdrawal with this card waits until the first commits.
+        /// It must come before the limit's read: MySQL takes a transaction's snapshot at its first plain read.
+        /// </summary>
+        private static void LockCard(BaseDataContext db, ulong cardId)
+        {
+            db.BankCards.Where(row => row.Id == cardId)
+                .ExecuteUpdate(setters => setters.SetProperty(row => row.WrongPinAttempts, row => row.WrongPinAttempts));
         }
 
         /// <summary>
