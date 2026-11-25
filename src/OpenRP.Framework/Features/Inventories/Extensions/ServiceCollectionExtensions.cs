@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using OpenRP.Framework.Features.Inventories.Entities;
 using OpenRP.Framework.Features.Inventories.Services;
 using OpenRP.Framework.Features.Inventories.Services.Dialogs;
 using OpenRP.Framework.Shared.BaseManager.Helpers;
@@ -19,6 +20,14 @@ namespace OpenRP.Framework.Features.Inventories.Extensions
                 .AddSingleton<IInventoryItemManager, InventoryItemManager>()
                 .AddSingleton<IInventoryManager, InventoryManager>()
                 .AddTransient<IInventoryDialogService, InventoryDialogService>(); // Transient because it uses IDroppedItemService, which uses a database context.
+        }
+
+        /// <summary>
+        /// Registers a provider that gives the items it handles their own name in the inventory.
+        /// </summary>
+        public static IServiceCollection AddInventoryItemNameProvider<T>(this IServiceCollection self) where T : class, IInventoryItemNameProvider
+        {
+            return self.AddSingleton<IInventoryItemNameProvider, T>();
         }
     }
 }

@@ -22,6 +22,7 @@ namespace OpenRP.Framework.Features.Inventories.Components
         public const string VehicleIdKey = "VEHICLE_ID";
         private const string PhoneIdKey = "PHONE_ID";
         private const string RadioIdKey = "RADIO_ID";
+        public const string BankCardIdKey = "BANK_CARD_ID";
 
         private readonly InventoryItemModel _inventoryItemModel;
         private bool _hasChanges;
@@ -225,6 +226,18 @@ namespace OpenRP.Framework.Features.Inventories.Components
                 return null;
             }
             return GetAdditionalData().GetUlong(RadioIdKey);
+        }
+
+        /// <summary>
+        /// The bank card this item is, or null when the item isn't a bank card.
+        /// </summary>
+        public ulong? GetBankCardId()
+        {
+            if (!GetItem().IsItemBankCard())
+            {
+                return null;
+            }
+            return GetAdditionalData().GetUlong(BankCardIdKey);
         }
 
         /// <summary>

@@ -118,9 +118,11 @@ See [Radios](features/radios.md).
 | `Banks` (`BankModel`) | `Name` (32), `Code` (4, unique), `JurisdictionId` → jurisdictions (restrict), `RunByFactionId` → factions (set null), `MonthlyFee` decimal(18,2) | The code and the jurisdiction's tag are part of every OBAN |
 | `BankAccounts` (`BankAccountModel`) | `Oban` (18, unique), `BankId` (restrict), `CurrencyId` (restrict), `Balance` decimal(18,2), `OwnerType` (Character, Faction, Property, Bank), `OwnerId`, `Name` (32), `ClosedAt`, `NextFeeAt` | The balance only changes through single updates. Owner type Bank is the bank's own account, without a fee |
 | `BankAccountAccess` (`BankAccountAccessModel`) | `BankAccountId` (cascade), `CharacterId` (cascade), `Level` (View, Full) | Unique per account + character |
-| `BankTransactions` (`BankTransactionModel`) | `BankAccountId` (cascade), `Amount` (signed), `BalanceAfter`, `Type`, `OtherOban`, `CharacterId` (set null), `CreatedOn` | An account's history |
+| `BankTransactions` (`BankTransactionModel`) | `BankAccountId` (cascade), `Amount` (signed), `BalanceAfter`, `Type`, `OtherOban`, `CharacterId` (set null), `BankCardId` (set null), `Description` (64), `CreatedOn` | An account's history. `BankCardId` marks ATM and card use; the ATM limit adds up a card's withdrawals by it |
 | `BankBranches` (`BankBranchModel`) | `BankId` (cascade), `PropertyId` (cascade, unique) | Tellers only work inside their bank's branches |
 | `BankTellers` (`BankTellerModel`) | `ActorId` (cascade, unique), `BankId` (cascade) | |
+| `BankCards` (`BankCardModel`) | `BankAccountId` (cascade), `CharacterId` (cascade), `Digits` (4), `Name` (32), `PinHash` (BCrypt), `WrongPinAttempts`, `BlockedAt`, `CancelledAt` | A [debit card](features/banking/cards-and-atms.md); its item stores `[BANK_CARD_ID=n]` |
+| `BankPendingDeposits` (`BankPendingDepositModel`) | `BankAccountId` (restrict), `BankCardId` (set null), `CharacterId` (set null), `Amount`, `CreditAt`, `CreditedAt`, `AtmX`, `AtmY`, `AtmZ`, `AtmInterior`, `AtmVirtualWorld` | Cash put into an ATM, credited at `CreditAt`; the ATM's position says where the cash sits until then |
 
 See [Banking](features/banking.md).
 
@@ -150,7 +152,7 @@ The item types (definitions), not the items players own.
 | `KeepOnDeath`, `CanDrop`, `CanDestroy`, `Stackable` | bool | |
 | `DropModelId` | int? | Object model shown when dropped |
 
-The Framework seeds 67 items:
+The Framework seeds 68 items:
 - a uniform (skin);
 - a wallet;
 - the bills and coins of the San Andreas Dollar and the Caeroyna Ruble;
@@ -160,7 +162,8 @@ The Framework seeds 67 items:
 - twelve fish species;
 - a mobile phone (item 49, `UseType` Phone). Each phone item points to its row in `Phones` with `[PHONE_ID=x]`;
 - a handheld radio (item 50, `UseType` Radio), pointing to its row in `Radios` with `[RADIO_ID=x]`, and a radio earpiece (item 51);
-- fishing gear (rod 52, bait 53, net 54), junk (55 to 57), treasures (58 to 61), four net-only fish (62 to 65) and two small saltwater fish (66 and 67).
+- fishing gear (rod 52, bait 53, net 54), junk (55 to 57), treasures (58 to 61), four net-only fish (62 to 65) and two small saltwater fish (66 and 67);
+- a debit card (item 68, `UseType` BankCard), pointing to its row in `BankCards` with `[BANK_CARD_ID=x]`.
 
 ### `Inventories` (`InventoryModel`)
 `Name`, `MaxWeight` (grams, null = unlimited). Seeded: "World Inventory", which holds items lying on the ground.

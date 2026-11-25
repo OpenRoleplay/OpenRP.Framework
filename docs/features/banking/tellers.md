@@ -21,6 +21,7 @@ A teller is an AI actor that works for a bank, stands inside one of its branches
    | `bank.withdraw` | pay out withdrawals |
    | `bank.transfer` | make transfers |
    | `bank.manage_access` | change who has access |
+   | `bank.cards` | issue, block and unblock [debit cards](cards-and-atms.md), and change their PIN |
    | `bank.close_account` | close accounts |
 
    An actor has no permissions by default.

@@ -90,6 +90,8 @@ namespace OpenRP.Framework.Extensions
             modelBuilder.ApplyConfiguration(new BankTransactionModelConfiguration());
             modelBuilder.ApplyConfiguration(new BankBranchModelConfiguration());
             modelBuilder.ApplyConfiguration(new BankTellerModelConfiguration());
+            modelBuilder.ApplyConfiguration(new BankCardModelConfiguration());
+            modelBuilder.ApplyConfiguration(new BankPendingDepositModelConfiguration());
 
             modelBuilder.ApplyConfiguration(new PropertyModelConfiguration());
             modelBuilder.ApplyConfiguration(new PropertyDoorModelConfiguration());

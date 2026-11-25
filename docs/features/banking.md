@@ -1,12 +1,13 @@
 # Banking
 
-Banks hold accounts, and each account has its own OBAN (Open Bank Account Number), which others need to send it money. Players do their banking at a bank: they talk to an AI teller, who opens the right form for them, or use `/bank` at the counter.
+Banks hold accounts, and each account has its own OBAN (Open Bank Account Number), which others need to send it money. Players do their banking at a bank: they talk to an AI teller, who opens the right form for them, or use `/bank` at the counter. Away from the bank, a [debit card](banking/cards-and-atms.md) works at ATMs and for [payments](payments.md).
 
 ## How to use it
 
 | Command | Groups | Does |
 |---|---|---|
 | `/bank` | Default | Opens the bank menu at the teller you're standing at |
+| `/atm` | Default | Uses the ATM you're standing at, with a debit card. See [Debit cards and ATMs](banking/cards-and-atms.md) |
 | `/editbanks` | Admin | Banks, their fee, branches, tellers and property accounts, and looking up an OBAN. See [Tellers](banking/tellers.md) |
 
 **Talking to a teller** opens the matching form:
@@ -19,6 +20,7 @@ Banks hold accounts, and each account has its own OBAN (Open Bank Account Number
 | "I want to wire money to someone" | Transfer |
 | "What's my balance?" | Your account, or the list when you have several |
 | "My brother needs access" | Who has access |
+| "I lost my card" | Debit card |
 | "I want to close my account" | Close the account |
 | "Show me everything" | The full bank menu |
 
@@ -54,7 +56,7 @@ A bank's city can be annexed or become independent ("Lies in" in `/editjurisdict
 
 ## Known limitations
 
-- **No ATMs, cheques, cards, interest or loans.**
+- **No cheques, interest or loans.**
 - **Local currency only,** and no currency exchange.
 - **Property accounts** are opened by admins, because properties have no owners yet.
 - **No payroll** or automatic payments.
@@ -66,15 +68,16 @@ A bank's city can be annexed or become independent ("Lies in" in `/editjurisdict
   - `IBankService`: banks, branches and tellers;
   - `IBankAccountService`: access rules, opening and closing, house accounts per currency (`GetOrOpenHouseAccount`), access lists, history;
   - `BankJurisdictionGuard`: keeps a bank's jurisdiction from being deleted (an `IJurisdictionDeletionGuard`);
-  - `IBankTransactionService`: deposit, withdraw, transfer and the monthly fees;
+  - `IBankTransactionService`: deposit, withdraw, transfer, card and cash payments, and the monthly fees;
+  - `IBankCardService` and `IAtmService`: see [Debit cards and ATMs](banking/cards-and-atms.md#deep-dive);
   - `ITellerService`: whether a teller can serve a customer right now;
   - `IBankEditorService`: `/editbanks`;
   - `IBankDialogService`: the menus.
-- **Database:** `IBankingDatabase` gives each operation a fresh database context. Reads use `AsNoTracking`, and money moves with `ExecuteUpdate` inside a transaction (`UPDATE … SET Balance = Balance - x WHERE … AND Balance - x >= 0`).
+- **Database:** `IBankingDatabase` gives each operation a fresh database context. Every balance change goes through `Helpers/BankLedger` (`Credit`, `Debit`), which also writes the history line. Reads use `AsNoTracking`, and money moves with `ExecuteUpdate` inside a transaction (`UPDATE … SET Balance = Balance - x WHERE … AND Balance - x >= 0`).
   - **Transactions** go through `UseInTransaction`, which runs them in EF's execution strategy. **Why:** a host whose connection retries on errors (`EnableRetryOnFailure`) refuses transactions opened directly; this way a dropped connection retries the whole transaction.
   - **Deposits** take the cash first. If crediting fails for any reason, the cash is handed back.
 - **The teller's actions:** registered with `AddActorAction` (see [ActorRoleplay](actor-roleplay.md#actions)), one per form, each needing its own actor permission.
 - **Fees:** `BankingSystem` runs every hour. Each fee is claimed by moving the account's `NextFeeAt` in one statement, so two servers never charge it twice.
 - **Tables:** [Banking](../database.md#banking).
 
-Want more? → [Accounts](banking/accounts.md) · [Tellers](banking/tellers.md) · [Currencies](currencies.md)
+Want more? → [Accounts](banking/accounts.md) · [Tellers](banking/tellers.md) · [Debit cards and ATMs](banking/cards-and-atms.md) · [Payments](payments.md) · [Currencies](currencies.md)

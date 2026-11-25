@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OpenRP.Framework.Database;
 using OpenRP.Framework.Database.Models;
 using OpenRP.Framework.Features.Banking.Entities;
 using OpenRP.Framework.Features.Banking.Enums;
@@ -138,11 +139,20 @@ namespace OpenRP.Framework.Features.Banking.Services
             if (GetAccessLevel(character, account) < BankAccessLevel.Manage)
                 return "Only the owner can close this account.";
 
+            if (HasPendingDeposits(account.Id))
+                return "An ATM deposit is still on its way to this account. Close it once that has arrived.";
+
             // In one statement, so money that arrives in the meantime can't be lost by closing.
             int closed = _database.Use(db => db.BankAccounts
-                .Where(row => row.Id == account.Id && row.ClosedAt == null && row.Balance == 0)
+                .Where(row => row.Id == account.Id && row.ClosedAt == null && row.Balance == 0
+                    && !db.BankPendingDeposits.Any(deposit => deposit.BankAccountId == row.Id && deposit.CreditedAt == null))
                 .ExecuteUpdate(setters => setters.SetProperty(row => row.ClosedAt, DateTime.UtcNow)));
             return closed == 1 ? null : "An account can only be closed with a balance of exactly 0. Withdraw or transfer the rest first.";
+        }
+
+        private bool HasPendingDeposits(ulong accountId)
+        {
+            return _database.Use(db => db.BankPendingDeposits.Any(deposit => deposit.BankAccountId == accountId && deposit.CreditedAt == null));
         }
 
         public List<BankAccessEntry> GetAccessList(BankAccountModel account)
@@ -175,8 +185,26 @@ namespace OpenRP.Framework.Features.Banking.Services
             if (GetAccessLevel(manager, account) < BankAccessLevel.Manage)
                 return "Only the owner can change who has access.";
 
-            _database.Use(db => db.BankAccountAccess.Where(access => access.Id == accessId && access.BankAccountId == account.Id).ExecuteDelete());
+            _database.Use(db =>
+            {
+                ulong? characterId = db.BankAccountAccess.Where(access => access.Id == accessId && access.BankAccountId == account.Id).Select(access => (ulong?)access.CharacterId).FirstOrDefault();
+                db.BankAccountAccess.Where(access => access.Id == accessId && access.BankAccountId == account.Id).ExecuteDelete();
+                BlockCardsOf(db, account.Id, characterId);
+            });
             return null;
+        }
+
+        /// <summary>
+        /// Someone who lost access can't keep using the account with a card they were given before.
+        /// </summary>
+        private static void BlockCardsOf(BaseDataContext db, ulong accountId, ulong? characterId)
+        {
+            if (characterId == null)
+                return;
+            DateTime now = DateTime.UtcNow;
+            db.BankCards
+                .Where(card => card.BankAccountId == accountId && card.CharacterId == characterId && card.BlockedAt == null && card.CancelledAt == null)
+                .ExecuteUpdate(setters => setters.SetProperty(card => card.BlockedAt, now));
         }
 
         public List<BankTransactionModel> GetHistory(BankAccountModel account)

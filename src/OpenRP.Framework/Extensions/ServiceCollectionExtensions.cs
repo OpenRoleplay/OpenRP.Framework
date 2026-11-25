@@ -25,6 +25,7 @@ using OpenRP.Framework.Features.Permissions.Extensions;
 using OpenRP.Framework.Features.Phones.Extensions;
 using OpenRP.Framework.Features.Radios.Extensions;
 using OpenRP.Framework.Features.Banking.Extensions;
+using OpenRP.Framework.Features.Payments.Extensions;
 using OpenRP.Framework.Features.Properties.Extensions;
 using OpenRP.Framework.Features.Vehicles.Extensions;
 using OpenRP.Framework.Features.VirtualWorlds.Extensions;
@@ -76,6 +77,7 @@ namespace OpenRP.Framework.Extensions
                 .AddPhones()
                 .AddRadios()
                 .AddBanking()
+                .AddPayments()
                 .AddDebugSettings()
                 .AddFlyMode()
                 .AddBiomeGenerator()

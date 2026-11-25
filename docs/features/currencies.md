@@ -34,7 +34,7 @@ Money is physical: bills and coins, carried as items in your wallet, or loose in
 
 ## Known limitations
 
-- **No card payments.** Bank accounts exist (see [Banking](banking.md)), but shops can't take payment from them yet.
+- **Paying shops and fees** goes through [Payments](payments.md), with cash or a debit card; no feature uses it yet.
 - **USD has no bills seeded,** so it can't be held.
 - **Cancelling.** A payment is only cancelled by a disconnect or an error. Bills already handed over stay with the receiver.
 

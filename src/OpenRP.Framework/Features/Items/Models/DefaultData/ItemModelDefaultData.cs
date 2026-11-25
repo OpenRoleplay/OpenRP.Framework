@@ -906,6 +906,20 @@ namespace OpenRP.Framework.Features.Items.Models.DefaultData
                     KeepOnDeath = true,
                     Stackable = false,
                     DropModelId = 19630
+                },
+                new ItemModel
+                {
+                    Id = 68,
+                    Name = "Debit card",
+                    Description = "A plastic bank card with a magnetic strip. With the right PIN it takes cash from ATMs and pays in shops. Whoever holds it and knows the PIN can use it.",
+                    UseType = ItemType.BankCard,
+                    UseValue = "",
+                    Weight = 5,
+                    CanDrop = true,
+                    CanDestroy = false,
+                    KeepOnDeath = true,
+                    Stackable = false,
+                    DropModelId = 1581
                 }
             );
         }

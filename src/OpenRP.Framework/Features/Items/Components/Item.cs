@@ -145,6 +145,11 @@ namespace OpenRP.Framework.Features.Items.Components
             return _itemModel.UseType == ItemType.Fish;
         }
 
+        public bool IsItemBankCard()
+        {
+            return _itemModel.UseType == ItemType.BankCard;
+        }
+
         public bool IsItemInventory()
         {
             return IsItemWallet();

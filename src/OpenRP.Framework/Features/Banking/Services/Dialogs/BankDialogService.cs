@@ -22,8 +22,9 @@ using System.Threading.Tasks;
 namespace OpenRP.Framework.Features.Banking.Services.Dialogs
 {
     /// <summary>
-    /// The bank menus. One file per flow: the menu and account picker, one account, opening, closing and access, and
-    /// the admin editor. Every step that does something checks the teller and the player's access again.
+    /// The bank menus. One file per flow: the menu and account picker, one account, opening, closing and access, cards
+    /// at the teller, ATMs, choosing a card and its PIN, the card item, and the admin editor. Every step that does
+    /// something checks the teller (or the ATM) and the player's access again.
     /// </summary>
     public partial class BankDialogService : IBankDialogService
     {
@@ -42,12 +43,15 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
         private readonly IFactionService _factionService;
         private readonly IPropertyEditorService _propertyEditorService;
         private readonly IActorEditorService _actorEditorService;
+        private readonly IBankCardService _bankCardService;
+        private readonly IAtmService _atmService;
         private readonly ILogger<BankDialogService> _logger;
 
         public BankDialogService(IDialogService dialogService, ITellerService tellerService, IBankService bankService, IBankAccountService bankAccountService,
             IBankTransactionService bankTransactionService, IBankEditorService bankEditorService, ICurrencyService currencyService, IJurisdictionService jurisdictionService,
             IJurisdictionDialogService jurisdictionDialogService, IFactionDialogService factionDialogService, IFactionService factionService,
-            IPropertyEditorService propertyEditorService, IActorEditorService actorEditorService, ILogger<BankDialogService> logger)
+            IPropertyEditorService propertyEditorService, IActorEditorService actorEditorService, IBankCardService bankCardService, IAtmService atmService,
+            ILogger<BankDialogService> logger)
         {
             _factionService = factionService;
             _dialogService = dialogService;
@@ -62,6 +66,8 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
             _factionDialogService = factionDialogService;
             _propertyEditorService = propertyEditorService;
             _actorEditorService = actorEditorService;
+            _bankCardService = bankCardService;
+            _atmService = atmService;
             _logger = logger;
         }
 

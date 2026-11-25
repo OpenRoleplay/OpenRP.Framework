@@ -38,6 +38,8 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
             int? depositRow = AddOperationRow(accountDialog, teller, level, BankOperation.Deposit, "Deposit cash");
             int? withdrawRow = AddOperationRow(accountDialog, teller, level, BankOperation.Withdraw, "Withdraw cash");
             int? transferRow = AddOperationRow(accountDialog, teller, level, BankOperation.Transfer, "Transfer money");
+            int? pendingRow = AddPendingDepositsRow(accountDialog, account);
+            int? cardRow = AddOperationRow(accountDialog, teller, level, BankOperation.ManageCards, "Debit card");
             int? accessRow = AddOperationRow(accountDialog, teller, level, BankOperation.ManageAccess, "Who has access");
             int? closeRow = account.OwnerType == BankAccountOwnerType.Bank ? null : AddOperationRow(accountDialog, teller, level, BankOperation.CloseAccount, "Close the account");
 
@@ -56,6 +58,10 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
                     OpenCashOperation(player, teller, accountId, BankOperation.Withdraw, null, reopenAccount);
                 else if (response.ItemIndex == transferRow)
                     OpenTransfer(player, teller, accountId, null, reopenAccount);
+                else if (response.ItemIndex == pendingRow)
+                    ShowPendingDeposits(player, account, reopenAccount);
+                else if (response.ItemIndex == cardRow)
+                    OpenCardMenu(player, teller, accountId, reopenAccount);
                 else if (response.ItemIndex == accessRow)
                     OpenAccessList(player, teller, accountId, reopenAccount);
                 else if (response.ItemIndex == closeRow)
@@ -94,10 +100,14 @@ namespace OpenRP.Framework.Features.Banking.Services.Dialogs
         private static string GetTransactionLabel(BankTransactionModel transaction)
         {
             string other = transaction.OtherOban == null ? string.Empty : $" {Oban.Format(transaction.OtherOban)}";
+            string forWhat = transaction.Description == null ? string.Empty : $": {transaction.Description}";
             return transaction.Type switch
             {
-                BankTransactionType.Deposit => "Deposit",
-                BankTransactionType.Withdrawal => "Withdrawal",
+                // ATM deposits and withdrawals say so in their description.
+                BankTransactionType.Deposit => transaction.Description ?? "Deposit",
+                BankTransactionType.Withdrawal => transaction.Description ?? "Withdrawal",
+                BankTransactionType.CardPayment => $"Card payment to{other}{forWhat}",
+                BankTransactionType.PaymentReceived => $"Payment{(transaction.OtherOban == null ? string.Empty : $" from{other}")}{forWhat}",
                 BankTransactionType.TransferIn => $"From{other}",
                 BankTransactionType.TransferOut => $"To{other}",
                 BankTransactionType.Fee => "Monthly fee",

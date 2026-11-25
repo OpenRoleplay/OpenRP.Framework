@@ -3,6 +3,7 @@ using OpenRP.Framework.Database.Services;
 using OpenRP.Framework.Features.Characters.Components;
 using OpenRP.Framework.Features.DroppedItems.Services;
 using OpenRP.Framework.Features.Inventories.Components;
+using OpenRP.Framework.Features.Inventories.Entities;
 using OpenRP.Framework.Features.Inventories.Enums;
 using OpenRP.Framework.Features.Inventories.Helpers;
 using OpenRP.Framework.Features.Items.Components;
@@ -35,12 +36,34 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
         private IChatService _chatService;
         private IDroppedItemService _droppedItemService;
         private readonly IServerEventAggregator _serverEventAggregator;
-        public InventoryDialogService(IDialogService dialogService, IChatService chatService, IDroppedItemService droppedItemService, IServerEventAggregator serverEventAggregator)
+        private readonly IEnumerable<IInventoryItemNameProvider> _nameProviders;
+        public InventoryDialogService(IDialogService dialogService, IChatService chatService, IDroppedItemService droppedItemService, IServerEventAggregator serverEventAggregator,
+            IEnumerable<IInventoryItemNameProvider> nameProviders)
         {
             _dialogService = dialogService;
             _chatService = chatService;
             _droppedItemService = droppedItemService;
             _serverEventAggregator = serverEventAggregator;
+            _nameProviders = nameProviders;
+        }
+
+        /// <summary>
+        /// The item's own name from a provider, such as a bank card with its account, or else its item type's name.
+        /// </summary>
+        private string GetDisplayName(InventoryItem inventoryItem)
+        {
+            IInventoryItemNameProvider? provider = GetNameProvider(inventoryItem);
+            return provider == null ? inventoryItem.GetName() : provider.GetName(inventoryItem);
+        }
+
+        private string? GetProvidedExtraInformation(InventoryItem inventoryItem)
+        {
+            return GetNameProvider(inventoryItem)?.GetExtraInformation(inventoryItem);
+        }
+
+        private IInventoryItemNameProvider? GetNameProvider(InventoryItem inventoryItem)
+        {
+            return _nameProviders.FirstOrDefault(provider => provider.Handles(inventoryItem));
         }
 
         public void OpenInventory(Player player, Inventory inventory, InventoryArguments inventoryArguments = InventoryArguments.None)
@@ -102,10 +125,16 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
                     extraInformation.Add($"{inventoryItem.GetRemainingUses()}/{inventoryItem.GetItem().GetMaxUses()} Durability");
                 }
 
+                string? providedExtraInformation = GetProvidedExtraInformation(inventoryItem);
+                if (providedExtraInformation != null)
+                {
+                    extraInformation.Add(providedExtraInformation);
+                }
+
                 // Fill Columns
                 List<string> rowColumns = new List<string>();
 
-                rowColumns.Add(inventoryItem.GetName());
+                rowColumns.Add(GetDisplayName(inventoryItem));
                 rowColumns.Add(inventoryItem.GetAmount().ToString());
 
                 if (!inventoryArguments.HasFlag(InventoryArguments.HideTotalWeight))
@@ -147,7 +176,7 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
         {
             Item item = inventoryOpened.SelectedInventoryItem.GetItem();
             BetterListDialog listDialog = new BetterListDialog("Select", "Cancel");
-            listDialog.SetTitle(TitleType.Children, inventoryOpened.SelectedInventoryItem.GetItem().GetName());
+            listDialog.SetTitle(TitleType.Children, GetDisplayName(inventoryOpened.SelectedInventoryItem));
 
             // Build a dictionary mapping action names to actions (delegates)
             Dictionary<string, Action> actions = BuildSelectedItemActions(player, inventoryOpened);
@@ -236,7 +265,7 @@ namespace OpenRP.Framework.Features.Inventories.Services.Dialogs
                     string description = String.IsNullOrEmpty(item.GetDescription()) ? "This item does not have a description." : item.GetDescription();
 
                     BetterMessageDialog messageDialog = new BetterMessageDialog("Close");
-                    messageDialog.SetTitle(TitleType.Children, inventoryOpened.OpenedInventory.GetName(), inventoryOpened.SelectedInventoryItem.GetName(), "Description");
+                    messageDialog.SetTitle(TitleType.Children, inventoryOpened.OpenedInventory.GetName(), GetDisplayName(inventoryOpened.SelectedInventoryItem), "Description");
                     messageDialog.SetContent(description);
                     _dialogService.ShowIgnoringDisconnect(player, messageDialog, _ => { });
                 };
